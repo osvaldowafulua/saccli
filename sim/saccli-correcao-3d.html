@@ -201,7 +201,7 @@ class Orbit {
   constructor(camera, dom) {
     this.camera = camera; this.dom = dom; this.target = new THREE.Vector3();
     this.enableDamping = true; this.damping = 0.14;
-    this.minDistance = 100; this.maxDistance = 14000; this.minPolarAngle = 0.03; this.maxPolarAngle = Math.PI * 0.48;
+    this.minDistance = 100; this.maxDistance = 70000; this.minPolarAngle = 0.03; this.maxPolarAngle = Math.PI * 0.48;
     this.sph = new THREE.Spherical(); this.dTheta = 0; this.dPhi = 0; this.zoom = 1; this.pan = new THREE.Vector3();
     const st = { mode: null, x: 0, y: 0, pts: new Map(), dist: 0 };
     dom.style.touchAction = "none";
@@ -369,7 +369,15 @@ const I18N_EXACT = {
   "Força × flecha (scanner 2)": "Force × deflection (scanner 2)",
   "Sobe elástico, cede, alivia em linha recta: o que fica é a correção": "Rises elastically, yields, unloads in a straight line: what remains is the correction",
   "Perfil da lima (A → C)": "File profile (A → C)",
+  // ---- 68-exterior.js
+  "PISO 0": "FLOOR 0", "PISO 1": "FLOOR 1", "PISO 2": "FLOOR 2", "Recepção · Sala de visitas de clientes": "Reception · Client visiting room", "Administração · HSA + RH · contabilidade · compras": "Administration · HSE + HR · accounting · purchasing", "Sala de reunião executiva · direcção": "Executive meeting room · management",
+  "10 · Exterior": "10 · Exterior", "10 · Escritório": "10 · Office", "10 · Cais · camião": "10 · Dock · truck", "Exterior": "Exterior", "Escritório": "Office", "Cais · camião": "Dock · truck",
+  "10 · Exterior — SACFILE": "10 · Exterior — SACFILE", "10 · Cais — camião de encomendas": "10 · Dock — delivery truck", "10 · Exterior · SACFILE": "10 · Exterior · SACFILE",
+  "Escritório central SACFILE · vidro e betão · 3 pisos": "SACFILE head office · glass and concrete · 3 floors", "Estacionamento · colaboradores e visitantes": "Car park · staff and visitors",
+  "Camião de encomendas · a carregar paletes de limas no cais": "Delivery truck · loading pallets of files at the dock", "Portaria · controlo de acessos": "Gatehouse · access control",
   // ---- 65-instalacoes.js
+  "1.º andar · engenharia · métodos · intervenção rápida": "1st floor · engineering · methods · rapid response", "Materiais e peças de reserva · intervenção rápida": "Materials and spare parts · rapid response", "1.º andar · capacetes · luvas · óculos · botas": "1st floor · helmets · gloves · goggles · boots",
+  "1.º andar · Sala dos engenheiros (intervenção rápida)": "1st floor · Engineers' room (rapid response)", "Manutenção · peças de reserva (intervenção rápida)": "Maintenance · spare parts (rapid response)", "1.º andar · Armazém de EPI": "1st floor · PPE store",
   "9 · Instalações": "9 · Facilities", "9 · Cais e portão": "9 · Dock and gate", "9 · Instalações de apoio em contentores": "9 · Support facilities in containers", "9 · Cais de carga e portão sandwich": "9 · Loading dock and sandwich gate",
   "SALA DE REUNIÃO EXECUTIVA": "EXECUTIVE MEETING ROOM", "1.º andar · direcção e gestão": "1st floor · management", "SALA DE VISITAS · CLIENTES": "CLIENT VISITING ROOM", "1.º andar · recepção de clientes e demonstrações": "1st floor · client reception and demonstrations",
   "1.º andar · Sala de reunião executiva": "1st floor · Executive meeting room", "1.º andar · Sala de visitas de clientes": "1st floor · Client visiting room", "Ventilação · extractores de cobertura, HVLS e ventiladores de parede": "Ventilation · roof extractors, HVLS and wall fans",
@@ -695,6 +703,8 @@ const I18N_EXACT = {
 
 // fragmentos para frases dinâmicas com números (substituição de sub-frases inteiras, da mais longa para a mais curta)
 const I18N_PHRASES = [
+  ["Recepção · Sala de visitas de clientes", "Reception · Client visiting room"], ["Administração · HSA + RH · contabilidade · compras", "Administration · HSE + HR · accounting · purchasing"], ["Sala de reunião executiva · direcção", "Executive meeting room · management"],
+  ["PISO 0 · ", "FLOOR 0 · "], ["PISO 1 · ", "FLOOR 1 · "], ["PISO 2 · ", "FLOOR 2 · "],
   ["Bigorna em apoio · ", "Anvil raised · "], ["A rodar a lima 180° · ", "Rotating the file 180° · "], ["A rodar a lima 90° · ", "Rotating the file 90° · "], ["Cinzel a descer · ", "Chisel lowering · "], ["A picar · ", "Cutting · "],
   ["9 · Instalações de apoio (contentores) · ", "9 · Support facilities (containers) · "], ["Relógio de turno · ", "Shift clock · "],
   ["Aparas do corte · ", "Cutting scrap · "],
@@ -835,7 +845,8 @@ const ease = (s) => s * s * (3 - 2 * s);
 // Renderer, câmara, luz
 // =====================================================================
 const FLOOR = -620;
-const HALL = { x: 11600, z: 7000, h: 7600 };   // nave alongada em x para a bobina/desbobinador no início da linha
+const HALL = { x: 11600, z: 7000, h: 7600 };
+const roofG = new THREE.Group();   // cobertura, asnas, clarabóias, luminárias (ver vista de topo em 90-ui.js)   // nave alongada em x para a bobina/desbobinador no início da linha
 const host = document.getElementById("view");
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setPixelRatio(Math.min(devicePixelRatio, 1.75));
@@ -846,15 +857,16 @@ renderer.toneMapping = THREE.ACESFilmicToneMapping;
 host.appendChild(renderer.domElement);
 
 const scene = new THREE.Scene();
+scene.add(roofG);
 scene.background = new THREE.Color(0xa3abb4);
-scene.fog = new THREE.Fog(0xa3abb4, 9000, 26000);
+scene.fog = new THREE.Fog(0xa3abb4, 30000, 110000);
 scene.environment = makeEnvironment(renderer);
 
-const camera = new THREE.PerspectiveCamera(38, innerWidth / innerHeight, 10, 40000);
+const camera = new THREE.PerspectiveCamera(38, innerWidth / innerHeight, 10, 160000);
 const controls = new Orbit(camera, renderer.domElement);
 controls.maxPolarAngle = Math.PI * 0.48;
 controls.minDistance = 100;
-controls.maxDistance = 14000;
+controls.maxDistance = 70000;   // permite as vistas exteriores (escritório, estacionamento, cais)
 
 scene.add(new THREE.HemisphereLight(0xf1f4f9, 0x4b5058, 1.05));
 const sun = new THREE.DirectionalLight(0xfff4e2, 1.5);
@@ -977,15 +989,16 @@ function buildHall() {
   box(4200, 4800, 30, M(0x9aa3ad, 0.5, 0.5), 0, 2400, 0, door, false);
   for (let y = 400; y < 4800; y += 480) box(4200, 18, 40, M(0x7c858f, 0.5, 0.5), 0, y, 0, door, false);
   box(4400, 200, 60, mat.yellow, 0, 4900, 0, door, false);
+  // cobertura num grupo próprio: esconde-se quando a câmara sobe acima dela (vista de topo "casa de bonecas")
   const roof = new THREE.Mesh(new THREE.PlaneGeometry(2 * HALL.x, 2 * HALL.z), M(0x5b6068, 0.3, 0.8));
-  roof.rotation.x = Math.PI / 2; roof.position.y = top; scene.add(roof);
+  roof.rotation.x = Math.PI / 2; roof.position.y = top; roofG.add(roof);
   const lo = top - 1100, hi = top - 120;
   for (let x = -8000; x <= 8000; x += 4000) {
-    beam(V(x, lo, -HALL.z), V(x, lo, HALL.z), 140, mat.steelBlue);
-    beam(V(x, hi, -HALL.z), V(x, hi, HALL.z), 140, mat.steelBlue);
-    for (let z = -HALL.z; z < HALL.z; z += 1400) { beam(V(x, lo, z), V(x, hi, z), 70, mat.steelBlue); beam(V(x, lo, z), V(x, hi, z + 1400), 60, mat.steelBlue); }
+    beam(V(x, lo, -HALL.z), V(x, lo, HALL.z), 140, mat.steelBlue, roofG);
+    beam(V(x, hi, -HALL.z), V(x, hi, HALL.z), 140, mat.steelBlue, roofG);
+    for (let z = -HALL.z; z < HALL.z; z += 1400) { beam(V(x, lo, z), V(x, hi, z), 70, mat.steelBlue, roofG); beam(V(x, lo, z), V(x, hi, z + 1400), 60, mat.steelBlue, roofG); }
   }
-  for (const x of [-6000, -2000, 2000, 6000]) box(1500, 20, 2 * HALL.z - 2000, mat.skylight, x, top - 15, 0, scene, false);
+  for (const x of [-6000, -2000, 2000, 6000]) box(1500, 20, 2 * HALL.z - 2000, mat.skylight, x, top - 15, 0, roofG, false);
   for (const x of [-8000, -4000, 0, 4000, 8000]) for (const z of [-HALL.z + 150, HALL.z - 150]) {
     const col = new THREE.Group(); col.position.set(x, FLOOR, z); scene.add(col);
     box(300, HALL.h, 24, mat.steelBlue, 0, HALL.h / 2, 0, col, false);
@@ -994,7 +1007,7 @@ function buildHall() {
     box(500, 30, 500, mat.dark, 0, 15, 0, col, false);
   }
   for (const x of [-6000, -2000, 2000, 6000]) for (const z of [-5250, -1750, 1750, 5250]) {
-    const g = new THREE.Group(); g.position.set(x, lo - 900, z); scene.add(g);
+    const g = new THREE.Group(); g.position.set(x, lo - 900, z); roofG.add(g);
     beam(V(0, 0, 0), V(0, 900, 0), 12, mat.dark, g);
     const shade = new THREE.Mesh(new THREE.CylinderGeometry(160, 260, 240, 24, 1, true), M(0x40454c, 0.6, 0.4, { side: THREE.DoubleSide }));
     shade.position.y = -100; g.add(shade);
@@ -5511,7 +5524,7 @@ function stackLoad(parent, x, y0, z, h, m) {
   for (let i = 0; i < nx; i++) for (let k = 0; k < nz; k++) for (let j = 0; j < ny; j++)
     box(cw - 14, ch - 8, cd - 14, m, x + (i - (nx - 1) / 2) * cw, y0 + j * ch + ch / 2, z + (k - (nz - 1) / 2) * cd, parent, false);
 }
-for (const [x, z] of [[-5800, -4600], [-4400, -4600]]) { const g = new THREE.Group(); g.position.set(x, FLOOR, z); scene.add(g); box(1200, 140, 1000, mat.wood, 0, 70, 0, g); stackLoad(g, 0, 140, 0, 700, mat.crate); }
+for (const [x, z] of [[-8300, -6300], [-8300, -3300]]) { const g = new THREE.Group(); g.position.set(x, FLOOR, z); scene.add(g); box(1200, 140, 1000, mat.wood, 0, 70, 0, g); stackLoad(g, 0, 140, 0, 700, mat.crate); }
 for (let i = 0; i < 6; i++) {
   const x = -7000 + i * 2800;
   for (const z of [-6600, -5600]) box(90, 4400, 90, mat.rackBlue, x, FLOOR + 2200, z);
@@ -5564,52 +5577,56 @@ for (let i = 0; i < 6; i++) {
     box(60, 2100, 70, mFrame, dx - 470, 1050, F + 20, g); box(60, 2100, 70, mFrame, dx + 470, 1050, F + 20, g); box(1000, 60, 70, mFrame, dx, 2120, F + 20, g);
     box(140, 30, 30, mat.chrome, dx + 320, 1050, F + 55, g);                           // puxador
     box(1100, 120, 500, M(0x6b7280, 0.3, 0.6), dx, 60, F + 300, g);                    // degrau
-    for (let i = 0; i < (opts.windows ?? Math.max(1, Math.floor((len - 1800) / 1500))); i++) {
-      const wx = dx + 1200 + i * 1500;
-      if (wx + 600 > len / 2 - 150) break;
+    if (opts.windows !== 0) for (let wx = -len / 2 + 1500; wx < len / 2 - 700; wx += 1500) {   // janelas ao longo da frente, fora da porta
+      if (Math.abs(wx - dx) < 1150) continue;
       box(1240, 940, 60, mFrame, wx, 1600, F + 10, g); box(1160, 860, 30, mat.glass, wx, 1600, F + 40, g);
     }
     const sign = new THREE.Mesh(new THREE.PlaneGeometry(2000, 500), new THREE.MeshBasicMaterial({ map: signTex(label, sub, band) }));
-    sign.position.set(Math.min(len / 2 - 1100, dx + 1500), CH - 330, F + 60); g.add(sign);
+    sign.position.set(dx > 0 ? Math.max(-len / 2 + 1100, dx - 1500) : Math.min(len / 2 - 1100, dx + 1500), CH - 330, F + 60); g.add(sign);
     if (!opts.noAC) box(640, 520, 320, mAC, len / 2 - 600, CH + 330, -CD / 2 + 400, g);   // unidade de ar condicionado no tecto
     const lamp = cyl(50, 90, mat.lamp, g, 12); lamp.rotation.x = Math.PI / 2; lamp.position.set(dx, 2350, F + 50);
     if (level === 1) {                                                                 // passadiço à frente com guarda-corpos e escada metálica
+      // passadiço de 1,1 m com guarda-corpos; o guarda-corpos tem uma ABERTURA de 1,4 m onde começa a escada
+      const sx = opts.stairSide || 1, xs = sx * (len / 2 - 650), SW = 1100, z0 = F + 1100, RUN = 2600, DROP = CH + 70 - 160;
       box(len + 300, 60, 1100, M(0x4b5563, 0.5, 0.5), 0, -35, F + 560, g);
-      for (let x = -len / 2 - 100; x <= len / 2 + 100; x += 1000) box(40, 1050, 40, mPost, x, 500, F + 1090, g);
-      box(len + 300, 40, 40, mat.yellow, 0, 1030, F + 1090, g); box(len + 300, 30, 30, mPost, 0, 520, F + 1090, g);
-      // escada metálica: desce do passadiço para a nave (local +z), encostada a um dos topos do contentor
-      const sx = opts.stairSide || 1, xs = sx * (len / 2 - 520), z0 = F + 1100, RUN = 3000, DROP = CH + 70 - 160;
-      for (let i = 0; i < 14; i++) { const t = i / 14; box(1000, 40, 260, M(0x4b5563, 0.5, 0.5), xs, -70 - t * DROP, z0 + 150 + t * RUN, g); }
-      for (const x of [xs - 470, xs + 470]) beam(V(x, -20, z0 + 50), V(x, -DROP + 120, z0 + 150 + RUN + 100), 60, mPost, g);
-      for (let i = 0; i <= 3; i++) { const t = i / 3; for (const x of [xs - 500, xs + 500]) box(40, 1000, 40, mPost, x, 430 - t * DROP, z0 + 150 + t * RUN, g); }
-      for (const x of [xs - 500, xs + 500]) beam(V(x, 1000, z0 + 150), V(x, 1000 - DROP, z0 + 150 + RUN), 40, mat.yellow, g);
+      const rail = (x0, x1) => { if (x1 - x0 < 200) return; const xm = (x0 + x1) / 2, w = x1 - x0; box(w, 40, 40, mat.yellow, xm, 1030, F + 1090, g); box(w, 30, 30, mPost, xm, 520, F + 1090, g); for (let x = x0; x <= x1; x += 1000) box(40, 1050, 40, mPost, Math.min(x, x1), 500, F + 1090, g); box(40, 1050, 40, mPost, x1, 500, F + 1090, g); };
+      rail(-len / 2 - 100, xs - SW / 2 - 100); rail(xs + SW / 2 + 100, len / 2 + 100);
+      for (const sxx of [-1, 1]) box(40, 1050, 40, mPost, sxx * (len / 2 + 120), 500, F + 10, g);   // guarda-corpos nos topos do passadiço
+      for (const sxx of [-1, 1]) { box(40, 40, 1100, mat.yellow, sxx * (len / 2 + 120), 1030, F + 560, g); box(30, 30, 1100, mPost, sxx * (len / 2 + 120), 520, F + 560, g); }
+      // escada metálica de 1,1 m AO LONGO DA FACHADA (não avança para a nave): patamar na abertura do guarda-corpos, no
+      // topo DIREITO (+x) do contentor, e 14 degraus (44°) a descer paralelamente ao contentor, para o lado do centro;
+      // fica a 1,1–2,2 m da fachada e termina antes da porta do piso térreo
+      const d = -Math.sign(xs), zc = F + 1100 + SW / 2 + 50, mSt = M(0x4b5563, 0.5, 0.5);
+      box(1300, 60, SW, mSt, xs, -35, zc, g);
+      for (let i = 1; i <= 14; i++) { const t = i / 14; box(240, 40, SW, mSt, xs + d * (650 + t * RUN), -70 - (DROP - 160) * t, zc, g); }
+      for (const z of [zc - SW / 2 + 30, zc + SW / 2 - 30]) beam(V(xs + d * 650, -20, z), V(xs + d * (650 + RUN + 100), -DROP + 140, z), 60, mPost, g);
+      for (const z of [zc - SW / 2 - 20, zc + SW / 2 + 20]) {
+        for (let i = 0; i <= 4; i++) { const t = i / 4; box(40, 1000, 40, mPost, xs + d * (650 + t * RUN), 430 - (DROP - 160) * t, z, g); }
+        beam(V(xs + d * 650, 1000, z), V(xs + d * (650 + RUN), 1000 - (DROP - 160), z), 40, mat.yellow, g);
+      }
+      box(40, 1050, 40, mPost, xs - d * 650, 500, zc + SW / 2 + 20, g); box(40, 1050, 40, mPost, xs - d * 650, 500, zc - SW / 2 - 20, g);   // guarda-corpos do patamar
+      box(1300, 40, 40, mat.yellow, xs, 1030, zc + SW / 2 + 20, g); box(40, 40, SW + 80, mat.yellow, xs - d * 650, 1030, zc, g);
     }
     return g;
   }
 
-  // ---------- fila da frente (parede +z), frentes viradas para −z (interior da nave)
-  const ZF = 5750, R180 = Math.PI;
-  container(-8271, ZF, L20, R180, "ADMINISTRAÇÃO", "Direcção · contabilidade · compras", 0xf1f3f5, "#1f5fd6");
-  container(-1871, ZF, L20, R180, "SALA DE ALMOÇO", "Refeitório dos funcionários", 0xfbf3e4, "#d97706");
-  container(-8271, ZF, L20, R180, "SALA DE REUNIÃO EXECUTIVA", "1.º andar · direcção e gestão", 0xeef2f7, "#1e3a8a", { level: 1, stairSide: -1, noAC: false });
-  container(-1871, ZF, L20, R180, "SALA DE VISITAS · CLIENTES", "1.º andar · recepção de clientes e demonstrações", 0xfdf6ec, "#9a3412", { level: 1, stairSide: 1 });
-  container(2870, ZF, L10, R180, "HSA + RH", "Segurança, saúde, ambiente · recursos humanos", 0xe8f5ec, "#15803d");
-  container(6200, ZF, L10, R180, "SALA DOS ENGENHEIROS", "Engenharia · métodos · manutenção", 0xe7eef8, "#2f6fdc");
-  // ---------- parede −x, frentes viradas para +x
-  const XW = -10300, R90 = Math.PI / 2;
-  container(XW, 3000, L10, R90, "WC", "Balneários · vestiários", 0xeef2f6, "#64748b", { door: -L10 / 2 + 700, windows: 0 });
-  container(XW, -2500, L10, R90, "ARMAZÉM DE EPI", "Capacetes · luvas · óculos · botas", 0xfff4e5, "#ea580c", { windows: 0 });
-  container(XW, -5300, L10, R90, "SALA DE LIMPEZA", "Material e produtos de limpeza", 0xeaf6fb, "#0e7490", { windows: 0 });
-  // ---------- atrás da linha (corredor do operador), frentes viradas para +z
-  // atrás da linha, fora do corredor dos robôs: o KMF 1500P circula em z −5500…−3000 (x ≥ 2000) e ao longo de x ≈ 9150;
-  // nada é colocado a menos de 1 m desses corredores, nem a menos de 0,5 m do corredor do operador da linha
-  container(-8450, -2950, L20, 0, "RECEPÇÃO LOGÍSTICA", "Armazém de entrada · bobinas · consumíveis", 0xf1f3f5, "#334155");
-  container(-3800, -2950, L10, 0, "MANUTENÇÃO", "Materiais e peças de reserva", 0xf1f3f5, "#b45309", { windows: 0 });
+  // ---------- bloco compacto no canto ESQUERDO da nave (x ≤ −2100), só com as instalações de intervenção rápida;
+  //            administração, HSA + RH, reunião executiva e visitas de clientes ficam no escritório central (68-exterior.js).
+  //            Nada em frente ao armário de paletes (x ≥ −7000, z ≈ −6100) nem nos corredores dos robôs.
+  const ZF = 5750, R180 = Math.PI, XW = -10300, R90 = Math.PI / 2;
+  // fila da frente (parede +z), frentes viradas para −z: refeitório (20') + manutenção (10'); 1.º andar: engenheiros e EPI
+  container(-8400, ZF, L20, R180, "SALA DE ALMOÇO", "Refeitório dos funcionários", 0xfbf3e4, "#d97706");
+  container(-8400, ZF, L20, R180, "SALA DOS ENGENHEIROS", "1.º andar · engenharia · métodos · intervenção rápida", 0xe7eef8, "#2f6fdc", { level: 1, stairSide: -1 });
+  container(-3600, ZF, L10, R180, "MANUTENÇÃO", "Materiais e peças de reserva · intervenção rápida", 0xf1f3f5, "#b45309", { windows: 0 });
+  container(-3600, ZF, L10, R180, "ARMAZÉM DE EPI", "1.º andar · capacetes · luvas · óculos · botas", 0xfff4e5, "#ea580c", { level: 1, stairSide: -1, windows: 0 });
+  // coluna da parede −x, frentes viradas para +x: WC junto ao refeitório; logística junto à bobina; limpeza ao fundo
+  container(XW, 2700, L10, R90, "WC", "Balneários · vestiários", 0xeef2f6, "#64748b", { door: -L10 / 2 + 700, windows: 0 });
+  container(XW, -2450, L10, R90, "RECEPÇÃO LOGÍSTICA", "Armazém de entrada · bobinas · consumíveis", 0xf1f3f5, "#334155", { windows: 0 });
+  container(XW, -5450, L10, R90, "SALA DE LIMPEZA", "Material e produtos de limpeza", 0xeaf6fb, "#0e7490", { windows: 0 });
 
-  // mesas e bancos à porta do refeitório; carrinho de limpeza; estante de EPI à porta
-  for (const x of [-2700, -1300]) { box(1400, 40, 700, mat.wood, x, FLOOR + 740, 3900); for (const s of [-1, 1]) box(1400, 30, 250, mat.wood, x, FLOOR + 460, 3900 + s * 500); for (const sx of [-1, 1]) box(60, 740, 60, mPost, x + sx * 600, FLOOR + 370, 3900); }
-  { const g = new THREE.Group(); g.position.set(-8600, FLOOR, -5300); scene.add(g); box(900, 60, 500, M(0x2563eb, 0.2, 0.5), 0, 900, 0, g); for (const [x, z] of [[-400, -200], [400, -200], [-400, 200], [400, 200]]) box(40, 880, 40, mPost, x, 440, z, g); box(700, 500, 400, mat.yellow, 0, 300, 0, g); cyl(25, 1200, mat.alu, g, 10).position.set(430, 600, 0); }   // carrinho de limpeza
-  { for (let i = 0; i < 3; i++) box(1200, 30, 400, mAC, -8600, FLOOR + 400 + i * 500, -2500); for (const s of [-1, 1]) box(40, 1500, 400, mPost, -8600 + s * 600, FLOOR + 750, -2500); for (const [i, c] of [[0, 0xf2c200], [1, 0x2563eb], [2, 0xef4444]]) box(300, 260, 240, M(c, 0.2, 0.5), -8900 + i * 300, FLOOR + 560, -2500); }   // estante de EPI
+  // mesas e bancos à porta do refeitório; carrinho de limpeza à porta da sala de limpeza
+  for (const x of [-7400, -6000]) { box(1400, 40, 700, mat.wood, x, FLOOR + 740, 3900); for (const s of [-1, 1]) box(1400, 30, 250, mat.wood, x, FLOOR + 460, 3900 + s * 500); for (const sx of [-1, 1]) box(60, 740, 60, mPost, x + sx * 600, FLOOR + 370, 3900); }
+  { const g = new THREE.Group(); g.position.set(-8500, FLOOR, -4700); scene.add(g); box(900, 60, 500, M(0x2563eb, 0.2, 0.5), 0, 900, 0, g); for (const [x, z] of [[-400, -200], [400, -200], [-400, 200], [400, 200]]) box(40, 880, 40, mPost, x, 440, z, g); box(700, 500, 400, mat.yellow, 0, 300, 0, g); cyl(25, 1200, mat.alu, g, 10).position.set(430, 600, 0); }   // carrinho de limpeza
 
   // ---------- zona de emergência (área livre, marcada no chão)
   {
@@ -5677,9 +5694,9 @@ for (let i = 0; i < 6; i++) {
   {
     const RY = FLOOR + HALL.h - 160, mFan = M(0x9aa3ad, 0.6, 0.45), mBlade = M(0x374151, 0.3, 0.6);
     for (const x of [-8000, -3000, 2000, 7000]) for (const z of [-4200, 3600]) {          // 8 extractores de cobertura (turbina)
-      cyl(420, 260, mFan, scene, 24).position.set(x, RY, z);
-      const cap = cyl(470, 60, mFan, scene, 24); cap.position.set(x, RY + 160, z);
-      const rot = new THREE.Group(); rot.position.set(x, RY - 140, z); scene.add(rot);
+      cyl(420, 260, mFan, roofG, 24).position.set(x, RY, z);
+      const cap = cyl(470, 60, mFan, roofG, 24); cap.position.set(x, RY + 160, z);
+      const rot = new THREE.Group(); rot.position.set(x, RY - 140, z); roofG.add(rot);
       for (let i = 0; i < 6; i++) { const b = box(360, 14, 120, mBlade, 0, 0, 0, rot, false); b.position.set(Math.cos(i * Math.PI / 3) * 200, 0, Math.sin(i * Math.PI / 3) * 200); b.rotation.y = -i * Math.PI / 3; b.rotation.x = 0.5; }
       fans.push({ g: rot, w: 9 });
     }
@@ -5766,20 +5783,171 @@ for (let i = 0; i < 6; i++) {
 
   // ---------- etiquetas e vistas
   const T = [
-    ["Administração · direcção, contabilidade, compras", -8271, ZF - 200], ["Sala de almoço dos funcionários", -1871, ZF - 200],
-    ["1.º andar · Sala de reunião executiva", -8271, ZF + 2900], ["1.º andar · Sala de visitas de clientes", -1871, ZF + 2900], ["HSA + Recursos Humanos", 2870, ZF - 200], ["Sala dos engenheiros", 6200, ZF - 200],
-    ["WC · balneários", XW + 200, 3000], ["Armazém de EPI", XW + 200, -2500], ["Sala de limpeza · material de limpeza", XW + 200, -5300],
-    ["Recepção logística · armazém de entrada", -8450, -2950], ["Manutenção · materiais e peças de reserva", -3800, -2950], ["Zona de emergência · ponto de encontro", 3300, -2100],
-    ["Cais de carga · camião a carregar paletes de caixas", HALL.x - 1800, 2200], ["Entrada · portão sandwich", 9850, HALL.z - 600],
+    ["Sala de almoço dos funcionários", -8400, ZF - 200, 0], ["1.º andar · Sala dos engenheiros (intervenção rápida)", -8400, ZF - 200, 1],
+    ["Manutenção · peças de reserva (intervenção rápida)", -3600, ZF - 200, 0], ["1.º andar · Armazém de EPI", -3600, ZF - 200, 1],
+    ["WC · balneários", XW + 200, 2700, 0], ["Recepção logística · armazém de entrada", XW + 200, -2450, 0], ["Sala de limpeza · material de limpeza", XW + 200, -5450, 0],
+    ["Zona de emergência · ponto de encontro", 3300, -2100, 0],
+    ["Cais de carga · camião a carregar paletes de caixas", HALL.x - 1800, 2200, 0], ["Entrada · portão sandwich", 9850, HALL.z - 600, 0],
   ];
-  for (const [text, x, z] of T) addTag({ text, at: () => V(x, FLOOR + CH + 650 + (z > ZF + 2000 ? CH + 70 : 0), z > ZF + 2000 ? ZF - 200 : z), max: 9000 });
+  for (const [text, x, z, lv] of T) addTag({ text, at: () => V(x, FLOOR + CH + 650 + lv * (CH + 70), z), max: 9000 });
   addTag({ text: "Corredor do KMF 1500P · 2,5 m livres (linha de segurança)", at: () => V(5500, FLOOR + 400, -4250), max: 7000 });
   addTag({ text: "Faixa do AMR · circulação livre", at: () => V(5200, FLOOR + 400, 600), max: 6000 });
   addTag({ text: "Ventilação · extractores de cobertura, HVLS e ventiladores de parede", at: () => V(-5500, FLOOR + 5800, 1800), min: 1500, max: 12000 });
-  addTag({ text: () => `9 · Instalações de apoio (contentores) · ${hhmm(SHIFT.min)}`, at: () => V(-1000, FLOOR + 4300, 5200), min: 3500, big: true });
+  addTag({ text: () => `9 · Instalações de apoio (contentores) · ${hhmm(SHIFT.min)}`, at: () => V(-6500, FLOOR + 6600, 5200), min: 3500, big: true });
   addTag({ text: () => (SHIFT.alarm === "lunch" ? "Sirene · ALMOÇO" : SHIFT.alarm === "end" ? "Sirene · FIM DE TURNO" : `Relógio de turno · ${hhmm(SHIFT.min)}`), at: () => V(5000, FLOOR + 4900, HALL.z - 300), max: 9000 });
-  addView("inst", "Instalações", [-2000, 4200, -400], [-2000, 200, 5200]);
+  addView("inst", "Instalações", [-3500, 4200, -1500], [-7500, 800, 4500]);
   addView("cais", "Cais e portão", [7600, 2800, -1200], [10800, 500, 2600]);
+}
+
+// ----- 68-exterior.js -----
+// =====================================================================
+// Exterior da fábrica SACFILE: revestimento exterior da nave (painel sandwich) com cobertura, letreiro luminoso
+// SACFILE em letras vermelhas, escritório central em vidro e betão, estacionamento, camião de encomendas no cais,
+// arruamentos, passeios e vegetação. A câmara pode sair da nave (vistas "Exterior" e "Escritório").
+// =====================================================================
+{
+  const GY = FLOOR - 2, X = HALL.x, Z = HALL.z, H = HALL.h, TOP = FLOOR + H;
+  const mAsph = M(0x3f4347, 0.05, 0.9), mKerb = M(0xc9ccd0, 0.1, 0.8), mGrass = M(0x4f7d3a, 0, 0.95), mConc = M(0xb8b4ad, 0.05, 0.75);
+  const mPost = M(0x3b4148, 0.4, 0.5);
+  const mGlassF = M(0x6fa8d6, 0.9, 0.08, { transparent: true, opacity: 0.55 }), mMullion = M(0x1f2933, 0.6, 0.4), mPanel = M(0xd3d8de, 0.4, 0.55);
+  const mRed = M(0xe11d2e, 0.1, 0.45, { emissive: 0xff2030, emissiveIntensity: 1.6 });
+
+  // ---------- terreno: asfalto à volta da nave, relva mais longe, passeios
+  const ground = new THREE.Mesh(new THREE.PlaneGeometry(2 * X + 70000, 2 * Z + 70000), mGrass); ground.rotation.x = -Math.PI / 2; ground.position.y = GY - 40; ground.receiveShadow = true; scene.add(ground);
+  const yard = new THREE.Mesh(new THREE.PlaneGeometry(2 * X + 30000, 2 * Z + 30000), mAsph); yard.rotation.x = -Math.PI / 2; yard.position.y = GY - 20; yard.receiveShadow = true; scene.add(yard);
+  box(2 * X + 30000, 150, 300, mKerb, 0, GY + 55, Z + 15000, scene, false); box(2 * X + 30000, 150, 300, mKerb, 0, GY + 55, -Z - 15000, scene, false);
+  box(300, 150, 2 * Z + 30000, mKerb, X + 15000, GY + 55, 0, scene, false); box(300, 150, 2 * Z + 30000, mKerb, -X - 15000, GY + 55, 0, scene, false);
+
+  // ---------- revestimento exterior da nave: painéis sandwich horizontais, soco de betão, cobertura a duas águas com beirais
+  const extTex = canvasTex(256, 256, (g, w, h) => { g.fillStyle = "#d6dbe1"; g.fillRect(0, 0, w, h); for (let y = 0; y < h; y += 32) { g.fillStyle = "#b8c0c8"; g.fillRect(0, y, w, 5); g.fillStyle = "#e9edf1"; g.fillRect(0, y + 5, w, 3); } }, [1, 1]);
+  const extWall = (len, x, z, rot) => {
+    const g = new THREE.Group(); g.position.set(x, FLOOR, z); g.rotation.y = rot; scene.add(g);
+    const t = extTex.clone(); t.needsUpdate = true; t.repeat.set(len / 2000, H / 2000);
+    const p = new THREE.Mesh(new THREE.PlaneGeometry(len, H + 500), M(0xffffff, 0.3, 0.55, { map: t })); p.position.set(0, (H + 500) / 2, 0); p.receiveShadow = true; g.add(p);
+    box(len, 1400, 160, M(0x8e9298, 0.05, 0.85), 0, 700, -60, g, false);                        // soco de betão
+    box(len - 2000, 900, 40, mat.window, 0, 5200, -10, g, false);                                // fita de janelas
+    for (let xx = -len / 2 + 1000; xx < len / 2 - 900; xx += 2000) box(80, 900, 60, mat.steelBlue, xx, 5200, -20, g, false);
+    box(len, 300, 60, M(0x1f4f9e, 0.1, 0.6), 0, 1450, -20, g, false);                            // faixa azul da marca
+    box(len + 200, 400, 300, M(0x9aa0a6, 0.3, 0.6), 0, H + 450, -100, g, false);                 // platibanda / beiral
+    return g;
+  };
+  extWall(2 * X + 300, 0, -Z - 150, Math.PI); extWall(2 * X + 300, 0, Z + 150, 0);
+  extWall(2 * Z + 300, -X - 150, 0, -Math.PI / 2); extWall(2 * Z + 300, X + 150, 0, Math.PI / 2);
+  {   // cobertura exterior: duas águas suaves com clarabóias e caleiras (esconde-se com a cobertura interior na vista de topo)
+    const half = new THREE.Mesh(new THREE.BoxGeometry(2 * X + 400, 60, Z + 400), M(0x8b9096, 0.4, 0.6));
+    for (const s of [-1, 1]) { const r = half.clone(); r.position.set(0, TOP + 420 + 350, s * (Z / 2 + 50)); r.rotation.x = s * Math.atan2(700, Z); roofG.add(r); }
+    box(2 * X + 400, 220, 500, M(0x7b8187, 0.5, 0.5), 0, TOP + 1200, 0, roofG, false);           // cumeeira
+    for (const x of [-6000, -2000, 2000, 6000]) for (const s of [-1, 1]) box(1500, 60, Z - 2400, M(0xdfe7ee, 0.2, 0.3, { transparent: true, opacity: 0.6 }), x, TOP + 820, s * (Z / 2 + 50), roofG, false);
+  }
+
+  // ---------- letreiro luminoso SACFILE: letras vermelhas em caixa sobre a fachada da entrada (+z) e na fachada do cais (+x)
+  const signTex = (w, h) => canvasTex(w, h, (g) => {
+    g.clearRect(0, 0, w, h); g.fillStyle = "#ff2a3a"; g.font = `900 ${Math.round(h * 0.78)}px Arial Black, Arial, sans-serif`; g.textAlign = "center"; g.textBaseline = "middle";
+    g.shadowColor = "#ff6070"; g.shadowBlur = h * 0.12; g.fillText("SACFILE", w / 2, h / 2 + h * 0.04);
+  });
+  const letters = (x, y, z, rot, w) => {
+    const g = new THREE.Group(); g.position.set(x, y, z); g.rotation.y = rot; scene.add(g);
+    const h = w * 0.22;
+    box(w + 600, h + 300, 180, M(0x1b1f24, 0.4, 0.5), 0, 0, -120, g, false);                     // chapa de fundo preta
+    const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ map: signTex(1024, 256), transparent: true, toneMapped: false })); m.position.z = -20; g.add(m);
+    box(w + 560, h + 260, 60, mRed, 0, 0, -150, g, false);                                      // moldura luminosa vermelha por trás da chapa
+    const spot = new THREE.PointLight(0xff3040, 1.2, w * 1.5); spot.position.set(0, -h, 600); g.add(spot);
+    return g;
+  };
+  letters(0, FLOOR + H - 1000, Z + 400, 0, 9000);                       // fachada principal (+z), sobre a entrada
+  letters(X + 400, FLOOR + H - 1000, -2500, Math.PI / 2, 6000);        // fachada do cais (+x)
+
+  // ---------- escritório central: 3 pisos em vidro e betão, à frente da nave (+z), com entrada em pala
+  {
+    const OX = -2500, OZ = Z + 9500, W = 16000, D = 9000, FH = 3600, N = 3;
+    for (let f = 0; f < N; f++) {
+      const y0 = FLOOR + f * FH;
+      box(W, 400, D, mConc, OX, y0 + 200, OZ);                                                   // laje
+      // fachada em vidro contínuo com montantes; núcleo de betão (escadas/elevador) na traseira
+      for (const [sx, sz, w, d] of [[0, 1, W, 60], [0, -1, W, 60], [1, 0, 60, D], [-1, 0, 60, D]]) {
+        const gl = box(w, FH - 400, d, mGlassF, OX + sx * (W / 2), y0 + 400 + (FH - 400) / 2, OZ + sz * (D / 2), scene, false); gl.receiveShadow = true;
+      }
+      for (let x = -W / 2; x <= W / 2; x += 1500) for (const sz of [-1, 1]) box(120, FH - 400, 140, mMullion, OX + x, y0 + 400 + (FH - 400) / 2, OZ + sz * (D / 2), scene, false);
+      for (let z = -D / 2; z <= D / 2; z += 1500) for (const sx of [-1, 1]) box(140, FH - 400, 120, mMullion, OX + sx * (W / 2), y0 + 400 + (FH - 400) / 2, OZ + z, scene, false);
+      box(W + 200, 300, D + 200, mConc, OX, y0 + FH - 150, OZ, scene, false);                   // viga de bordadura
+    }
+    box(W + 200, 400, D + 200, mConc, OX, FLOOR + N * FH + 200, OZ);                              // cobertura
+    box(4200, N * FH + 1200, 4200, mConc, OX - W / 2 + 2100, FLOOR + (N * FH + 1200) / 2, OZ - D / 2 + 2100);   // núcleo de betão
+    box(6000, 300, 4000, mConc, OX, FLOOR + FH + 100, OZ + D / 2 + 2000);                        // pala da entrada
+    for (const s of [-1, 1]) box(300, FH, 300, mConc, OX + s * 2600, FLOOR + FH / 2, OZ + D / 2 + 3800);
+    box(2400, 2400, 80, M(0x254e7a, 0.6, 0.2, { transparent: true, opacity: 0.7 }), OX, FLOOR + 1400, OZ + D / 2 + 20, scene, false);   // porta de vidro
+    letters(OX, FLOOR + N * FH + 900, OZ + D / 2 - 200, 0, 7000);                                  // letreiro no topo do escritório
+    const stepW = 8000; for (let i = 0; i < 3; i++) box(stepW - i * 400, 150, 1200 - i * 300, mKerb, OX, GY + 75 + i * 150, OZ + D / 2 + 4600 + i * 250, scene, false);   // degraus de acesso
+    // pisos: 0 recepção + sala de visitas de clientes · 1 administração (direcção, contabilidade, compras) · 2 sala de reunião executiva
+    const FLOORS = [["PISO 0", "Recepção · Sala de visitas de clientes"], ["PISO 1", "Administração · HSA + RH · contabilidade · compras"], ["PISO 2", "Sala de reunião executiva · direcção"]];
+    FLOORS.forEach(([t1, t2], f) => {
+      const tex = canvasTex(1024, 192, (g, w, h) => { g.fillStyle = "rgba(20,28,40,0.85)"; g.fillRect(0, 0, w, h); g.fillStyle = "#ffffff"; g.font = "800 60px Arial"; g.fillText(tr(t1), 30, 80); g.fillStyle = "#cfe3f7"; g.font = "600 40px Arial"; g.fillText(tr(t2), 30, 150); });
+      const pl = new THREE.Mesh(new THREE.PlaneGeometry(6400, 1200), new THREE.MeshBasicMaterial({ map: tex, transparent: true })); pl.position.set(OX + 3000, FLOOR + f * FH + 2000, OZ + D / 2 + 90); scene.add(pl);
+      // interior: pavimento, mesas e cadeiras simplificadas (vê-se através do vidro)
+      for (let k = 0; k < 4; k++) { box(1800, 40, 900, mat.wood, OX - W / 2 + 3000 + k * 3000, FLOOR + f * FH + 1150, OZ + (f === 2 ? 0 : -1500), scene, false); for (const sx of [-1, 1]) box(60, 720, 60, mPost, OX - W / 2 + 3000 + k * 3000 + sx * 800, FLOOR + f * FH + 780, OZ + (f === 2 ? 0 : -1500), scene, false); }
+      if (f === 2) box(6000, 60, 1800, M(0x3b2a1e, 0.1, 0.6), OX + 2000, FLOOR + f * FH + 1150, OZ, scene, false);   // mesa de reunião executiva
+      addTag({ text: `${t1} · ${t2}`, at: () => V(OX + 3000, FLOOR + f * FH + 2900, OZ + D / 2 + 300), max: 30000 });
+    });
+    addTag({ text: "Escritório central SACFILE · vidro e betão · 3 pisos", at: () => V(OX, FLOOR + N * FH + 2200, OZ), min: 2000, max: 90000, big: true });
+  }
+
+  // ---------- estacionamento: lugares marcados em frente ao escritório, carros, passadeira e postes de iluminação
+  {
+    const PX0 = 8000, PZ = Z + 6000, N = 10, BW = 2600, BL = 5000;
+    box(N * BW + 400, 10, BL + 400, M(0x2f3337, 0.05, 0.9), PX0 + (N * BW) / 2, GY + 2, PZ, scene, false);
+    for (let i = 0; i <= N; i++) box(120, 12, BL, mat.label, PX0 + i * BW, GY + 10, PZ, scene, false);
+    const car = (x, z, c, rot) => {
+      const g = new THREE.Group(); g.position.set(x, GY, z); g.rotation.y = rot; scene.add(g);
+      box(4300, 520, 1800, M(c, 0.6, 0.35), 0, 560, 0, g); box(2400, 560, 1650, M(0x1a2430, 0.5, 0.15), -150, 1100, 0, g);
+      for (const sx of [-1, 1]) for (const sz of [-1, 1]) { const w = cyl(330, 220, mat.black, g, 18); w.rotation.x = Math.PI / 2; w.position.set(sx * 1400, 330, sz * 900); }
+      box(300, 150, 80, mat.ledR, -2160, 700, 650, g, false); box(300, 150, 80, mat.ledR, -2160, 700, -650, g, false);
+    };
+    [[0, 0x2b5fb3], [1, 0xe5e7eb], [3, 0x1f2937], [4, 0xb91c1c], [6, 0x9ca3af], [7, 0x2f6fdc], [9, 0xf59e0b]].forEach(([i, c]) => car(PX0 + (i + 0.5) * BW, PZ, c, Math.PI / 2));
+    for (let i = 0; i < 6; i++) box(600, 40, 2200, mat.label, PX0 - 1800, GY + 8, PZ - 4200 + i * 900, scene, false);   // passadeira
+    for (const x of [PX0 - 600, PX0 + N * BW + 600, -14000]) { cyl(70, 7000, mat.alu, scene, 12).position.set(x, GY + 3500, PZ + BL / 2 + 800); box(900, 160, 320, mat.dark, x + 350, GY + 7000, PZ + BL / 2 + 800); box(700, 20, 240, mat.lamp, x + 350, GY + 6910, PZ + BL / 2 + 800, scene, false); }
+    addTag({ text: "Estacionamento · colaboradores e visitantes", at: () => V(PX0 + (N * BW) / 2, GY + 2500, PZ), max: 40000 });
+  }
+
+  // ---------- camião de encomendas no cais (+x): tractor + semi-reboque encostado à porta do cais (a traseira está dentro da nave)
+  {
+    const DZ = 2200, RX = X + 600;                                                                // o reboque começa dentro (DX+600) e sai pela porta
+    const g = new THREE.Group(); g.position.set(RX + 1000, FLOOR + 150, DZ); scene.add(g);      // continuação do reboque, encostado ao primeiro troço
+    box(11500, 2600, 2550, M(0xf1f1ee, 0.2, 0.5), 5750, 1300, 0, g);                           // caixa
+    box(11500, 120, 2550, mat.dark, 5750, 2680, 0, g, false);
+    const logo = new THREE.Mesh(new THREE.PlaneGeometry(5000, 1100), new THREE.MeshBasicMaterial({ map: signTex(1024, 256), transparent: true, toneMapped: false })); logo.position.set(5750, 1500, 1290); g.add(logo);
+    box(11000, 300, 2300, mat.dark, 5750, 150, 0, g);                                            // chassis
+    for (const x of [8200, 9600]) for (const s of [-1, 1]) { const w = cyl(520, 380, mat.black, g, 24); w.rotation.x = Math.PI / 2; w.position.set(x, -150 + 520 - 150, s * 1050); }
+    for (const s of [-1, 1]) { const leg = box(140, 900, 140, mat.alu, 2800, -300, s * 800, g); }   // apoios (recolhidos)
+    // tractor
+    const t = new THREE.Group(); t.position.set(RX + 1000 + 11500 + 300, FLOOR + 150, DZ); scene.add(t);
+    box(2300, 2400, 2500, M(0xb91c1c, 0.3, 0.4), 1150, 1700, 0, t);                               // cabina vermelha
+    box(1500, 1200, 2450, M(0x1a2430, 0.5, 0.15), 1550, 2200, 0, t, false);                       // vidros
+    box(2000, 500, 2400, M(0x8b1a1a, 0.3, 0.5), 2250, 500, 0, t);                                 // pára-choques/grelha
+    box(3600, 300, 2300, mat.dark, 1000, 150, 0, t);
+    for (const x of [-700, 1600]) for (const s of [-1, 1]) { const w = cyl(520, 380, mat.black, t, 24); w.rotation.x = Math.PI / 2; w.position.set(x, 220, s * 1050); }
+    cyl(120, 1200, mat.alu, t, 12).position.set(-200, 3000, -900);                                // escape
+    for (const s of [-1, 1]) box(300, 200, 120, mat.lamp, 2360, 900, s * 900, t, false);
+    addTag({ text: "Camião de encomendas · a carregar paletes de limas no cais", at: () => V(RX + 7000, FLOOR + 4200, DZ), max: 40000 });
+  }
+
+  // ---------- portaria e vedação do recinto, árvores
+  {
+    box(3000, 2800, 2600, mConc, X + 9000, GY + 1400, Z + 13000); box(2200, 1200, 60, M(0x254e7a, 0.6, 0.2, { transparent: true, opacity: 0.7 }), X + 9000, GY + 1700, Z + 14320, scene, false);
+    box(3400, 300, 3000, M(0x9aa0a6, 0.3, 0.6), X + 9000, GY + 2950, Z + 13000, scene, false);
+    const arm = box(6000, 120, 120, M(0xfbbf24, 0.2, 0.5), X + 4000, GY + 1100, Z + 13000); for (let i = 0; i < 5; i++) box(600, 124, 124, M(0xdc2626, 0.2, 0.5), X + 1500 + i * 1200, GY + 1100, Z + 13000, scene, false);
+    cyl(140, 1100, mat.dark, scene, 12).position.set(X + 7100, GY + 550, Z + 13000);
+    for (let x = -X - 14000; x <= X + 14000; x += 2500) { cyl(40, 2000, mat.dark, scene, 8).position.set(x, GY + 1000, Z + 15200); cyl(40, 2000, mat.dark, scene, 8).position.set(x, GY + 1000, -Z - 15200); }
+    for (const z of [-Z - 15200, Z + 15200]) box(2 * X + 28000, 1800, 20, M(0x4b5563, 0.2, 0.6, { transparent: true, opacity: 0.35, side: THREE.DoubleSide }), 0, GY + 1100, z, scene, false);
+    const tree = (x, z, s = 1) => { cyl(90 * s, 1800 * s, M(0x5b3a1e, 0, 0.9), scene, 8).position.set(x, GY + 900 * s, z); const c = new THREE.Mesh(new THREE.SphereGeometry(1500 * s, 12, 10), M(0x3f7a33, 0, 0.9)); c.position.set(x, GY + 2900 * s, z); c.castShadow = true; scene.add(c); };
+    [[-16000, 2000, 1.1], [-16000, -3000, 1], [-16000, 7000, 0.9], [-9000, 12500, 1], [-13000, 12500, 1.2], [20000, -9000, 1], [16000, -12000, 1.1], [-4000, -12500, 1], [4000, -12500, 1.1]].forEach(([x, z, s]) => tree(x, z, s));
+  }
+
+  addTag({ text: "10 · Exterior · SACFILE", at: () => V(0, FLOOR + H + 3200, Z + 2500), min: 4000, max: 80000, big: true });
+  addTag({ text: "Portaria · controlo de acessos", at: () => V(X + 9000, GY + 4200, Z + 13000), max: 40000 });
+  addView("ext", "Exterior", [38000, 12000, 30000], [0, 1500, 3000]);
+  addView("office", "Escritório", [12000, 5000, 32000], [-2500, 3500, 16500]);
+  addView("dock", "Cais · camião", [30000, 6000, 14000], [16000, 1200, 2200]);
+  window.__ext = true;
 }
 
 // ----- 70-tags.js -----
@@ -6189,7 +6357,9 @@ function renderTags() {
     const at = tg.at();
     const dist = camera.position.distanceTo(at);
     v3.copy(at).project(camera);
-    const show = v3.z < 1 && dist >= tg.min && dist <= tg.max && Math.abs(v3.x) < 1.05 && Math.abs(v3.y) < 1.05 && (!tg.when || tg.when());
+    const camIn = Math.abs(camera.position.x) < HALL.x && Math.abs(camera.position.z) < HALL.z;
+    const tagIn = Math.abs(at.x) < HALL.x && Math.abs(at.z) < HALL.z && at.y < FLOOR + HALL.h;   // de fora só se vêem as etiquetas exteriores, e vice-versa
+    const show = camIn === tagIn && v3.z < 1 && dist >= tg.min && dist <= tg.max && Math.abs(v3.x) < 1.05 && Math.abs(v3.y) < 1.05 && (!tg.when || tg.when());
     tg.el.style.display = show ? "block" : "none";
     if (!show) continue;
     tg.el.textContent = tr(typeof tg.text === "function" ? tg.text() : tg.text);
@@ -6206,7 +6376,7 @@ const VIEWS = {
   cell: [[-2600, 2300, 2300], [-200, 80, 0]],
   mod: [[420, 520, 760], [0, 30, 0]],
   exp: [[1600, 2700, 3900], [5200, -400, 200]],
-  top: [[-200, 3600, 1], [-200, 0, 0]],
+  top: [[0, 21000, 1], [0, 0, 0]],   // vista de topo: acima da nave, com a cobertura escondida
 };
 function view(name) { const [p, tg] = VIEWS[name]; camera.position.set(...p); controls.target.set(...tg); controls.update(); }
 for (const v of World.views) VIEWS[v.key] = [v.pos, v.target];
@@ -6217,7 +6387,7 @@ VIEWS.crates = [[-2400, 1900, 2300], [-900, -200, 200]];
 const AREAS = [
   ["feed", "0 · Bobina de banda"], ["lam", "1 · Laminagem"], ["pic", "2 · Picagem"], ["ind", "3 · Têmpera"], ["indHmi", "3 · Painel da têmpera"],
   ["dur", "4 · Dureza"], ["jato", "5 · Jateamento"], ["cell", "6 · SACCLI"], ["mod", "6 · Módulos A–C"], ["crates", "6 · Caixas e robôs"],
-  ["pack", "7 · Embalagem e palete"], ["exp", "8 · Expedição (AMR)"], ["kmf", "8 · Armário (KMF 1500P)"], ["inst", "9 · Instalações"], ["cais", "9 · Cais e portão"],
+  ["pack", "7 · Embalagem e palete"], ["exp", "8 · Expedição (AMR)"], ["kmf", "8 · Armário (KMF 1500P)"], ["inst", "9 · Instalações"], ["cais", "9 · Cais e portão"], ["ext", "10 · Exterior"], ["office", "10 · Escritório"], ["dock", "10 · Cais · camião"],
 ];
 VIEWS.molde = [[-8300, 650, 500], [-8950, 100, -380]];
 AREAS.splice(2, 0, ["molde", "1 · Molde de corte"]);
@@ -6284,9 +6454,13 @@ renderer.setAnimationLoop((now) => {
   for (const s of World.systems) { if (!paused && s.update) s.update(dt * P.speed); if (s.draw) s.draw(paused ? 0 : dt * P.speed); }
   tourTick(dt);
   controls.update();
-  camera.position.x = Math.max(-HALL.x + 300, Math.min(HALL.x - 300, camera.position.x));
-  camera.position.z = Math.max(-HALL.z + 300, Math.min(HALL.z - 300, camera.position.z));
-  camera.position.y = Math.max(FLOOR + 150, Math.min(FLOOR + HALL.h - 1300, camera.position.y));
+  camera.position.x = Math.max(-HALL.x - 30000, Math.min(HALL.x + 30000, camera.position.x));   // pode sair para o exterior
+  camera.position.z = Math.max(-HALL.z - 30000, Math.min(HALL.z + 30000, camera.position.z));
+  // acima das asnas a cobertura esconde-se (vista de topo); a câmara pode subir até 24 m
+  camera.position.y = Math.max(FLOOR + 150, Math.min(24000, camera.position.y));
+  const inside = Math.abs(camera.position.x) < HALL.x && Math.abs(camera.position.z) < HALL.z;
+  const above = inside && camera.position.y > FLOOR + HALL.h - 1400;
+  if (roofG.visible === above) roofG.visible = !above;
   renderer.render(scene, camera);
   renderTags();
   if ((hudTick += dt) > 0.05) { hudTick = 0; renderHUD(); }
@@ -6322,10 +6496,14 @@ const TOUR = [
     "A delta robot moves the files from the green crate into cartons of 6; the flaps close and the carton travels to the end of the conveyor. The KUKA LBR iisy cobot picks each carton and palletises 3 × 4 per layer, 2 layers: 24 cartons per pallet."],
   ["exp", "8 · Expedição — AMR", "Quando a palete está completa, o AMR entra por baixo, levanta-a e leva-a até ao posto de expedição, seguindo as faixas no chão. Uma palete vazia é reposta no posto de paletização.",
     "When the pallet is complete, the AMR drives underneath, lifts it and carries it to the shipping stand, following the floor markings. An empty pallet is put back at the palletising stand."],
-  ["inst", "9 · Instalações de apoio em contentores", "Dentro da nave, em contentores modulares de 10' e 20': administração, sala de almoço, HSA + recursos humanos e sala dos engenheiros na frente; WC/balneários, armazém de EPI e sala de limpeza junto à parede; recepção logística, zona de emergência (ponto de encontro, primeiros socorros, lava-olhos, extintores) e manutenção atrás da linha. Por cima da administração e do refeitório, no 1.º andar, ficam a sala de reunião executiva e a sala de visitas de clientes, com passadiço e escada metálica. A ventilação faz-se com extractores de cobertura, ventiladores HVLS de tecto e ventiladores axiais de parede. O relógio de turno acciona a sirene e as luzes de alarme ao almoço (12:00) e no fim do turno (17:00).",
-    "Inside the hall, in 10' and 20' modular containers: administration, canteen, HSE + HR and the engineers' room at the front; WC/changing rooms, PPE store and cleaning room by the wall; logistics reception, emergency zone (assembly point, first aid, eyewash, extinguishers) and maintenance behind the line. Above the administration and the canteen, on the first floor, are the executive meeting room and the client visiting room, with a walkway and a steel staircase. Ventilation is provided by roof extractors, HVLS ceiling fans and wall-mounted axial fans. The shift clock triggers the siren and alarm lights at lunch (12:00) and at the end of the shift (17:00)."],
+  ["inst", "9 · Instalações de apoio em contentores", "Dentro da nave, num bloco compacto à esquerda, só as instalações de intervenção rápida: sala de almoço e manutenção no rés-do-chão, sala dos engenheiros e armazém de EPI no 1.º andar; WC, recepção logística e sala de limpeza na parede; WC/balneários, armazém de EPI e sala de limpeza junto à parede; recepção logística, zona de emergência (ponto de encontro, primeiros socorros, lava-olhos, extintores) e manutenção atrás da linha. A administração, HSA + RH, a sala de reunião executiva e a sala de visitas de clientes ficam no escritório central, fora da nave. A ventilação faz-se com extractores de cobertura, ventiladores HVLS de tecto e ventiladores axiais de parede. O relógio de turno acciona a sirene e as luzes de alarme ao almoço (12:00) e no fim do turno (17:00).",
+    "Inside the hall, in a compact block on the left, only the rapid-response facilities: canteen and maintenance on the ground floor, engineers' room and PPE store on the first floor; WC, logistics reception and cleaning room along the wall; WC/changing rooms, PPE store and cleaning room by the wall; logistics reception, emergency zone (assembly point, first aid, eyewash, extinguishers) and maintenance behind the line. Administration, HSE + HR, the executive meeting room and the client visiting room are in the central office outside the hall. Ventilation is provided by roof extractors, HVLS ceiling fans and wall-mounted axial fans. The shift clock triggers the siren and alarm lights at lunch (12:00) and at the end of the shift (17:00)."],
   ["cais", "9 · Cais de carga e portão sandwich", "Na porta da parede lateral está o cais de carga: o camião encosta por fora, a rampa niveladora faz a ponte e as paletes de caixas prontas, trazidas pelo KMF 1500P, entram no reboque. Ao lado, a entrada principal é um portão seccional de painéis sandwich com porta de peões e pirilampo.",
     "At the side-wall door is the loading dock: the truck backs in from outside, the dock leveler bridges the gap and the pallets of finished cartons, brought by the KMF 1500P, go into the trailer. Next to it, the main entrance is a sectional sandwich-panel gate with a pedestrian door and a beacon."],
+  ["ext", "10 · Exterior — SACFILE", "Vista de fora: a nave em painel sandwich com cobertura a duas águas e o letreiro luminoso SACFILE em letras vermelhas sobre a entrada e sobre o cais. À frente, o escritório central em vidro e betão com 3 pisos — recepção e sala de visitas de clientes, administração (direcção, contabilidade, compras) e sala de reunião executiva —, o estacionamento de colaboradores e visitantes, a portaria com barreira e a vedação do recinto.",
+    "Seen from outside: the sandwich-panel hall with a gabled roof and the illuminated SACFILE sign in red letters above the entrance and the dock. In front, the central office in glass and concrete with 3 floors — reception and client visiting room, administration (management, accounting, purchasing) and the executive meeting room —, the staff and visitor car park, the gatehouse with barrier and the site fence."],
+  ["dock", "10 · Cais — camião de encomendas", "No cais lateral o camião de encomendas (tractor + semi-reboque SACFILE) está encostado à porta: a traseira do reboque entra na nave, a rampa niveladora faz a ponte e o KMF 1500P carrega as paletes de limas embaladas para expedição.",
+    "At the side dock the delivery truck (tractor + SACFILE semi-trailer) is backed against the door: the rear of the trailer enters the hall, the dock leveler bridges the gap and the KMF 1500P loads the pallets of packed files for shipping."],
   ["kmf", "8 · Armário de paletes — KUKA KMF 1500P", "O KUKA KMF 1500P, empilhador autónomo de 1500 kg com navegação laser, vai buscar a palete ao posto de expedição e arruma-a no armário de paletes, no primeiro lugar livre dos três níveis. Quando o armário está cheio, a palete mais antiga sai para o camião.",
     "The KUKA KMF 1500P, a 1500 kg autonomous forklift with laser navigation, collects the pallet from the shipping stand and stores it in the pallet rack, in the first free slot of the three levels. When the rack is full, the oldest pallet leaves for the truck."],
 ];

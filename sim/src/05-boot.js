@@ -8,7 +8,7 @@ class Orbit {
   constructor(camera, dom) {
     this.camera = camera; this.dom = dom; this.target = new THREE.Vector3();
     this.enableDamping = true; this.damping = 0.14;
-    this.minDistance = 100; this.maxDistance = 14000; this.minPolarAngle = 0.03; this.maxPolarAngle = Math.PI * 0.48;
+    this.minDistance = 100; this.maxDistance = 70000; this.minPolarAngle = 0.03; this.maxPolarAngle = Math.PI * 0.48;
     this.sph = new THREE.Spherical(); this.dTheta = 0; this.dPhi = 0; this.zoom = 1; this.pan = new THREE.Vector3();
     const st = { mode: null, x: 0, y: 0, pts: new Map(), dist: 0 };
     dom.style.touchAction = "none";

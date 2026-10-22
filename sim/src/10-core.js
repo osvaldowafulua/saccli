@@ -48,7 +48,8 @@ const ease = (s) => s * s * (3 - 2 * s);
 // Renderer, câmara, luz
 // =====================================================================
 const FLOOR = -620;
-const HALL = { x: 11600, z: 7000, h: 7600 };   // nave alongada em x para a bobina/desbobinador no início da linha
+const HALL = { x: 11600, z: 7000, h: 7600 };
+const roofG = new THREE.Group();   // cobertura, asnas, clarabóias, luminárias (ver vista de topo em 90-ui.js)   // nave alongada em x para a bobina/desbobinador no início da linha
 const host = document.getElementById("view");
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setPixelRatio(Math.min(devicePixelRatio, 1.75));
@@ -59,15 +60,16 @@ renderer.toneMapping = THREE.ACESFilmicToneMapping;
 host.appendChild(renderer.domElement);
 
 const scene = new THREE.Scene();
+scene.add(roofG);
 scene.background = new THREE.Color(0xa3abb4);
-scene.fog = new THREE.Fog(0xa3abb4, 9000, 26000);
+scene.fog = new THREE.Fog(0xa3abb4, 30000, 110000);
 scene.environment = makeEnvironment(renderer);
 
-const camera = new THREE.PerspectiveCamera(38, innerWidth / innerHeight, 10, 40000);
+const camera = new THREE.PerspectiveCamera(38, innerWidth / innerHeight, 10, 160000);
 const controls = new Orbit(camera, renderer.domElement);
 controls.maxPolarAngle = Math.PI * 0.48;
 controls.minDistance = 100;
-controls.maxDistance = 14000;
+controls.maxDistance = 70000;   // permite as vistas exteriores (escritório, estacionamento, cais)
 
 scene.add(new THREE.HemisphereLight(0xf1f4f9, 0x4b5058, 1.05));
 const sun = new THREE.DirectionalLight(0xfff4e2, 1.5);
@@ -190,15 +192,16 @@ function buildHall() {
   box(4200, 4800, 30, M(0x9aa3ad, 0.5, 0.5), 0, 2400, 0, door, false);
   for (let y = 400; y < 4800; y += 480) box(4200, 18, 40, M(0x7c858f, 0.5, 0.5), 0, y, 0, door, false);
   box(4400, 200, 60, mat.yellow, 0, 4900, 0, door, false);
+  // cobertura num grupo próprio: esconde-se quando a câmara sobe acima dela (vista de topo "casa de bonecas")
   const roof = new THREE.Mesh(new THREE.PlaneGeometry(2 * HALL.x, 2 * HALL.z), M(0x5b6068, 0.3, 0.8));
-  roof.rotation.x = Math.PI / 2; roof.position.y = top; scene.add(roof);
+  roof.rotation.x = Math.PI / 2; roof.position.y = top; roofG.add(roof);
   const lo = top - 1100, hi = top - 120;
   for (let x = -8000; x <= 8000; x += 4000) {
-    beam(V(x, lo, -HALL.z), V(x, lo, HALL.z), 140, mat.steelBlue);
-    beam(V(x, hi, -HALL.z), V(x, hi, HALL.z), 140, mat.steelBlue);
-    for (let z = -HALL.z; z < HALL.z; z += 1400) { beam(V(x, lo, z), V(x, hi, z), 70, mat.steelBlue); beam(V(x, lo, z), V(x, hi, z + 1400), 60, mat.steelBlue); }
+    beam(V(x, lo, -HALL.z), V(x, lo, HALL.z), 140, mat.steelBlue, roofG);
+    beam(V(x, hi, -HALL.z), V(x, hi, HALL.z), 140, mat.steelBlue, roofG);
+    for (let z = -HALL.z; z < HALL.z; z += 1400) { beam(V(x, lo, z), V(x, hi, z), 70, mat.steelBlue, roofG); beam(V(x, lo, z), V(x, hi, z + 1400), 60, mat.steelBlue, roofG); }
   }
-  for (const x of [-6000, -2000, 2000, 6000]) box(1500, 20, 2 * HALL.z - 2000, mat.skylight, x, top - 15, 0, scene, false);
+  for (const x of [-6000, -2000, 2000, 6000]) box(1500, 20, 2 * HALL.z - 2000, mat.skylight, x, top - 15, 0, roofG, false);
   for (const x of [-8000, -4000, 0, 4000, 8000]) for (const z of [-HALL.z + 150, HALL.z - 150]) {
     const col = new THREE.Group(); col.position.set(x, FLOOR, z); scene.add(col);
     box(300, HALL.h, 24, mat.steelBlue, 0, HALL.h / 2, 0, col, false);
@@ -207,7 +210,7 @@ function buildHall() {
     box(500, 30, 500, mat.dark, 0, 15, 0, col, false);
   }
   for (const x of [-6000, -2000, 2000, 6000]) for (const z of [-5250, -1750, 1750, 5250]) {
-    const g = new THREE.Group(); g.position.set(x, lo - 900, z); scene.add(g);
+    const g = new THREE.Group(); g.position.set(x, lo - 900, z); roofG.add(g);
     beam(V(0, 0, 0), V(0, 900, 0), 12, mat.dark, g);
     const shade = new THREE.Mesh(new THREE.CylinderGeometry(160, 260, 240, 24, 1, true), M(0x40454c, 0.6, 0.4, { side: THREE.DoubleSide }));
     shade.position.y = -100; g.add(shade);

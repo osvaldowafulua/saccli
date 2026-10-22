@@ -357,7 +357,9 @@ function renderTags() {
     const at = tg.at();
     const dist = camera.position.distanceTo(at);
     v3.copy(at).project(camera);
-    const show = v3.z < 1 && dist >= tg.min && dist <= tg.max && Math.abs(v3.x) < 1.05 && Math.abs(v3.y) < 1.05 && (!tg.when || tg.when());
+    const camIn = Math.abs(camera.position.x) < HALL.x && Math.abs(camera.position.z) < HALL.z;
+    const tagIn = Math.abs(at.x) < HALL.x && Math.abs(at.z) < HALL.z && at.y < FLOOR + HALL.h;   // de fora só se vêem as etiquetas exteriores, e vice-versa
+    const show = camIn === tagIn && v3.z < 1 && dist >= tg.min && dist <= tg.max && Math.abs(v3.x) < 1.05 && Math.abs(v3.y) < 1.05 && (!tg.when || tg.when());
     tg.el.style.display = show ? "block" : "none";
     if (!show) continue;
     tg.el.textContent = tr(typeof tg.text === "function" ? tg.text() : tg.text);
@@ -374,7 +376,7 @@ const VIEWS = {
   cell: [[-2600, 2300, 2300], [-200, 80, 0]],
   mod: [[420, 520, 760], [0, 30, 0]],
   exp: [[1600, 2700, 3900], [5200, -400, 200]],
-  top: [[-200, 3600, 1], [-200, 0, 0]],
+  top: [[0, 21000, 1], [0, 0, 0]],   // vista de topo: acima da nave, com a cobertura escondida
 };
 function view(name) { const [p, tg] = VIEWS[name]; camera.position.set(...p); controls.target.set(...tg); controls.update(); }
 for (const v of World.views) VIEWS[v.key] = [v.pos, v.target];
@@ -385,7 +387,7 @@ VIEWS.crates = [[-2400, 1900, 2300], [-900, -200, 200]];
 const AREAS = [
   ["feed", "0 · Bobina de banda"], ["lam", "1 · Laminagem"], ["pic", "2 · Picagem"], ["ind", "3 · Têmpera"], ["indHmi", "3 · Painel da têmpera"],
   ["dur", "4 · Dureza"], ["jato", "5 · Jateamento"], ["cell", "6 · SACCLI"], ["mod", "6 · Módulos A–C"], ["crates", "6 · Caixas e robôs"],
-  ["pack", "7 · Embalagem e palete"], ["exp", "8 · Expedição (AMR)"], ["kmf", "8 · Armário (KMF 1500P)"], ["inst", "9 · Instalações"], ["cais", "9 · Cais e portão"],
+  ["pack", "7 · Embalagem e palete"], ["exp", "8 · Expedição (AMR)"], ["kmf", "8 · Armário (KMF 1500P)"], ["inst", "9 · Instalações"], ["cais", "9 · Cais e portão"], ["ext", "10 · Exterior"], ["office", "10 · Escritório"], ["dock", "10 · Cais · camião"],
 ];
 VIEWS.molde = [[-8300, 650, 500], [-8950, 100, -380]];
 AREAS.splice(2, 0, ["molde", "1 · Molde de corte"]);
@@ -452,9 +454,13 @@ renderer.setAnimationLoop((now) => {
   for (const s of World.systems) { if (!paused && s.update) s.update(dt * P.speed); if (s.draw) s.draw(paused ? 0 : dt * P.speed); }
   tourTick(dt);
   controls.update();
-  camera.position.x = Math.max(-HALL.x + 300, Math.min(HALL.x - 300, camera.position.x));
-  camera.position.z = Math.max(-HALL.z + 300, Math.min(HALL.z - 300, camera.position.z));
-  camera.position.y = Math.max(FLOOR + 150, Math.min(FLOOR + HALL.h - 1300, camera.position.y));
+  camera.position.x = Math.max(-HALL.x - 30000, Math.min(HALL.x + 30000, camera.position.x));   // pode sair para o exterior
+  camera.position.z = Math.max(-HALL.z - 30000, Math.min(HALL.z + 30000, camera.position.z));
+  // acima das asnas a cobertura esconde-se (vista de topo); a câmara pode subir até 24 m
+  camera.position.y = Math.max(FLOOR + 150, Math.min(24000, camera.position.y));
+  const inside = Math.abs(camera.position.x) < HALL.x && Math.abs(camera.position.z) < HALL.z;
+  const above = inside && camera.position.y > FLOOR + HALL.h - 1400;
+  if (roofG.visible === above) roofG.visible = !above;
   renderer.render(scene, camera);
   renderTags();
   if ((hudTick += dt) > 0.05) { hudTick = 0; renderHUD(); }
@@ -490,10 +496,14 @@ const TOUR = [
     "A delta robot moves the files from the green crate into cartons of 6; the flaps close and the carton travels to the end of the conveyor. The KUKA LBR iisy cobot picks each carton and palletises 3 × 4 per layer, 2 layers: 24 cartons per pallet."],
   ["exp", "8 · Expedição — AMR", "Quando a palete está completa, o AMR entra por baixo, levanta-a e leva-a até ao posto de expedição, seguindo as faixas no chão. Uma palete vazia é reposta no posto de paletização.",
     "When the pallet is complete, the AMR drives underneath, lifts it and carries it to the shipping stand, following the floor markings. An empty pallet is put back at the palletising stand."],
-  ["inst", "9 · Instalações de apoio em contentores", "Dentro da nave, em contentores modulares de 10' e 20': administração, sala de almoço, HSA + recursos humanos e sala dos engenheiros na frente; WC/balneários, armazém de EPI e sala de limpeza junto à parede; recepção logística, zona de emergência (ponto de encontro, primeiros socorros, lava-olhos, extintores) e manutenção atrás da linha. Por cima da administração e do refeitório, no 1.º andar, ficam a sala de reunião executiva e a sala de visitas de clientes, com passadiço e escada metálica. A ventilação faz-se com extractores de cobertura, ventiladores HVLS de tecto e ventiladores axiais de parede. O relógio de turno acciona a sirene e as luzes de alarme ao almoço (12:00) e no fim do turno (17:00).",
-    "Inside the hall, in 10' and 20' modular containers: administration, canteen, HSE + HR and the engineers' room at the front; WC/changing rooms, PPE store and cleaning room by the wall; logistics reception, emergency zone (assembly point, first aid, eyewash, extinguishers) and maintenance behind the line. Above the administration and the canteen, on the first floor, are the executive meeting room and the client visiting room, with a walkway and a steel staircase. Ventilation is provided by roof extractors, HVLS ceiling fans and wall-mounted axial fans. The shift clock triggers the siren and alarm lights at lunch (12:00) and at the end of the shift (17:00)."],
+  ["inst", "9 · Instalações de apoio em contentores", "Dentro da nave, num bloco compacto à esquerda, só as instalações de intervenção rápida: sala de almoço e manutenção no rés-do-chão, sala dos engenheiros e armazém de EPI no 1.º andar; WC, recepção logística e sala de limpeza na parede; WC/balneários, armazém de EPI e sala de limpeza junto à parede; recepção logística, zona de emergência (ponto de encontro, primeiros socorros, lava-olhos, extintores) e manutenção atrás da linha. A administração, HSA + RH, a sala de reunião executiva e a sala de visitas de clientes ficam no escritório central, fora da nave. A ventilação faz-se com extractores de cobertura, ventiladores HVLS de tecto e ventiladores axiais de parede. O relógio de turno acciona a sirene e as luzes de alarme ao almoço (12:00) e no fim do turno (17:00).",
+    "Inside the hall, in a compact block on the left, only the rapid-response facilities: canteen and maintenance on the ground floor, engineers' room and PPE store on the first floor; WC, logistics reception and cleaning room along the wall; WC/changing rooms, PPE store and cleaning room by the wall; logistics reception, emergency zone (assembly point, first aid, eyewash, extinguishers) and maintenance behind the line. Administration, HSE + HR, the executive meeting room and the client visiting room are in the central office outside the hall. Ventilation is provided by roof extractors, HVLS ceiling fans and wall-mounted axial fans. The shift clock triggers the siren and alarm lights at lunch (12:00) and at the end of the shift (17:00)."],
   ["cais", "9 · Cais de carga e portão sandwich", "Na porta da parede lateral está o cais de carga: o camião encosta por fora, a rampa niveladora faz a ponte e as paletes de caixas prontas, trazidas pelo KMF 1500P, entram no reboque. Ao lado, a entrada principal é um portão seccional de painéis sandwich com porta de peões e pirilampo.",
     "At the side-wall door is the loading dock: the truck backs in from outside, the dock leveler bridges the gap and the pallets of finished cartons, brought by the KMF 1500P, go into the trailer. Next to it, the main entrance is a sectional sandwich-panel gate with a pedestrian door and a beacon."],
+  ["ext", "10 · Exterior — SACFILE", "Vista de fora: a nave em painel sandwich com cobertura a duas águas e o letreiro luminoso SACFILE em letras vermelhas sobre a entrada e sobre o cais. À frente, o escritório central em vidro e betão com 3 pisos — recepção e sala de visitas de clientes, administração (direcção, contabilidade, compras) e sala de reunião executiva —, o estacionamento de colaboradores e visitantes, a portaria com barreira e a vedação do recinto.",
+    "Seen from outside: the sandwich-panel hall with a gabled roof and the illuminated SACFILE sign in red letters above the entrance and the dock. In front, the central office in glass and concrete with 3 floors — reception and client visiting room, administration (management, accounting, purchasing) and the executive meeting room —, the staff and visitor car park, the gatehouse with barrier and the site fence."],
+  ["dock", "10 · Cais — camião de encomendas", "No cais lateral o camião de encomendas (tractor + semi-reboque SACFILE) está encostado à porta: a traseira do reboque entra na nave, a rampa niveladora faz a ponte e o KMF 1500P carrega as paletes de limas embaladas para expedição.",
+    "At the side dock the delivery truck (tractor + SACFILE semi-trailer) is backed against the door: the rear of the trailer enters the hall, the dock leveler bridges the gap and the KMF 1500P loads the pallets of packed files for shipping."],
   ["kmf", "8 · Armário de paletes — KUKA KMF 1500P", "O KUKA KMF 1500P, empilhador autónomo de 1500 kg com navegação laser, vai buscar a palete ao posto de expedição e arruma-a no armário de paletes, no primeiro lugar livre dos três níveis. Quando o armário está cheio, a palete mais antiga sai para o camião.",
     "The KUKA KMF 1500P, a 1500 kg autonomous forklift with laser navigation, collects the pallet from the shipping stand and stores it in the pallet rack, in the first free slot of the three levels. When the rack is full, the oldest pallet leaves for the truck."],
 ];

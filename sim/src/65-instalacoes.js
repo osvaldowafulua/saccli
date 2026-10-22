@@ -33,52 +33,56 @@
     box(60, 2100, 70, mFrame, dx - 470, 1050, F + 20, g); box(60, 2100, 70, mFrame, dx + 470, 1050, F + 20, g); box(1000, 60, 70, mFrame, dx, 2120, F + 20, g);
     box(140, 30, 30, mat.chrome, dx + 320, 1050, F + 55, g);                           // puxador
     box(1100, 120, 500, M(0x6b7280, 0.3, 0.6), dx, 60, F + 300, g);                    // degrau
-    for (let i = 0; i < (opts.windows ?? Math.max(1, Math.floor((len - 1800) / 1500))); i++) {
-      const wx = dx + 1200 + i * 1500;
-      if (wx + 600 > len / 2 - 150) break;
+    if (opts.windows !== 0) for (let wx = -len / 2 + 1500; wx < len / 2 - 700; wx += 1500) {   // janelas ao longo da frente, fora da porta
+      if (Math.abs(wx - dx) < 1150) continue;
       box(1240, 940, 60, mFrame, wx, 1600, F + 10, g); box(1160, 860, 30, mat.glass, wx, 1600, F + 40, g);
     }
     const sign = new THREE.Mesh(new THREE.PlaneGeometry(2000, 500), new THREE.MeshBasicMaterial({ map: signTex(label, sub, band) }));
-    sign.position.set(Math.min(len / 2 - 1100, dx + 1500), CH - 330, F + 60); g.add(sign);
+    sign.position.set(dx > 0 ? Math.max(-len / 2 + 1100, dx - 1500) : Math.min(len / 2 - 1100, dx + 1500), CH - 330, F + 60); g.add(sign);
     if (!opts.noAC) box(640, 520, 320, mAC, len / 2 - 600, CH + 330, -CD / 2 + 400, g);   // unidade de ar condicionado no tecto
     const lamp = cyl(50, 90, mat.lamp, g, 12); lamp.rotation.x = Math.PI / 2; lamp.position.set(dx, 2350, F + 50);
     if (level === 1) {                                                                 // passadiço à frente com guarda-corpos e escada metálica
+      // passadiço de 1,1 m com guarda-corpos; o guarda-corpos tem uma ABERTURA de 1,4 m onde começa a escada
+      const sx = opts.stairSide || 1, xs = sx * (len / 2 - 650), SW = 1100, z0 = F + 1100, RUN = 2600, DROP = CH + 70 - 160;
       box(len + 300, 60, 1100, M(0x4b5563, 0.5, 0.5), 0, -35, F + 560, g);
-      for (let x = -len / 2 - 100; x <= len / 2 + 100; x += 1000) box(40, 1050, 40, mPost, x, 500, F + 1090, g);
-      box(len + 300, 40, 40, mat.yellow, 0, 1030, F + 1090, g); box(len + 300, 30, 30, mPost, 0, 520, F + 1090, g);
-      // escada metálica: desce do passadiço para a nave (local +z), encostada a um dos topos do contentor
-      const sx = opts.stairSide || 1, xs = sx * (len / 2 - 520), z0 = F + 1100, RUN = 3000, DROP = CH + 70 - 160;
-      for (let i = 0; i < 14; i++) { const t = i / 14; box(1000, 40, 260, M(0x4b5563, 0.5, 0.5), xs, -70 - t * DROP, z0 + 150 + t * RUN, g); }
-      for (const x of [xs - 470, xs + 470]) beam(V(x, -20, z0 + 50), V(x, -DROP + 120, z0 + 150 + RUN + 100), 60, mPost, g);
-      for (let i = 0; i <= 3; i++) { const t = i / 3; for (const x of [xs - 500, xs + 500]) box(40, 1000, 40, mPost, x, 430 - t * DROP, z0 + 150 + t * RUN, g); }
-      for (const x of [xs - 500, xs + 500]) beam(V(x, 1000, z0 + 150), V(x, 1000 - DROP, z0 + 150 + RUN), 40, mat.yellow, g);
+      const rail = (x0, x1) => { if (x1 - x0 < 200) return; const xm = (x0 + x1) / 2, w = x1 - x0; box(w, 40, 40, mat.yellow, xm, 1030, F + 1090, g); box(w, 30, 30, mPost, xm, 520, F + 1090, g); for (let x = x0; x <= x1; x += 1000) box(40, 1050, 40, mPost, Math.min(x, x1), 500, F + 1090, g); box(40, 1050, 40, mPost, x1, 500, F + 1090, g); };
+      rail(-len / 2 - 100, xs - SW / 2 - 100); rail(xs + SW / 2 + 100, len / 2 + 100);
+      for (const sxx of [-1, 1]) box(40, 1050, 40, mPost, sxx * (len / 2 + 120), 500, F + 10, g);   // guarda-corpos nos topos do passadiço
+      for (const sxx of [-1, 1]) { box(40, 40, 1100, mat.yellow, sxx * (len / 2 + 120), 1030, F + 560, g); box(30, 30, 1100, mPost, sxx * (len / 2 + 120), 520, F + 560, g); }
+      // escada metálica de 1,1 m AO LONGO DA FACHADA (não avança para a nave): patamar na abertura do guarda-corpos, no
+      // topo DIREITO (+x) do contentor, e 14 degraus (44°) a descer paralelamente ao contentor, para o lado do centro;
+      // fica a 1,1–2,2 m da fachada e termina antes da porta do piso térreo
+      const d = -Math.sign(xs), zc = F + 1100 + SW / 2 + 50, mSt = M(0x4b5563, 0.5, 0.5);
+      box(1300, 60, SW, mSt, xs, -35, zc, g);
+      for (let i = 1; i <= 14; i++) { const t = i / 14; box(240, 40, SW, mSt, xs + d * (650 + t * RUN), -70 - (DROP - 160) * t, zc, g); }
+      for (const z of [zc - SW / 2 + 30, zc + SW / 2 - 30]) beam(V(xs + d * 650, -20, z), V(xs + d * (650 + RUN + 100), -DROP + 140, z), 60, mPost, g);
+      for (const z of [zc - SW / 2 - 20, zc + SW / 2 + 20]) {
+        for (let i = 0; i <= 4; i++) { const t = i / 4; box(40, 1000, 40, mPost, xs + d * (650 + t * RUN), 430 - (DROP - 160) * t, z, g); }
+        beam(V(xs + d * 650, 1000, z), V(xs + d * (650 + RUN), 1000 - (DROP - 160), z), 40, mat.yellow, g);
+      }
+      box(40, 1050, 40, mPost, xs - d * 650, 500, zc + SW / 2 + 20, g); box(40, 1050, 40, mPost, xs - d * 650, 500, zc - SW / 2 - 20, g);   // guarda-corpos do patamar
+      box(1300, 40, 40, mat.yellow, xs, 1030, zc + SW / 2 + 20, g); box(40, 40, SW + 80, mat.yellow, xs - d * 650, 1030, zc, g);
     }
     return g;
   }
 
-  // ---------- fila da frente (parede +z), frentes viradas para −z (interior da nave)
-  const ZF = 5750, R180 = Math.PI;
-  container(-8271, ZF, L20, R180, "ADMINISTRAÇÃO", "Direcção · contabilidade · compras", 0xf1f3f5, "#1f5fd6");
-  container(-1871, ZF, L20, R180, "SALA DE ALMOÇO", "Refeitório dos funcionários", 0xfbf3e4, "#d97706");
-  container(-8271, ZF, L20, R180, "SALA DE REUNIÃO EXECUTIVA", "1.º andar · direcção e gestão", 0xeef2f7, "#1e3a8a", { level: 1, stairSide: -1, noAC: false });
-  container(-1871, ZF, L20, R180, "SALA DE VISITAS · CLIENTES", "1.º andar · recepção de clientes e demonstrações", 0xfdf6ec, "#9a3412", { level: 1, stairSide: 1 });
-  container(2870, ZF, L10, R180, "HSA + RH", "Segurança, saúde, ambiente · recursos humanos", 0xe8f5ec, "#15803d");
-  container(6200, ZF, L10, R180, "SALA DOS ENGENHEIROS", "Engenharia · métodos · manutenção", 0xe7eef8, "#2f6fdc");
-  // ---------- parede −x, frentes viradas para +x
-  const XW = -10300, R90 = Math.PI / 2;
-  container(XW, 3000, L10, R90, "WC", "Balneários · vestiários", 0xeef2f6, "#64748b", { door: -L10 / 2 + 700, windows: 0 });
-  container(XW, -2500, L10, R90, "ARMAZÉM DE EPI", "Capacetes · luvas · óculos · botas", 0xfff4e5, "#ea580c", { windows: 0 });
-  container(XW, -5300, L10, R90, "SALA DE LIMPEZA", "Material e produtos de limpeza", 0xeaf6fb, "#0e7490", { windows: 0 });
-  // ---------- atrás da linha (corredor do operador), frentes viradas para +z
-  // atrás da linha, fora do corredor dos robôs: o KMF 1500P circula em z −5500…−3000 (x ≥ 2000) e ao longo de x ≈ 9150;
-  // nada é colocado a menos de 1 m desses corredores, nem a menos de 0,5 m do corredor do operador da linha
-  container(-8450, -2950, L20, 0, "RECEPÇÃO LOGÍSTICA", "Armazém de entrada · bobinas · consumíveis", 0xf1f3f5, "#334155");
-  container(-3800, -2950, L10, 0, "MANUTENÇÃO", "Materiais e peças de reserva", 0xf1f3f5, "#b45309", { windows: 0 });
+  // ---------- bloco compacto no canto ESQUERDO da nave (x ≤ −2100), só com as instalações de intervenção rápida;
+  //            administração, HSA + RH, reunião executiva e visitas de clientes ficam no escritório central (68-exterior.js).
+  //            Nada em frente ao armário de paletes (x ≥ −7000, z ≈ −6100) nem nos corredores dos robôs.
+  const ZF = 5750, R180 = Math.PI, XW = -10300, R90 = Math.PI / 2;
+  // fila da frente (parede +z), frentes viradas para −z: refeitório (20') + manutenção (10'); 1.º andar: engenheiros e EPI
+  container(-8400, ZF, L20, R180, "SALA DE ALMOÇO", "Refeitório dos funcionários", 0xfbf3e4, "#d97706");
+  container(-8400, ZF, L20, R180, "SALA DOS ENGENHEIROS", "1.º andar · engenharia · métodos · intervenção rápida", 0xe7eef8, "#2f6fdc", { level: 1, stairSide: -1 });
+  container(-3600, ZF, L10, R180, "MANUTENÇÃO", "Materiais e peças de reserva · intervenção rápida", 0xf1f3f5, "#b45309", { windows: 0 });
+  container(-3600, ZF, L10, R180, "ARMAZÉM DE EPI", "1.º andar · capacetes · luvas · óculos · botas", 0xfff4e5, "#ea580c", { level: 1, stairSide: -1, windows: 0 });
+  // coluna da parede −x, frentes viradas para +x: WC junto ao refeitório; logística junto à bobina; limpeza ao fundo
+  container(XW, 2700, L10, R90, "WC", "Balneários · vestiários", 0xeef2f6, "#64748b", { door: -L10 / 2 + 700, windows: 0 });
+  container(XW, -2450, L10, R90, "RECEPÇÃO LOGÍSTICA", "Armazém de entrada · bobinas · consumíveis", 0xf1f3f5, "#334155", { windows: 0 });
+  container(XW, -5450, L10, R90, "SALA DE LIMPEZA", "Material e produtos de limpeza", 0xeaf6fb, "#0e7490", { windows: 0 });
 
-  // mesas e bancos à porta do refeitório; carrinho de limpeza; estante de EPI à porta
-  for (const x of [-2700, -1300]) { box(1400, 40, 700, mat.wood, x, FLOOR + 740, 3900); for (const s of [-1, 1]) box(1400, 30, 250, mat.wood, x, FLOOR + 460, 3900 + s * 500); for (const sx of [-1, 1]) box(60, 740, 60, mPost, x + sx * 600, FLOOR + 370, 3900); }
-  { const g = new THREE.Group(); g.position.set(-8600, FLOOR, -5300); scene.add(g); box(900, 60, 500, M(0x2563eb, 0.2, 0.5), 0, 900, 0, g); for (const [x, z] of [[-400, -200], [400, -200], [-400, 200], [400, 200]]) box(40, 880, 40, mPost, x, 440, z, g); box(700, 500, 400, mat.yellow, 0, 300, 0, g); cyl(25, 1200, mat.alu, g, 10).position.set(430, 600, 0); }   // carrinho de limpeza
-  { for (let i = 0; i < 3; i++) box(1200, 30, 400, mAC, -8600, FLOOR + 400 + i * 500, -2500); for (const s of [-1, 1]) box(40, 1500, 400, mPost, -8600 + s * 600, FLOOR + 750, -2500); for (const [i, c] of [[0, 0xf2c200], [1, 0x2563eb], [2, 0xef4444]]) box(300, 260, 240, M(c, 0.2, 0.5), -8900 + i * 300, FLOOR + 560, -2500); }   // estante de EPI
+  // mesas e bancos à porta do refeitório; carrinho de limpeza à porta da sala de limpeza
+  for (const x of [-7400, -6000]) { box(1400, 40, 700, mat.wood, x, FLOOR + 740, 3900); for (const s of [-1, 1]) box(1400, 30, 250, mat.wood, x, FLOOR + 460, 3900 + s * 500); for (const sx of [-1, 1]) box(60, 740, 60, mPost, x + sx * 600, FLOOR + 370, 3900); }
+  { const g = new THREE.Group(); g.position.set(-8500, FLOOR, -4700); scene.add(g); box(900, 60, 500, M(0x2563eb, 0.2, 0.5), 0, 900, 0, g); for (const [x, z] of [[-400, -200], [400, -200], [-400, 200], [400, 200]]) box(40, 880, 40, mPost, x, 440, z, g); box(700, 500, 400, mat.yellow, 0, 300, 0, g); cyl(25, 1200, mat.alu, g, 10).position.set(430, 600, 0); }   // carrinho de limpeza
 
   // ---------- zona de emergência (área livre, marcada no chão)
   {
@@ -146,9 +150,9 @@
   {
     const RY = FLOOR + HALL.h - 160, mFan = M(0x9aa3ad, 0.6, 0.45), mBlade = M(0x374151, 0.3, 0.6);
     for (const x of [-8000, -3000, 2000, 7000]) for (const z of [-4200, 3600]) {          // 8 extractores de cobertura (turbina)
-      cyl(420, 260, mFan, scene, 24).position.set(x, RY, z);
-      const cap = cyl(470, 60, mFan, scene, 24); cap.position.set(x, RY + 160, z);
-      const rot = new THREE.Group(); rot.position.set(x, RY - 140, z); scene.add(rot);
+      cyl(420, 260, mFan, roofG, 24).position.set(x, RY, z);
+      const cap = cyl(470, 60, mFan, roofG, 24); cap.position.set(x, RY + 160, z);
+      const rot = new THREE.Group(); rot.position.set(x, RY - 140, z); roofG.add(rot);
       for (let i = 0; i < 6; i++) { const b = box(360, 14, 120, mBlade, 0, 0, 0, rot, false); b.position.set(Math.cos(i * Math.PI / 3) * 200, 0, Math.sin(i * Math.PI / 3) * 200); b.rotation.y = -i * Math.PI / 3; b.rotation.x = 0.5; }
       fans.push({ g: rot, w: 9 });
     }
@@ -235,18 +239,18 @@
 
   // ---------- etiquetas e vistas
   const T = [
-    ["Administração · direcção, contabilidade, compras", -8271, ZF - 200], ["Sala de almoço dos funcionários", -1871, ZF - 200],
-    ["1.º andar · Sala de reunião executiva", -8271, ZF + 2900], ["1.º andar · Sala de visitas de clientes", -1871, ZF + 2900], ["HSA + Recursos Humanos", 2870, ZF - 200], ["Sala dos engenheiros", 6200, ZF - 200],
-    ["WC · balneários", XW + 200, 3000], ["Armazém de EPI", XW + 200, -2500], ["Sala de limpeza · material de limpeza", XW + 200, -5300],
-    ["Recepção logística · armazém de entrada", -8450, -2950], ["Manutenção · materiais e peças de reserva", -3800, -2950], ["Zona de emergência · ponto de encontro", 3300, -2100],
-    ["Cais de carga · camião a carregar paletes de caixas", HALL.x - 1800, 2200], ["Entrada · portão sandwich", 9850, HALL.z - 600],
+    ["Sala de almoço dos funcionários", -8400, ZF - 200, 0], ["1.º andar · Sala dos engenheiros (intervenção rápida)", -8400, ZF - 200, 1],
+    ["Manutenção · peças de reserva (intervenção rápida)", -3600, ZF - 200, 0], ["1.º andar · Armazém de EPI", -3600, ZF - 200, 1],
+    ["WC · balneários", XW + 200, 2700, 0], ["Recepção logística · armazém de entrada", XW + 200, -2450, 0], ["Sala de limpeza · material de limpeza", XW + 200, -5450, 0],
+    ["Zona de emergência · ponto de encontro", 3300, -2100, 0],
+    ["Cais de carga · camião a carregar paletes de caixas", HALL.x - 1800, 2200, 0], ["Entrada · portão sandwich", 9850, HALL.z - 600, 0],
   ];
-  for (const [text, x, z] of T) addTag({ text, at: () => V(x, FLOOR + CH + 650 + (z > ZF + 2000 ? CH + 70 : 0), z > ZF + 2000 ? ZF - 200 : z), max: 9000 });
+  for (const [text, x, z, lv] of T) addTag({ text, at: () => V(x, FLOOR + CH + 650 + lv * (CH + 70), z), max: 9000 });
   addTag({ text: "Corredor do KMF 1500P · 2,5 m livres (linha de segurança)", at: () => V(5500, FLOOR + 400, -4250), max: 7000 });
   addTag({ text: "Faixa do AMR · circulação livre", at: () => V(5200, FLOOR + 400, 600), max: 6000 });
   addTag({ text: "Ventilação · extractores de cobertura, HVLS e ventiladores de parede", at: () => V(-5500, FLOOR + 5800, 1800), min: 1500, max: 12000 });
-  addTag({ text: () => `9 · Instalações de apoio (contentores) · ${hhmm(SHIFT.min)}`, at: () => V(-1000, FLOOR + 4300, 5200), min: 3500, big: true });
+  addTag({ text: () => `9 · Instalações de apoio (contentores) · ${hhmm(SHIFT.min)}`, at: () => V(-6500, FLOOR + 6600, 5200), min: 3500, big: true });
   addTag({ text: () => (SHIFT.alarm === "lunch" ? "Sirene · ALMOÇO" : SHIFT.alarm === "end" ? "Sirene · FIM DE TURNO" : `Relógio de turno · ${hhmm(SHIFT.min)}`), at: () => V(5000, FLOOR + 4900, HALL.z - 300), max: 9000 });
-  addView("inst", "Instalações", [-2000, 4200, -400], [-2000, 200, 5200]);
+  addView("inst", "Instalações", [-3500, 4200, -1500], [-7500, 800, 4500]);
   addView("cais", "Cais e portão", [7600, 2800, -1200], [10800, 500, 2600]);
 }

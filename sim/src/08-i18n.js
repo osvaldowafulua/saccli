@@ -79,7 +79,15 @@ const I18N_EXACT = {
   "Força × flecha (scanner 2)": "Force × deflection (scanner 2)",
   "Sobe elástico, cede, alivia em linha recta: o que fica é a correção": "Rises elastically, yields, unloads in a straight line: what remains is the correction",
   "Perfil da lima (A → C)": "File profile (A → C)",
+  // ---- 68-exterior.js
+  "PISO 0": "FLOOR 0", "PISO 1": "FLOOR 1", "PISO 2": "FLOOR 2", "Recepção · Sala de visitas de clientes": "Reception · Client visiting room", "Administração · HSA + RH · contabilidade · compras": "Administration · HSE + HR · accounting · purchasing", "Sala de reunião executiva · direcção": "Executive meeting room · management",
+  "10 · Exterior": "10 · Exterior", "10 · Escritório": "10 · Office", "10 · Cais · camião": "10 · Dock · truck", "Exterior": "Exterior", "Escritório": "Office", "Cais · camião": "Dock · truck",
+  "10 · Exterior — SACFILE": "10 · Exterior — SACFILE", "10 · Cais — camião de encomendas": "10 · Dock — delivery truck", "10 · Exterior · SACFILE": "10 · Exterior · SACFILE",
+  "Escritório central SACFILE · vidro e betão · 3 pisos": "SACFILE head office · glass and concrete · 3 floors", "Estacionamento · colaboradores e visitantes": "Car park · staff and visitors",
+  "Camião de encomendas · a carregar paletes de limas no cais": "Delivery truck · loading pallets of files at the dock", "Portaria · controlo de acessos": "Gatehouse · access control",
   // ---- 65-instalacoes.js
+  "1.º andar · engenharia · métodos · intervenção rápida": "1st floor · engineering · methods · rapid response", "Materiais e peças de reserva · intervenção rápida": "Materials and spare parts · rapid response", "1.º andar · capacetes · luvas · óculos · botas": "1st floor · helmets · gloves · goggles · boots",
+  "1.º andar · Sala dos engenheiros (intervenção rápida)": "1st floor · Engineers' room (rapid response)", "Manutenção · peças de reserva (intervenção rápida)": "Maintenance · spare parts (rapid response)", "1.º andar · Armazém de EPI": "1st floor · PPE store",
   "9 · Instalações": "9 · Facilities", "9 · Cais e portão": "9 · Dock and gate", "9 · Instalações de apoio em contentores": "9 · Support facilities in containers", "9 · Cais de carga e portão sandwich": "9 · Loading dock and sandwich gate",
   "SALA DE REUNIÃO EXECUTIVA": "EXECUTIVE MEETING ROOM", "1.º andar · direcção e gestão": "1st floor · management", "SALA DE VISITAS · CLIENTES": "CLIENT VISITING ROOM", "1.º andar · recepção de clientes e demonstrações": "1st floor · client reception and demonstrations",
   "1.º andar · Sala de reunião executiva": "1st floor · Executive meeting room", "1.º andar · Sala de visitas de clientes": "1st floor · Client visiting room", "Ventilação · extractores de cobertura, HVLS e ventiladores de parede": "Ventilation · roof extractors, HVLS and wall fans",
@@ -405,6 +413,8 @@ const I18N_EXACT = {
 
 // fragmentos para frases dinâmicas com números (substituição de sub-frases inteiras, da mais longa para a mais curta)
 const I18N_PHRASES = [
+  ["Recepção · Sala de visitas de clientes", "Reception · Client visiting room"], ["Administração · HSA + RH · contabilidade · compras", "Administration · HSE + HR · accounting · purchasing"], ["Sala de reunião executiva · direcção", "Executive meeting room · management"],
+  ["PISO 0 · ", "FLOOR 0 · "], ["PISO 1 · ", "FLOOR 1 · "], ["PISO 2 · ", "FLOOR 2 · "],
   ["Bigorna em apoio · ", "Anvil raised · "], ["A rodar a lima 180° · ", "Rotating the file 180° · "], ["A rodar a lima 90° · ", "Rotating the file 90° · "], ["Cinzel a descer · ", "Chisel lowering · "], ["A picar · ", "Cutting · "],
   ["9 · Instalações de apoio (contentores) · ", "9 · Support facilities (containers) · "], ["Relógio de turno · ", "Shift clock · "],
   ["Aparas do corte · ", "Cutting scrap · "],
