@@ -320,9 +320,8 @@
       const x = -8000 + i * 3200, z = -Z - 1500;
       box(1400, 200, 900, mConc, x, GY + 100, z, scene, false);
       box(1200, 1400, 450, M(0xe5e7eb, 0.3, 0.5), x, GY + 900, z);
-      for (const sx of [-1, 1]) { cyl(260, 30, M(0x111827, 0.3, 0.6), scene, 24).rotation.x = Math.PI / 2; const r = cyl(260, 30, M(0x111827, 0.3, 0.6), scene, 24); r.rotation.x = Math.PI / 2; r.position.set(x + sx * 300, GY + 1000, z + 240); const rot = new THREE.Group(); rot.position.set(x + sx * 300, GY + 1000, z + 250); scene.add(rot); for (let k = 0; k < 4; k++) { const b = box(200, 70, 8, M(0x374151, 0.3, 0.6), 0, 0, 0, rot, false); b.position.set(Math.cos(k * Math.PI / 2) * 130, Math.sin(k * Math.PI / 2) * 130, 0); b.rotation.z = k * Math.PI / 2; } acRot.push(rot); }
+      for (const sx of [-1, 1]) { const r = cyl(260, 30, M(0x111827, 0.3, 0.6), scene, 24); r.rotation.x = Math.PI / 2; r.position.set(x + sx * 300, GY + 1000, z + 240); const rot = new THREE.Group(); rot.position.set(x + sx * 300, GY + 1000, z + 250); scene.add(rot); for (let k = 0; k < 4; k++) { const b = box(200, 70, 8, M(0x374151, 0.3, 0.6), 0, 0, 0, rot, false); b.position.set(Math.cos(k * Math.PI / 2) * 130, Math.sin(k * Math.PI / 2) * 130, 0); b.rotation.z = k * Math.PI / 2; } acRot.push(rot); }
       box(1200, 10, 10, mat.alu, x, GY + 1700, z + 230, scene, false);
-      cyl(30, 1500, mat.alu, scene, 10).rotation.z = 0;
       const pipe = cyl(30, 1500, M(0x9ca3af, 0.6, 0.4), scene, 10); pipe.rotation.x = Math.PI / 2; pipe.position.set(x + 500, GY + 500, z + 750);
     }
     addTag({ text: "Painéis solares fotovoltaicos · nave e escritório", at: () => V(0, TOP + 2600, 2500), min: 3000, max: 90000 });
@@ -344,7 +343,7 @@
     addTag({ text: "Tanque de azoto líquido · N₂ −196 °C · vaporizador", at: () => V(UX, GY + 6800, -3500), max: 60000 });
     // poço de água subterrânea: tampa de betão, bomba submersível (cabeça do furo), depósito de água e quadro
     box(1600, 250, 1600, mConc, UX, GY + 125, 2500); cyl(320, 400, M(0x2563eb, 0.3, 0.5), scene, 20).position.set(UX, GY + 450, 2500);
-    cyl(60, 900, M(0x9ca3af, 0.6, 0.4), scene, 10).rotation.z = Math.PI / 2; const pw = cyl(60, 1600, M(0x9ca3af, 0.6, 0.4), scene, 10); pw.rotation.z = Math.PI / 2; pw.position.set(UX + 900, GY + 600, 2500);
+    const pw = cyl(60, 1600, M(0x9ca3af, 0.6, 0.4), scene, 10); pw.rotation.z = Math.PI / 2; pw.position.set(UX + 900, GY + 600, 2500);
     const wt = cyl(1100, 2600, M(0x1e3a8a, 0.3, 0.5), scene, 32); wt.position.set(UX, GY + 300 + 1300, 5200); box(2600, 300, 2600, mConc, UX, GY + 150, 5200, scene, false);
     box(500, 700, 250, mat.dark, UX + 1500, GY + 700, 2500);
     addTag({ text: "Poço de água subterrânea · bomba submersível · depósito 10 m³", at: () => V(UX, GY + 4200, 3800), max: 60000 });
