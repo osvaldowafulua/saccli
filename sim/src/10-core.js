@@ -126,10 +126,12 @@ function unitMesh(m, geo = unitBox) { const o = new THREE.Mesh(geo, m); o.castSh
 // =====================================================================
 function canvasTex(w, h, draw, repeat = [1, 1]) {
   const c = document.createElement("canvas"); c.width = w; c.height = h;
-  draw(c.getContext("2d"), w, h);
+  const g = c.getContext("2d");
+  LANG.used = false; draw(g, w, h);
   const t = new THREE.CanvasTexture(c);
   t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(...repeat);
   t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8;
+  if (LANG.used) LANG.canvases.push(() => { g.clearRect(0, 0, w, h); draw(g, w, h); t.needsUpdate = true; });   // placa com texto traduzível: redesenha ao mudar de idioma
   return t;
 }
 const concrete = canvasTex(512, 512, (g, w, h) => {

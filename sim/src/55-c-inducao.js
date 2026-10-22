@@ -23,7 +23,7 @@
   const clamp = (v, a = 0, b = 1) => Math.max(a, Math.min(b, v));
   const seg = (t, a, b) => ease(clamp((t - a) / (b - a)));
   const lerp = (a, b, k) => a + (b - a) * k;
-  const fmt = (v, d = 1) => v.toFixed(d).replace(".", ",");
+  const fmt = (v, d = 1) => (LANG.cur === "en" ? v.toFixed(d) : v.toFixed(d).replace(".", ","));   // separador decimal conforme o idioma dos ecrãs
 
   // ---------- tempos do ciclo (segundos de linha)
   const T_DOWN = 0.18, T_CLOSE = 0.28, T_LIFT = 0.48, T_CIN = 0.78, T_ON = 0.8, T_TOP = 1.72;   // na paragem do slot 9
@@ -33,7 +33,7 @@
   const mCu = M(0xc8733f, 0.95, 0.27, { emissive: 0xff5a14, emissiveIntensity: 0 });
   const mCuT = M(0xc8733f, 0.95, 0.27, { emissive: 0xff5a14, emissiveIntensity: 0 });
   const mCuBar = M(0xd88c55, 0.9, 0.3);
-  const mInsul = M(0xd9c58f, 0.05, 0.7);                     // isolante (resina/Celeron)
+  const mInsul = M(0x6b4a2f, 0.05, 0.6);                     // isolante (Celeron castanho)
   const mCab = M(0xd5d9dc, 0.25, 0.5);                       // RAL 7035
   const mCabDark = M(0x3e444c, 0.4, 0.5);
   const mTrafo = M(0x35597f, 0.35, 0.45);
@@ -71,13 +71,13 @@
     let x0 = 22;
     if (icon) { g.fillStyle = band; g.fillRect(4, 4, h - 8, h - 8); g.fillStyle = "#fff"; g.font = `800 ${Math.round(h * 0.42)}px Arial`; g.textAlign = "center"; g.textBaseline = "middle"; g.fillText(icon, h / 2, h / 2 + 2); x0 = h + 14; }
     g.textAlign = "left"; g.textBaseline = "middle";
-    lines.forEach(([t, f, c], i) => { g.font = f; g.fillStyle = c || "#16202c"; g.fillText(t, x0, (h / (lines.length + 1)) * (i + 1)); });
+    lines.forEach(([t, f, c], i) => { g.font = f; g.fillStyle = c || "#16202c"; g.fillText(tr(t), x0, (h / (lines.length + 1)) * (i + 1)); });
   });
   const warnTex = (txt) => canvasTex(256, 128, (g) => {
     g.fillStyle = "#f2c200"; g.fillRect(0, 0, 256, 128); g.strokeStyle = "#111"; g.lineWidth = 8;
     g.beginPath(); g.moveTo(64, 16); g.lineTo(114, 106); g.lineTo(14, 106); g.closePath(); g.stroke();
     g.fillStyle = "#111"; g.font = "800 54px Arial"; g.textAlign = "center"; g.textBaseline = "middle"; g.fillText("⚡", 64, 74);
-    g.font = "700 26px Arial"; g.textAlign = "left"; g.fillText(txt[0], 128, 48); g.font = "20px Arial"; g.fillText(txt[1], 128, 86);
+    g.font = "700 26px Arial"; g.textAlign = "left"; g.fillText(tr(txt[0]), 128, 48); g.font = "20px Arial"; g.fillText(tr(txt[1]), 128, 86);
   });
 
   // estado inicial coerente: cada lima já com o que as estações anteriores lhe fizeram (forma completa, dentes, …)
@@ -233,6 +233,22 @@
     cyl(30, 14, mat.dark, scene, 24).position.set(x, yt + 276, z);
   }
 
+  // consola do operador no lado +z da linha: repete o ecrã do gerador (kW, kHz, °C e curva de temperatura)
+  {
+    const cx = -6690, cz = -60;
+    box(220, 10, 180, mat.dark, cx, FLOOR + 5, cz);
+    box(90, 300 - FLOOR - 10, 90, mCab, cx, (300 + FLOOR + 10) / 2, cz);
+    const head = new THREE.Group(); head.position.set(cx, 440, cz); head.rotation.set(-0.3, 0.45, 0, "YXZ"); scene.add(head);
+    put(rbox(420, 320, 86, 14, mCab), 0, 0, 0, head);
+    box(392, 290, 6, mat.black, 0, 14, 44, head);
+    put(new THREE.Mesh(new THREE.PlaneGeometry(360, 270), new THREE.MeshBasicMaterial({ map: hmiTex, toneMapped: false })), 0, 14, 47.5, head);
+    const btn = (r, h, m, x) => { const o = cyl(r, h, m, head, 20); o.rotation.x = Math.PI / 2; o.position.set(x, -142, 43 + h / 2); return o; };
+    btn(20, 5, mat.yellow, -150); btn(14, 18, M(0xc4161c, 0.1, 0.4), -150);
+    btn(10, 8, M(0x1c9a48, 0.1, 0.4, { emissive: 0x22c55e, emissiveIntensity: 0.35 }), -95); btn(10, 8, mat.black, -62);
+    box(140, 24, 3, mat.label, 90, -142, 44, head);
+    box(110, 70, 60, mat.dark, 0, -170, -10, head);
+  }
+
   // =====================================================================
   // 3 · Refrigerador de circuito fechado (água desionizada da bobina e do gerador)
   // =====================================================================
@@ -266,11 +282,11 @@
     const louv = canvasTex(128, 128, (g, w, h) => { g.fillStyle = "#dfe4e8"; g.fillRect(0, 0, w, h); g.fillStyle = "#7d868f"; for (let y = 8; y < h; y += 12) g.fillRect(8, y, w - 16, 5); });
     plate(430, 520, louv, CX, FLOOR + 380, CZ + CD / 2 + 1);
     chillTex = canvasTex(320, 160, () => {}); chillTex.wrapS = chillTex.wrapT = THREE.ClampToEdgeWrapping; chillG = chillTex.image.getContext("2d");
-    box(250, 140, 10, mat.dark, CX - 60, FLOOR + 1060, CZ + CD / 2 + 5);
-    put(new THREE.Mesh(new THREE.PlaneGeometry(230, 115), new THREE.MeshBasicMaterial({ map: chillTex, toneMapped: false })), CX - 60, FLOOR + 1060, CZ + CD / 2 + 10.5);
+    box(250, 140, 10, mat.dark, CX - 60, FLOOR + 1150, CZ + CD / 2 + 5);
+    put(new THREE.Mesh(new THREE.PlaneGeometry(230, 115), new THREE.MeshBasicMaterial({ map: chillTex, toneMapped: false })), CX - 60, FLOOR + 1150, CZ + CD / 2 + 10.5);
     plate(300, 90, labelTex(400, 120, [["REFRIGERADOR", "800 34px Arial"], ["circuito fechado · 30 kW", "24px Arial", "#3d4b5c"]], "#e9edf1", "#0e7490", "❄"), CX, FLOOR + 900, CZ + CD / 2 + 1);
     // tubagens isoladas para o gerador (ida azul / retorno vermelho)
-    for (const [y, m] of [[-330, mHoseB], [-250, mHoseR]]) cylX(16, 100, m, -7120, y, -1120);
+    for (const [y, m] of [[-330, mHoseB], [-250, mHoseR]]) cylX(16, 240, m, -7040, y, -1120);
   }
 
   // =====================================================================
@@ -325,7 +341,7 @@
     box(110, 10, 18, mat.yellow, -5720, TY0 + 72, TZ1 + 70);
     cyl(6, 300, mat.chrome, scene, 10).position.set(TX0 + 60, -170, TZ0 + 34);
     box(60, 50, 44, mat.dark, TX0 + 60, -10, TZ0 + 34);
-    plate(200, 76, labelTex(400, 152, [["TANQUE DE TÊMPERA", "800 34px Arial"], ["água · 450 L · 25 °C", "26px Arial", "#3d4b5c"]], "#e9edf1", "#0e7490", "≈"), -6080, -300, TZ1 + 6);
+    plate(260, 76, labelTex(540, 158, [["TANQUE DE TÊMPERA", "800 36px Arial"], ["água · 450 L · 25 °C", "28px Arial", "#3d4b5c"]], "#e9edf1", "#0e7490", "≈"), -6060, -300, TZ1 + 6);
   }
   // água: volume translúcido azul-esverdeado + superfície com ondulação
   const waterTop = (() => {
@@ -339,13 +355,13 @@
     g.putImageData(img, 0, 0);
     const t = new THREE.CanvasTexture(c); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(2, 1);
     const m = new THREE.Mesh(new THREE.PlaneGeometry(TX1 - TX0 - 2 * WT, TZ1 - TZ0 - 2 * WT),
-      new THREE.MeshStandardMaterial({ color: 0x2f8794, metalness: 0.05, roughness: 0.05, transparent: true, opacity: 0.4, normalMap: t, normalScale: new THREE.Vector2(0.22, 0.22), envMapIntensity: 1.3, depthWrite: false }));
+      new THREE.MeshStandardMaterial({ color: 0x1f6f7b, metalness: 0, roughness: 0.08, transparent: true, opacity: 0.3, normalMap: t, normalScale: new THREE.Vector2(0.2, 0.2), envMapIntensity: 0.75, depthWrite: false }));
     m.rotation.x = -Math.PI / 2; m.renderOrder = 3; put(m, (TX0 + TX1) / 2, WATER, (TZ0 + TZ1) / 2);
     return m;
   })();
   {
     const h = WATER - 2 - (TY0 + WT);
-    const v = box(TX1 - TX0 - 2 * WT - 1, h, TZ1 - TZ0 - 2 * WT - 1, M(0x0f5a66, 0, 0.2, { transparent: true, opacity: 0.26, depthWrite: false }), (TX0 + TX1) / 2, TY0 + WT + h / 2, (TZ0 + TZ1) / 2, scene, false);
+    const v = box(TX1 - TX0 - 2 * WT - 1, h, TZ1 - TZ0 - 2 * WT - 1, M(0x0c4d58, 0, 0.3, { transparent: true, opacity: 0.2, depthWrite: false }), (TX0 + TX1) / 2, TY0 + WT + h / 2, (TZ0 + TZ1) / 2, scene, false);
     v.renderOrder = 2;
   }
 
@@ -451,6 +467,8 @@
     box(200, 10, 40, mat.black, -10, 16, 0, tg);                             // concentrador de fluxo (ferrite)
     // conversor de revenido (caixa na traseira do pilar)
     box(260, 340, 150, mCab, XT + 210, 120, -812);
+    box(60, -50 - FLOOR, 60, mat.steelBlue, XT + 210, (-50 + FLOOR) / 2, -812);   // pé do conversor
+    box(150, 10, 150, mat.dark, XT + 210, FLOOR + 5, -812);
     tempTex = canvasTex(256, 128, () => {}); tempTex.wrapS = tempTex.wrapT = THREE.ClampToEdgeWrapping; tempG = tempTex.image.getContext("2d");
     box(170, 92, 8, mat.dark, XT + 210, 210, -733);
     put(new THREE.Mesh(new THREE.PlaneGeometry(160, 80), new THREE.MeshBasicMaterial({ map: tempTex, toneMapped: false })), XT + 210, 210, -728.5);
@@ -484,6 +502,11 @@
   ring.rotation.x = -Math.PI / 2; ring.renderOrder = 4; put(ring, X_LAND, WATER + 1, Z0);
   let ringAge = 9;
   const glowLight = new THREE.PointLight(0xff8a3a, 0, 1600, 2); scene.add(glowLight);
+  // halo de incandescência (aditivo) à volta da lima quente: lê-se "quente" mesmo com o tone mapping
+  const halo = new THREE.Sprite(new THREE.SpriteMaterial({
+    map: canvasTex(128, 128, (g) => { const gr = g.createRadialGradient(64, 64, 0, 64, 64, 64); gr.addColorStop(0, "rgba(255,255,255,1)"); gr.addColorStop(0.35, "rgba(255,255,255,0.55)"); gr.addColorStop(1, "rgba(255,255,255,0)"); g.fillStyle = gr; g.fillRect(0, 0, 128, 128); }),
+    color: 0xff8a2a, blending: THREE.AdditiveBlending, transparent: true, depthWrite: false, opacity: 0 }));
+  halo.renderOrder = 5; scene.add(halo);
 
   // =====================================================================
   // 9 · Modelo do processo (tudo em função do tempo de linha → igual a qualquer velocidade)
@@ -586,11 +609,11 @@
     const g = hg, Tm = P.indT, Dw = UP.dwell, tw = tauWater(), Q = P.quenchT;
     g.fillStyle = "#0a111d"; g.fillRect(0, 0, HW, HH);
     g.fillStyle = "#15294b"; g.fillRect(0, 0, HW, 58);
-    g.textBaseline = "middle"; g.textAlign = "left"; g.fillStyle = "#eaf1fd"; g.font = "700 27px Arial"; g.fillText("GERADOR DE INDUÇÃO · MF", 20, 30);
-    const [chip, cc] = s.on ? ["A AQUECER", "#f59e0b"] : s.quench ? ["TÊMPERA EM ÁGUA", "#38bdf8"] : ["PRONTO", "#22c55e"];
+    g.textBaseline = "middle"; g.textAlign = "left"; g.fillStyle = "#eaf1fd"; g.font = "700 27px Arial"; g.fillText(tr("GERADOR DE INDUÇÃO · MF"), 20, 30);
+    const [chip, cc] = s.on ? [tr("A AQUECER"), "#f59e0b"] : s.quench ? [tr("TÊMPERA EM ÁGUA"), "#38bdf8"] : [tr("PRONTO"), "#22c55e"];
     g.font = "700 20px Arial"; const cw = g.measureText(chip).width + 30;
     g.fillStyle = cc; g.fillRect(HW - 20 - cw, 13, cw, 34); g.fillStyle = "#0a111d"; g.fillText(chip, HW - 5 - cw, 31);
-    const tiles = [["POTÊNCIA", s.on ? fmt(s.kW, 0) : "0", "kW", s.on], ["FREQUÊNCIA", s.on ? fmt(s.kHz, 1) : "—", "kHz", s.on], ["TEMPERATURA DA PEÇA", s.T == null ? "—" : String(Math.round(s.T)), "°C", s.T != null && s.T > 300]];
+    const tiles = [[tr("POTÊNCIA"), s.on ? fmt(s.kW, 0) : "0", "kW", s.on], [tr("FREQUÊNCIA"), s.on ? fmt(s.kHz, 1) : "—", "kHz", s.on], [tr("TEMPERATURA DA PEÇA"), s.T == null ? "—" : String(Math.round(s.T)), "°C", s.T != null && s.T > 300]];
     tiles.forEach(([lab, val, unit, hot], i) => {
       const x = 20 + i * 256, y = 72, w = 244, h = 124;
       g.fillStyle = "#101c31"; g.fillRect(x, y, w, h);
@@ -610,9 +633,9 @@
     for (let tt = 0; tt <= tMax + 1e-6; tt += 0.5) { g.beginPath(); g.moveTo(fx(tt), py + ph); g.lineTo(fx(tt), py + ph + 6); g.stroke(); if (Math.abs(tt % 1) < 1e-6) g.fillText(fmt(tt, 0) + " s", fx(tt), py + ph + 18); }
     g.setLineDash([7, 5]); g.strokeStyle = "#f59e0b"; g.beginPath(); g.moveTo(px, fy(Tm)); g.lineTo(px + pw, fy(Tm)); g.stroke(); g.setLineDash([]);
     g.textAlign = "left"; g.fillStyle = "#fbbf24"; g.font = "700 16px Arial"; g.fillText(`${Tm} °C`, px + 8, fy(Tm) - 12);
-    g.fillStyle = "#c9d6ea"; g.font = "15px Arial"; g.fillText("aquecimento por indução", fx(T_ON) + 6, py + 16);
-    g.fillStyle = "#7dd3fc"; g.font = "700 16px Arial"; g.fillText(`têmpera em água: ${fmt(Q, 2)} s`, Math.min(fx(tw) + 8, px + pw - 210), py + 40);
-    g.fillStyle = "#7f93b3"; g.font = "14px Arial"; g.fillText("T (°C) × t", px + pw - 74, py + ph - 14);
+    g.fillStyle = "#c9d6ea"; g.font = "15px Arial"; g.fillText(tr("aquecimento por indução"), fx(T_ON) + 6, py + 16);
+    g.fillStyle = "#7dd3fc"; g.font = "700 16px Arial"; g.fillText(tr("têmpera em água: ") + fmt(Q, 2) + " s", Math.min(fx(tw) + 8, px + pw - 210), py + 40);
+    g.fillStyle = "#7f93b3"; g.font = "14px Arial"; g.fillText(tr("T (°C) × t"), px + pw - 74, py + ph - 14);
     if (s.tau != null) {
       const n = 160, tEnd = Math.min(s.tau, tMax);
       g.beginPath();
@@ -622,23 +645,23 @@
     }
     g.strokeStyle = "#3a4d6e"; g.lineWidth = 1.5; g.strokeRect(px, py, pw, ph);
     g.fillStyle = "#8fa3c0"; g.font = "16px Arial"; g.textAlign = "left";
-    g.fillText(`Bobina Ø104 mm · ${NT} espiras · água ${fmt(s.water, 1)} °C`, 20, HH - 34);
-    g.textAlign = "right"; g.fillText(`Peças temperadas: ${s.n}`, HW - 20, HH - 34);
+    g.fillText(tr("Bobina Ø104 mm · ") + NT + tr(" espiras · água ") + fmt(s.water, 1) + " °C", 20, HH - 34);
+    g.textAlign = "right"; g.fillText(tr("Peças temperadas: ") + s.n, HW - 20, HH - 34);
     hmiTex.needsUpdate = true;
   }
   function drawChiller(w, on) {
     const g = chillG; g.fillStyle = "#06121a"; g.fillRect(0, 0, 320, 160);
-    g.fillStyle = "#67e8f9"; g.font = "700 22px Arial"; g.textBaseline = "middle"; g.textAlign = "left"; g.fillText("ÁGUA DA BOBINA", 16, 26);
+    g.fillStyle = "#67e8f9"; g.font = "700 22px Arial"; g.textBaseline = "middle"; g.textAlign = "left"; g.fillText(tr("ÁGUA DA BOBINA"), 16, 26);
     g.fillStyle = "#ffffff"; g.font = "700 46px Menlo, monospace"; g.fillText(fmt(w, 1), 16, 84); g.font = "700 22px Arial"; g.fillText("°C", 150, 92);
-    g.fillStyle = "#9fb3d1"; g.font = "18px Arial"; g.fillText("caudal 32 L/min · 3,2 bar", 16, 134);
+    g.fillStyle = "#9fb3d1"; g.font = "18px Arial"; g.fillText(tr("caudal 32 L/min · 3,2 bar"), 16, 134);
     g.fillStyle = on ? "#22c55e" : "#64748b"; g.beginPath(); g.arc(296, 26, 9, 0, 7); g.fill();
     chillTex.needsUpdate = true;
   }
   function drawTemper(on, T) {
     const g = tempG; g.fillStyle = "#0a111d"; g.fillRect(0, 0, 256, 128);
-    g.fillStyle = "#c4b5fd"; g.font = "700 18px Arial"; g.textBaseline = "middle"; g.textAlign = "left"; g.fillText("REVENIDO", 12, 20);
+    g.fillStyle = "#c4b5fd"; g.font = "700 18px Arial"; g.textBaseline = "middle"; g.textAlign = "left"; g.fillText(tr("REVENIDO"), 12, 20);
     g.fillStyle = on ? "#fbbf24" : "#64748b"; g.font = "700 44px Menlo, monospace"; g.fillText(String(Math.round(T)), 12, 68); g.font = "700 20px Arial"; g.fillText("°C", 120, 74);
-    g.fillStyle = "#9fb3d1"; g.font = "16px Arial"; g.fillText(on ? "4,5 kW · 30 kHz" : "em espera", 12, 108);
+    g.fillStyle = "#9fb3d1"; g.font = "16px Arial"; g.fillText(on ? tr("4,5 kW · 30 kHz") : tr("em espera"), 12, 108);
     tempTex.needsUpdate = true;
   }
 
@@ -647,15 +670,16 @@
   // =====================================================================
   const liveT = { T: null, on: false };
   addTag({ text: () => `3 · Têmpera por indução — ${P.indT} °C → água`, at: () => V(-6250, 1500, -620), min: 2500, big: true });
-  addTag({ text: "Bobina de indução (cobre, arrefecida a água)", at: () => V(car.position.x - 20, YC + 300, Z0 - 60), max: 3000 });
-  addTag({ text: () => `Peça: ${Math.round(liveT.T)} °C`, at: () => V(X9, YC + 120, Z0 + 60), max: 2600, when: () => liveT.on && liveT.T > 100 });
-  addTag({ text: "Fonte AC / gerador de indução · HMI para o corredor do operador", at: () => V(GX, 1500, GZB), max: 4500 });
-  addTag({ text: "Água de resfriamento da bobina (entrada · saída)", at: () => V(car.position.x - 120, 330, -930), max: 2600 });
+  const front = () => camera.position.z > -900;              // etiquetas da linha só vistas do lado da linha (não por trás do gerador)
+  addTag({ text: "Bobina de indução (cobre, arrefecida a água)", at: () => V(car.position.x - 20, YC + 300, Z0 - 60), max: 3000, when: front });
+  addTag({ text: () => `Peça: ${Math.round(liveT.T)} °C`, at: () => V(X9, YC + 120, Z0 + 60), max: 2600, when: () => front() && liveT.on && liveT.T > 100 });
+  addTag({ text: "Fonte AC / gerador de indução", at: () => V(GX, 1500, GZ), max: 4500 });
+  addTag({ text: "Água de resfriamento da bobina (entrada · saída)", at: () => V(car.position.x - 120, 330, -930), max: 2600, when: front });
   addTag({ text: "Refrigerador · circuito fechado", at: () => V(-7410, 760, -900), max: 4500 });
-  addTag({ text: "Tanque de têmpera (água)", at: () => V(-5780, -40, TZ1 + 10), max: 3500 });
-  addTag({ text: "Elevador de raspadores", at: () => V(-5770, 120, Z0 + 60), max: 2400 });
-  addTag({ text: "Extração de vapor", at: () => V((TX0 + TX1) / 2, 1050, Z0), max: 3500 });
-  addTag({ text: "Revenido por indução · ~200 °C", at: () => V(XT, 560, Z0), max: 3500 });
+  addTag({ text: "Tanque de têmpera (água)", at: () => V(-5780, -40, TZ1 + 10), max: 3500, when: front });
+  addTag({ text: "Elevador de raspadores", at: () => V(-5770, 120, Z0 + 60), max: 2400, when: front });
+  addTag({ text: "Extração de vapor", at: () => V((TX0 + TX1) / 2, 1050, Z0), max: 3500, when: front });
+  addTag({ text: "Revenido por indução · ~200 °C", at: () => V(XT, 560, Z0), max: 3500, when: front });
   addView("ind", "Indução", [-5700, 1100, 1400], [-6200, 100, -420]);
   addView("indHmi", "Indução · painel", [-7300, 1000, -2700], [-6620, 700, -1245]);
 
@@ -723,7 +747,10 @@
       if (hot && hotH > 0.01) {
         hot.g.updateMatrixWorld(); tmp.set(0, 2 + P.h / 2 + 18, 0); hot.g.localToWorld(tmp);
         glowLight.position.copy(tmp); glowLight.intensity = 140000 * hotH * hotH; glowLight.color.setRGB(1, 0.45 + 0.35 * hotH, 0.15 + 0.2 * hotH);
-      } else glowLight.intensity = 0;
+        tmp.set(0, 2 + P.h / 2, 0); hot.g.localToWorld(tmp); halo.position.copy(tmp);
+        halo.scale.set(2 * HL() + 150, 110 + 40 * hotH, 1); halo.material.opacity = 0.9 * Math.pow(hotH, 1.3);
+        halo.material.color.setRGB(1, 0.42 + 0.3 * hotH, 0.12 + 0.12 * hotH);
+      } else { glowLight.intensity = 0; halo.material.opacity = 0; }
       liveT.on = inCoil; liveT.T = T9;
 
       // partículas
@@ -780,7 +807,7 @@
           kW: (Tn >= P.indT - 5 ? 0.38 : 1) * pw * (0.97 + 0.03 * Math.sin(clock * 11)), kHz: 18 + 8 * clamp((Tn - 650) / 250) + 0.1 * Math.sin(clock * 5),
           T: Tcur, tau, water: waterT, n: nQ,
         };
-        const key = `${s.on}|${s.quench}|${Math.round(s.kW)}|${s.kHz.toFixed(1)}|${Tcur == null ? "-" : Math.round(Tcur)}|${tau == null ? "-" : tau.toFixed(2)}|${P.indT}|${P.quenchT}|${nQ}|${waterT.toFixed(1)}`;
+        const key = `${s.on}|${s.quench}|${Math.round(s.kW)}|${s.kHz.toFixed(1)}|${Tcur == null ? "-" : Math.round(Tcur)}|${tau == null ? "-" : tau.toFixed(2)}|${P.indT}|${P.quenchT}|${nQ}|${waterT.toFixed(1)}|${LANG.rev}`;
         if (key !== hmiKey) { hmiKey = key; drawHMI(s); }
         hmiT = now;
         if ((chillT += 1) % 4 === 0) drawChiller(waterT, true);

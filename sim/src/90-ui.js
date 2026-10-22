@@ -30,7 +30,7 @@ function renderResults() {
   const e = P.e0 / 1000, rows = [];
   for (const [pt, name] of [["B", "Torta em B · segura A+C, corrige B"], ["C", "Torta em A ou C · segura 2 pares, corrige a ponta"]]) {
     const F = forceFor(e, pt), R = reactions(F, pt), d = bend(F, pt);
-    rows.push([`<span class="sec">${name}</span>`, null]);
+    rows.push([`<span class="sec">${tr(name)}</span>`, null]);
     rows.push(["Início da cedência", fmtF(Fy(pt))]);
     rows.push([`Força p/ corrigir ${P.e0} µm`, `<span class="hl">${fmtF(F)}</span>`]);
     rows.push(["Reacção no par que segura (bloqueado)", fmtF(R.near)]);
@@ -38,21 +38,21 @@ function renderResults() {
     rows.push(["Actuador de " + fmtF(P.cap), F <= P.cap ? '<span class="good"><b>chega</b></span>' : `<span class="bad"><b>não chega (×${(F / P.cap).toFixed(1)})</b></span>`]);
   }
   const s = sigma();
-  rows.push([`<span class="sec">Medição</span>`, null]);
+  rows.push([`<span class="sec">${tr("Medição")}</span>`, null]);
   rows.push(["Sensor", SENSORS[P.sensor].name]);
   rows.push(["Repetibilidade vs tolerância", `${s} µm vs ±${P.tol} µm`]);
   rows.push(["O sensor resolve a tolerância?", s <= P.tol / 3 ? '<span class="good"><b>sim</b></span>' : '<span class="bad"><b>não</b></span>']);
-  rows.push([`<span class="sec">Força elástica (volta ao sítio)</span>`, null]);
+  rows.push([`<span class="sec">${tr("Força elástica (volta ao sítio)")}</span>`, null]);
   rows.push(["3 pontos: 0,5 µm / 5 µm", fmtF(Kof("B") * 0.0005) + " / " + fmtF(Kof("B") * 0.005)]);
   rows.push(["Consola: 0,5 µm / 5 µm", fmtF(Kof("C") * 0.0005) + " / " + fmtF(Kof("C") * 0.005)]);
-  $("res").innerHTML = rows.map(([a, b]) => (b === null ? a : `<span>${a}</span><span>${b}</span>`)).join("");
+  $("res").innerHTML = rows.map(([a, b]) => (b === null ? tr(a) : `<span>${tr(a)}</span><span>${tr(b)}</span>`)).join("");
   const Fc = Math.max(forceFor(e, "B"), forceFor(e, "C"));
   const notes = [];
   if (Fc > P.cap) notes.push(`<span class="bad">O actuador de correção precisa de ~${fmtF(Fc)}. Com ${fmtF(P.cap)} a lima só flete de forma elástica e volta torta.</span>`);
   if (s > P.tol / 3) notes.push(`<span class="bad">O ${SENSORS[P.sensor].name} tem repetibilidade de ${s} µm: não consegue garantir ±${P.tol} µm. Para 0,5 µm é preciso um sensor de deslocamento/confocal de alta precisão.</span>`);
   notes.push(`Os pares que seguram fecham com ${fmtF(P.clamp)} (guia linear) e depois ficam bloqueados (fuso auto-bloqueante/travão), porque a reacção chega a ${fmtF(2 * forceFor(e, "C"))}.`);
   notes.push(`O scanner 2 mede a flecha δ e a força F em tempo real e pára quando δ − F/K = erro; assim a variação de ±${P.var}% na dureza não estraga a correção.`);
-  $("explain").innerHTML = notes.join("<br>");
+  $("explain").innerHTML = notes.map(tr).join("<br>");
 }
 
 const trace = [];
@@ -70,8 +70,8 @@ function drawFD(j) {
   if (P.cap < fMax) { g.strokeStyle = "rgba(239,83,80,.7)"; g.beginPath(); g.moveTo(pad, Yf(P.cap)); g.lineTo(W - 10, Yf(P.cap)); g.stroke(); }
   g.setLineDash([]);
   g.fillStyle = "#8fa3c0"; g.font = "17px system-ui";
-  g.fillText("F", 8, 22); g.fillText("δ", W - 22, H - 8); g.fillText("cedência", W - 92, Yf(fy) - 6); g.fillText(fmtF(fMax), pad + 4, 22);
-  if (P.cap < fMax) { g.fillStyle = "#ef5350"; g.fillText("limite actuador", W - 140, Yf(P.cap) - 6); }
+  g.fillText("F", 8, 22); g.fillText("δ", W - 22, H - 8); g.fillText(tr("cedência"), W - 92, Yf(fy) - 6); g.fillText(fmtF(fMax), pad + 4, 22);
+  if (P.cap < fMax) { g.fillStyle = "#ef5350"; g.fillText(tr("limite actuador"), W - 140, Yf(P.cap) - 6); }
   g.strokeStyle = "#f59e42"; g.lineWidth = 3; g.beginPath();
   trace.forEach(([d, f], i) => (i ? g.lineTo(X(d), Yf(f)) : g.moveTo(X(d), Yf(f))));
   g.stroke();
@@ -88,7 +88,7 @@ function drawProfile(l, label, progress = 1) {
   g.fillStyle = "#8fa3c0"; g.font = "17px system-ui";
   g.fillText("+" + span.toFixed(span >= 10 ? 0 : 1) + " µm", 4, 18);
   for (const [pt, s] of [["A", 0], ["B", 0.5], ["C", 1]]) g.fillText(pt, pad + s * (W - pad - 20), H - 6);
-  g.fillText(label, W - 200, 18);
+  g.fillText(tr(label), W - 200, 18);
   if (!l) return;
   g.strokeStyle = Math.abs(um(l.e)) <= P.tol ? "#3b82f6" : "#ef5350"; g.lineWidth = 3; g.beginPath();
   const n = Math.max(1, Math.round(80 * progress));
@@ -102,8 +102,8 @@ function drawProfile(l, label, progress = 1) {
 function renderMotors() {
   $("mgrid").innerHTML = acts.map((a) => {
     const cls = a.role === "push" && a.force > P.cap + 1e-6 ? "over" : a.role;
-    const role = a.role === "push" ? "corrige" : a.role === "hold" ? "segura" : "livre";
-    return `<div class="m ${cls}"><b>${a.name} (${a.motor}) · ${role}</b>${a.role === "hold" && a.force ? "reacção " : ""}${fmtF(a.force)}</div>`;
+    const role = tr(a.role === "push" ? "corrige" : a.role === "hold" ? "segura" : "livre");
+    return `<div class="m ${cls}"><b>${a.name} (${a.motor}) · ${role}</b>${a.role === "hold" && a.force ? tr("reacção ") : ""}${fmtF(a.force)}</div>`;
   }).join("");
 }
 function drawHMI() {
@@ -122,15 +122,15 @@ function drawHMI() {
   });
   g.font = "bold 24px system-ui"; g.fillStyle = "#4ade80"; g.fillText("OK  " + okCount, 330, 160);
   g.fillStyle = "#ef5350"; g.fillText("NOK " + nokCount, 330, 200);
-  g.fillStyle = "#8fa3c0"; g.font = "13px system-ui"; g.fillText("tol ±" + P.tol + " µm", 330, 236);
-  g.fillText("paletes " + shipped, 330, 258);
+  g.fillStyle = "#8fa3c0"; g.font = "13px system-ui"; g.fillText(tr("tol ±") + P.tol + " µm", 330, 236);
+  g.fillText(tr("paletes ") + shipped, 330, 258);
   hmiTex.needsUpdate = true;
 }
 
 // =====================================================================
 // Ciclo: indexar → (robô entrada | scanner 1 | módulo corrige na esteira | robô saída)
 // =====================================================================
-const DUR = { index: 1.6, scan: 1.6, approach: 0.7, hold: 0.35, release: 1.0, verify: 0.9, pass: 1.0, retract: 0.5, end: 0.5 };
+const DUR = { index: 1.2, scan: 1.2, approach: 0.6, hold: 0.35, release: 0.7, verify: 0.6, pass: 0.7, retract: 0.4, end: 0.3 };   // ciclo SACCLI ≈ ritmo da linha a montante
 const measure = (l) => l.e + gauss() * sigma() / 1000;
 // lado (z do mundo) para onde a lima está curvada: +lateral local = −z no mundo
 const bulgeSide = (meas) => -(Math.sign(meas) || 1);
@@ -204,7 +204,7 @@ function stepJob(dt) {
     // rápido na zona elástica; depois devagar, proporcional ao que falta para o alvo
     const fyNom = Fy(j.pt, P.sy);
     const left = Math.max(0, (j.target - j.predF) / j.target);
-    const rate = j.F < 0.92 * fyNom ? fyNom / 1.0 : fyNom * 0.05 * Math.max(0.06, Math.min(1, left * 1.5));
+    const rate = j.F < 0.92 * fyNom ? fyNom / 0.7 : fyNom * 0.16 * Math.max(0.12, Math.min(1, left * 1.5));
     j.F = Math.min(P.cap, j.F + rate * dt);
     const truth = bend(j.F, j.pt, l.syTrue, 90);
     j.d = truth.loaded + gauss() * sigma() / 1000;
@@ -318,21 +318,21 @@ function renderHUD() {
   let label = names[key];
   if (key === "retract" || key === "end") label = j.result === "ok" ? "OK — corrigida, segue na esteira" : j.result === "weak" ? "NOK — actuador sem força para passar a cedência" : "NOK — rejeitar";
   if (j && j.step === "hold" && j.capped) label = "Parar: limite do actuador atingido";
-  $("phase").textContent = label;
+  $("phase").textContent = tr(label);
   $("phaseDot").style.background = (key === "end" || key === "retract" || key === "pass") ? (j.result === "ok" ? "#4ade80" : "#ef5350") : key === "press" || key === "hold" ? "#f59e42" : "#6aa8ff";
   if (j && j.dir) {
     const holds = acts.filter((a) => a.role === "hold").map((a) => a.name).join(" ");
     const push = acts.find((a) => a.role === "push");
-    $("order").innerHTML = `Torta em <b>${j.pt}</b> · ${fmtUm(um(j.meas ?? l.meas1))} → segurar <b>${holds}</b> · corrigir com <b>${push ? push.name : "—"}</b>`;
-  } else if (j && j.step === "decide") $("order").textContent = "A ler o scanner 1…";
-  else if (j && j.step === "pass") $("order").innerHTML = `Lima direita (${fmtUm(um(l.meas1))}, dentro de ±${P.tol} µm) → <b>segue sem correção</b>`;
-  $("limaId").textContent = l ? `#${l.id} · σy real ${l.syTrue.toFixed(0)} MPa` : "—";
+    $("order").innerHTML = tr(`Torta em <b>${j.pt}</b> · ${fmtUm(um(j.meas ?? l.meas1))} → segurar <b>${holds}</b> · corrigir com <b>${push ? push.name : "—"}</b>`);
+  } else if (j && j.step === "decide") $("order").textContent = tr("A ler o scanner 1…");
+  else if (j && j.step === "pass") $("order").innerHTML = tr(`Lima direita (${fmtUm(um(l.meas1))}, dentro de ±${P.tol} µm) → <b>segue sem correção</b>`);
+  $("limaId").textContent = l ? tr(`#${l.id} · σy real ${l.syTrue.toFixed(0)} MPa`) : "—";
   $("eMeas").textContent = l && l.meas1 !== undefined ? fmtUm(um(l.meas1)) : "—";
   $("force").textContent = j && j.F ? fmtF(j.F) : "0 N";
   $("defl").textContent = j && j.d ? j.d.toFixed(3) + " mm" : "—";
   if (j && j.F && l && j.pt) {
     const sig = Math.min(l.syTrue, cOf(j.pt) * j.F * P.a * (P.h / 2) / I());
-    $("stress").textContent = sig.toFixed(0) + " MPa" + (j.F > Fy(j.pt, l.syTrue) ? " · plástico" : " · elástico");
+    $("stress").textContent = sig.toFixed(0) + " MPa" + tr(j.F > Fy(j.pt, l.syTrue) ? " · plástico" : " · elástico");
   } else $("stress").textContent = "—";
   const tgt = j && j.target ? um(j.target) : 0, pred = j && j.predF ? Math.max(0, um(j.predF)) : 0;
   const full = Math.max(tgt * 1.25, 0.01);
@@ -360,7 +360,7 @@ function renderTags() {
     const show = v3.z < 1 && dist >= tg.min && dist <= tg.max && Math.abs(v3.x) < 1.05 && Math.abs(v3.y) < 1.05 && (!tg.when || tg.when());
     tg.el.style.display = show ? "block" : "none";
     if (!show) continue;
-    tg.el.textContent = typeof tg.text === "function" ? tg.text() : tg.text;
+    tg.el.textContent = tr(typeof tg.text === "function" ? tg.text() : tg.text);
     tg.el.style.left = ((v3.x + 1) / 2) * innerWidth + "px";
     tg.el.style.top = ((1 - v3.y) / 2) * innerHeight + "px";
   }
@@ -377,9 +377,19 @@ const VIEWS = {
   top: [[-200, 3600, 1], [-200, 0, 0]],
 };
 function view(name) { const [p, tg] = VIEWS[name]; camera.position.set(...p); controls.target.set(...tg); controls.update(); }
-for (const v of World.views) {
-  VIEWS[v.key] = [v.pos, v.target];
-  const b = document.createElement("button"); b.textContent = v.label; b.onclick = () => view(v.key); $("stationViews").appendChild(b);
+for (const v of World.views) VIEWS[v.key] = [v.pos, v.target];
+// botões grandes, por ordem do processo, para ver cada área (as vistas das estações vêm dos ficheiros 55-*)
+VIEWS.feed = [[-10500, 1500, 1500], [-9650, 0, -420]];
+VIEWS.pack = [[2500, 2000, 2100], [3600, -150, -150]];
+VIEWS.crates = [[-2400, 1900, 2300], [-900, -200, 200]];
+const AREAS = [
+  ["feed", "0 · Alimentação"], ["lam", "1 · Laminagem"], ["pic", "2 · Picagem"], ["ind", "3 · Têmpera"], ["indHmi", "3 · Painel da têmpera"],
+  ["dur", "4 · Dureza"], ["jato", "5 · Jateamento"], ["cell", "6 · SACCLI"], ["mod", "6 · Módulos A–C"], ["crates", "6 · Caixas e robôs"],
+  ["pack", "7 · Embalagem e palete"], ["exp", "8 · Expedição (AMR)"], ["kmf", "8 · Armário (KMF 1500P)"],
+];
+for (const [key, label] of AREAS) {
+  if (!VIEWS[key]) continue;
+  const b = document.createElement("button"); b.className = "area"; b.textContent = label; b.onclick = () => view(key); $("stationViews").appendChild(b);   // texto traduzido por i18nInit()
 }
 $("viewFab").onclick = () => view("fab");
 $("viewCell").onclick = () => view("cell");
@@ -387,7 +397,14 @@ $("viewMod").onclick = () => view("mod");
 $("viewExp").onclick = () => view("exp");
 $("viewTop").onclick = () => view("top");
 $("panels").onclick = () => ["ctrl", "charts", "motors"].forEach((id) => $(id).classList.toggle("hidden"));
-$("play").onclick = () => { paused = !paused; $("play").textContent = paused ? "▶ Continuar" : "❚❚ Pausa"; };
+$("play").onclick = () => { paused = !paused; $("play").textContent = tr(paused ? "▶ Continuar" : "❚❚ Pausa"); };
+// velocidade da linha: botões 0,5×…6× no painel de parâmetros
+function setSpeed(v) {
+  setVal("speed", v); readUI();
+  for (const b of $("speedBtns").querySelectorAll("button")) b.classList.toggle("active", Number(b.dataset.speed) === v);
+}
+for (const b of $("speedBtns").querySelectorAll("button")) b.onclick = () => setSpeed(Number(b.dataset.speed));
+$("speed").addEventListener("input", () => { for (const b of $("speedBtns").querySelectorAll("button")) b.classList.toggle("active", Number(b.dataset.speed) === Number($("speed").value)); });
 addEventListener("keydown", (e) => { if (e.code === "Space" && !["INPUT", "SELECT"].includes(e.target.tagName)) { e.preventDefault(); $("play").click(); } });
 addEventListener("resize", () => { camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix(); renderer.setSize(innerWidth, innerHeight); });
 
@@ -400,6 +417,8 @@ makeLima("pool"); makeLima("pool");
 // caixas no arranque: entrada (descarga, fila, enchimento, retorno), verdes e vermelhas
 newInCrate(BIN_IN.x, BIN_IN.z, CAP_IN, "atInput");
 newInCrate(BIN_IN.x - BIN_IN.w - 40, BIN_IN.z, CAP_IN, "toInput");
+newInCrate(BIN_IN.x - 2 * (BIN_IN.w + 40), BIN_IN.z, CAP_IN, "toInput");   // mais 2 caixas em circulação para a linha a montante não parar à espera de caixa vazia
+newInCrate(FILL_X + BIN_IN.w + 40, RET_Z, 0, "returning");
 newInCrate(FILL_X, BIN_IN.z, 3, "filling");
 newInCrate(FILL_X, RET_Z, 0, "waitFill");
 newOutCrate(OK_X, 4);
@@ -436,4 +455,6 @@ renderer.setAnimationLoop((now) => {
   if ((hudTick += dt) > 0.05) { hudTick = 0; renderHUD(); }
   if ((drawHMI.t = (drawHMI.t || 0) + dt) > 0.25) { drawHMI.t = 0; drawHMI(); }
 });
-window.__saccli = { FL, rackSlots, cartons, packer, runLog, P, limas, get job() { return job; }, bend, forceFor, robotIn, robotOut, camera, controls, amr, station, outCrates, cobot };
+LANG.hooks.push(() => { renderResults(); renderHUD(); renderMotors(); $("play").textContent = tr(paused ? "▶ Continuar" : "❚❚ Pausa"); setSpeed(P.speed); });
+i18nInit();
+window.__saccli = { tags: World.tags, FL, rackSlots, cartons, packer, runLog, P, limas, get job() { return job; }, bend, forceFor, robotIn, robotOut, camera, controls, amr, station, outCrates, cobot };

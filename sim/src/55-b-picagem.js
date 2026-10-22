@@ -124,9 +124,9 @@
     g.fillStyle = "#e9edf1"; g.fillRect(0, 0, w, h); g.strokeStyle = "#24302b"; g.lineWidth = 5; g.strokeRect(4, 4, w - 8, h - 8);
     g.fillStyle = "#2f5a45"; g.fillRect(4, 4, 104, h - 8);
     g.fillStyle = "#fff"; g.font = "800 42px Arial, sans-serif"; g.textAlign = "center"; g.textBaseline = "middle"; g.fillText("PL", 56, h / 2);
-    g.textAlign = "left"; g.fillStyle = "#16202c"; g.font = "700 27px Arial, sans-serif"; g.fillText("PICADORA DE LIMAS", 124, 32);
-    g.font = "19px Arial, sans-serif"; g.fillText("came de 6 ressaltos · 720 golpes/min", 124, 63);
-    g.fillStyle = "#4a5868"; g.font = "17px Arial, sans-serif"; g.fillText("cinzel HSS · avanço por fuso de esferas", 124, 90);
+    g.textAlign = "left"; g.fillStyle = "#16202c"; g.font = "700 27px Arial, sans-serif"; g.fillText(tr("PICADORA DE LIMAS"), 124, 32);
+    g.font = "19px Arial, sans-serif"; g.fillText(tr("came de 6 ressaltos · 720 golpes/min"), 124, 63);
+    g.fillStyle = "#4a5868"; g.font = "17px Arial, sans-serif"; g.fillText(tr("cinzel HSS · avanço por fuso de esferas"), 124, 90);
   }), -8090, 946, ZF + 1);
 
   // =================================================================
@@ -186,8 +186,8 @@
   put(rbox(113, 16, 168, 15, mCast), 0, 352, -462.5, carG);
   plate(84, 92, canvasTex(168, 184, (g, w, h) => {
     g.fillStyle = "#e3e7eb"; g.fillRect(0, 0, w, h); g.strokeStyle = "#8d969f"; g.lineWidth = 4; g.strokeRect(2, 2, w - 4, h - 4);
-    g.fillStyle = "#2f5a45"; g.font = "800 30px Arial, sans-serif"; g.textAlign = "center"; g.fillText("CINZEL", w / 2, 50);
-    g.fillStyle = "#3d4b5c"; g.font = "600 18px Arial, sans-serif"; g.fillText("picado bastardo", w / 2, 86); g.fillText("10 dentes/cm", w / 2, 112);
+    g.fillStyle = "#2f5a45"; g.font = "800 30px Arial, sans-serif"; g.textAlign = "center"; g.fillText(tr("CINZEL"), w / 2, 50);
+    g.fillStyle = "#3d4b5c"; g.font = "600 18px Arial, sans-serif"; g.fillText(tr("picado bastardo"), w / 2, 86); g.fillText(tr("10 dentes/cm"), w / 2, 112);
     g.fillText("65° · 12°", w / 2, 138);
   }), 0, 262, -379.5, 0, carG);
   const hitLed = box(26, 8, 3, mHit, 0, 330, -378.5, carG);
@@ -322,7 +322,7 @@
     g.fillStyle = "#f2c200"; g.fillRect(0, 0, 256, 128); g.fillStyle = "#111";
     g.beginPath(); g.moveTo(64, 18); g.lineTo(112, 104); g.lineTo(16, 104); g.closePath(); g.lineWidth = 8; g.strokeStyle = "#111"; g.stroke();
     g.font = "800 60px Arial"; g.textAlign = "center"; g.textBaseline = "middle"; g.fillText("!", 64, 72);
-    g.font = "700 26px Arial"; g.textAlign = "left"; g.fillText("400 V", 132, 50); g.font = "20px Arial"; g.fillText("Comando", 132, 86);
+    g.font = "700 26px Arial"; g.textAlign = "left"; g.fillText("400 V", 132, 50); g.font = "20px Arial"; g.fillText(tr("Comando"), 132, 86);
   }), -8610, 250, -858.5);
   tube([V(-8610, 380, -1000), V(-8560, 430, -1045), V(-8491, 500, -1058), V(-8490, 1000, -1060), V(-8440, 1052, -1060), V(-8200, 1060, -1062), V(-8100, 1118, -1020), V(-8070, 1200, -960), V(-8060, 1247, -925)], 11, mat.black, scene, false, 80, 8);
   // coluna luminosa no braço
@@ -362,7 +362,7 @@
       g.fillStyle = "#f2c200"; g.fillRect(0, 0, w, h); g.strokeStyle = "#111"; g.lineWidth = 6; g.strokeRect(3, 3, w - 6, h - 6);
       g.beginPath(); g.moveTo(62, 22); g.lineTo(112, 112); g.lineTo(12, 112); g.closePath(); g.lineWidth = 9; g.stroke();
       g.fillStyle = "#111"; g.font = "800 58px Arial"; g.textAlign = "center"; g.textBaseline = "middle"; g.fillText("!", 62, 80);
-      g.textAlign = "left"; g.font = "800 30px Arial"; g.fillText("PERIGO", 128, 52); g.font = "600 19px Arial"; g.fillText("cinzel em", 128, 84); g.fillText("movimento", 128, 106);
+      g.textAlign = "left"; g.font = "800 30px Arial"; g.fillText(tr("PERIGO"), 128, 52); g.font = "600 19px Arial"; g.fillText(tr("cinzel em"), 128, 84); g.fillText(tr("movimento"), 128, 106);
     }), GX0 + 110, 520, GZ + 3);
   }
 
@@ -503,20 +503,20 @@
     const g = hg;
     g.fillStyle = "#0b1220"; g.fillRect(0, 0, HW, HH);
     g.fillStyle = "#1d3b30"; g.fillRect(0, 0, HW, 42);
-    g.textBaseline = "middle"; g.textAlign = "left"; g.fillStyle = "#e9f5ee"; g.font = "700 21px Arial, sans-serif"; g.fillText("PICAGEM · CINZEL", 14, 22);
-    g.textAlign = "right"; g.fillStyle = "#a7c9b6"; g.font = "17px Arial, sans-serif"; g.fillText(`Limas picadas: ${st.n}`, HW - 14, 22);
-    g.textAlign = "left"; g.fillStyle = "#7f9a8c"; g.font = "600 14px Arial, sans-serif"; g.fillText("GOLPES / MIN", 16, 62);
+    g.textBaseline = "middle"; g.textAlign = "left"; g.fillStyle = "#e9f5ee"; g.font = "700 21px Arial, sans-serif"; g.fillText(tr("PICAGEM · CINZEL"), 14, 22);
+    g.textAlign = "right"; g.fillStyle = "#a7c9b6"; g.font = "17px Arial, sans-serif"; g.fillText(tr("Limas picadas: ") + st.n, HW - 14, 22);
+    g.textAlign = "left"; g.fillStyle = "#7f9a8c"; g.font = "600 14px Arial, sans-serif"; g.fillText(tr("GOLPES / MIN"), 16, 62);
     g.fillStyle = engaged ? "#ffffff" : "#56695f"; g.font = "700 56px Menlo, Consolas, monospace"; g.fillText(engaged ? String(gpm) : "0", 16, 104);
-    g.fillStyle = s >= 0 && s < 0.99 ? "#fbbf24" : "#8fa79a"; g.font = "600 16px Arial, sans-serif"; g.fillText(phaseText(s, !!UP.limaAt(SLOT)), 16, 146);
+    g.fillStyle = s >= 0 && s < 0.99 ? "#fbbf24" : "#8fa79a"; g.font = "600 16px Arial, sans-serif"; g.fillText(tr(phaseText(s, !!UP.limaAt(SLOT))), 16, 146);
     // tabela à direita
-    const rows = [["Carro X", `${(c * limaLen() * 0.85).toFixed(1)} mm`], ["Cinzel", engaged && s > 0.06 && s < 0.92 ? "a bater" : "recolhido"],
-      ["Bigorna", anvUp ? "em apoio" : "em baixo"], ["Óleo de corte", engaged ? "névoa ON" : "OFF"], ["Golpes", String(st.strikes)]];
+    const rows = [[tr("Carro X"), `${(c * limaLen() * 0.85).toFixed(1)} mm`], [tr("Cinzel"), engaged && s > 0.06 && s < 0.92 ? tr("a bater") : tr("recolhido")],
+      [tr("Bigorna"), anvUp ? tr("em apoio") : tr("em baixo")], [tr("Óleo de corte"), engaged ? tr("névoa ON") : tr("OFF")], [tr("Golpes"), String(st.strikes)]];
     rows.forEach(([k, v], i) => {
       const y = 64 + i * 22; g.fillStyle = "#7f9a8c"; g.font = "15px Arial, sans-serif"; g.textAlign = "left"; g.fillText(k, 300, y);
       g.fillStyle = "#dfe9e3"; g.font = "600 15px Arial, sans-serif"; g.textAlign = "right"; g.fillText(v, HW - 14, y);
     });
     // lima esquemática (vista de cima) com os dentes picados até à frente do cinzel
-    g.textAlign = "left"; g.fillStyle = "#7f9a8c"; g.font = "600 14px Arial, sans-serif"; g.fillText(`DENTES PICADOS · ${Math.round(c * 100)} %`, 16, 182);
+    g.textAlign = "left"; g.fillStyle = "#7f9a8c"; g.font = "600 14px Arial, sans-serif"; g.fillText(tr("DENTES PICADOS · ") + Math.round(c * 100) + " %", 16, 182);
     const x0 = 22, x1 = 430, ym = 238, hw = 26, xt = x1 + 62;
     const yAt = (x) => { const u = Math.max(0, (x0 + 210 - x) / 210); return hw * (1 - 0.42 * u * u); };
     g.beginPath(); g.moveTo(x0, ym - yAt(x0)); for (let x = x0; x <= x1; x += 6) g.lineTo(x, ym - yAt(x)); g.lineTo(x1, ym + yAt(x1));
@@ -528,8 +528,8 @@
     g.strokeStyle = "#cfd8e2"; g.lineWidth = 1.6; for (let x = x0 - 40; x < x1; x += 7) { g.beginPath(); g.moveTo(x, ym + hw); g.lineTo(x + 22, ym - hw); g.stroke(); }
     g.restore();
     if (s >= 0 && s < 0.99) { g.strokeStyle = "#fbbf24"; g.lineWidth = 3; g.beginPath(); g.moveTo(xc, ym - hw - 10); g.lineTo(xc + 10, ym + hw + 10); g.stroke(); }
-    g.fillStyle = "#6b7f74"; g.font = "13px Arial, sans-serif"; g.fillText("ponta", x0, 290); g.textAlign = "right"; g.fillText("espigão", xt, 290);
-    g.textAlign = "left"; g.fillStyle = "#8fa79a"; g.fillText("picado bastardo · 10 dentes/cm · cinzel 12°", 110, 306);
+    g.fillStyle = "#6b7f74"; g.font = "13px Arial, sans-serif"; g.fillText(tr("ponta"), x0, 290); g.textAlign = "right"; g.fillText(tr("espigão"), xt, 290);
+    g.textAlign = "left"; g.fillStyle = "#8fa79a"; g.fillText(tr("picado bastardo · 10 dentes/cm · cinzel 12°"), 110, 306);
     hmiTex.needsUpdate = true;
   }
 
@@ -597,7 +597,7 @@
       setLamp(mLampG, !UP.waiting); setLamp(mLampA, UP.waiting && Math.sin(clock * 8) > 0); setLamp(mLampR, false);
       // HMI (no máximo ~12×/s e só se algo mudou)
       const now = performance.now(), anvUp = an > 0.5, gpm = gpmNow();
-      const key = `${phaseText(s, !!here)}|${Math.round(c * 100)}|${st.n}|${engaged}|${anvUp}|${gpm}|${Math.floor(st.strikes / 3)}`;
+      const key = `${LANG.rev}|${phaseText(s, !!here)}|${Math.round(c * 100)}|${st.n}|${engaged}|${anvUp}|${gpm}|${Math.floor(st.strikes / 3)}`;
       if (key !== hmiKey && now - hmiT > 80) { hmiKey = key; hmiT = now; drawHMI(s, c, gpm, engaged, anvUp); }
     },
   });

@@ -6,7 +6,7 @@
 // =====================================================================
 const UP = {
   X0: -9600, PITCH: 350, FIRST: -1, END: 20, Z: BIN_IN.z, TOP: 0,
-  dwell: 1.8, move: 0.9, t: 0, phase: "dwell", shift: 0, waiting: false, made: 0,
+  dwell: 5.0, move: 1.2, t: 0, phase: "dwell", shift: 0, waiting: false, made: 0,
   limas: [], stations: [],
   GAPS: [[-6280, -5590]],   // fosso de têmpera: a lima sai da bobina e cai na água
 };
@@ -148,6 +148,6 @@ addSystem({
   for (let i = 0; i < 6; i++) box(limaLen() * 0.72, P.h * 1.6, P.b * 0.9, mat.steel, x - 120, 410 + P.h * 0.8, UP.Z - 110 + i * 44);   // barras chatas à espera
   addTag({ text: "0 · Alimentação de barras de aço", at: () => V(x - 120, 560, UP.Z), max: 6000 });
 }
-addTag({ text: () => (UP.waiting ? "Linha a montante · em espera (caixa azul cheia)" : `Linha a montante · ${UP.made} limas produzidas`), at: () => V(UP.xOf(12), 1500, UP.Z), min: 2500, big: true });
+addTag({ text: () => (UP.waiting ? "Linha a montante · em espera (caixa azul cheia)" : (UP.made === 1 ? "Linha a montante · 1 lima produzida" : `Linha a montante · ${UP.made} limas produzidas`)), at: () => V(UP.xOf(14), 1950, UP.Z), min: 2500, big: true });
 addView("up", "Linha a montante", [-5200, 2600, 3000], [-5600, 0, -420]);
 window.__UP = UP;

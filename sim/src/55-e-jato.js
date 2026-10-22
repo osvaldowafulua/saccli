@@ -133,28 +133,28 @@
     g.fillStyle = "#2c4b6e"; g.fillRect(5, 5, 104, h - 10);
     g.fillStyle = "#fff"; g.font = "800 40px Arial, sans-serif"; g.textAlign = "center"; g.textBaseline = "middle"; g.fillText("JT", 57, h / 2 - 12);
     g.font = "700 19px Arial, sans-serif"; g.fillText("500", 57, h / 2 + 22);
-    g.textAlign = "left"; g.fillStyle = "#16202c"; g.font = "700 27px Arial, sans-serif"; g.fillText("JATEAMENTO DE LIMAS", 124, 36);
-    g.font = "19px Arial, sans-serif"; g.fillText("Cabine de passagem · cinza especial", 124, 68);
-    g.fillStyle = "#4a5868"; g.font = "17px Arial, sans-serif"; g.fillText("Granalha 2 × 11 kW  ·  jato húmido 2 bicos", 124, 96);
+    g.textAlign = "left"; g.fillStyle = "#16202c"; g.font = "700 27px Arial, sans-serif"; g.fillText(tr("JATEAMENTO DE LIMAS"), 124, 36);
+    g.font = "19px Arial, sans-serif"; g.fillText(tr("Cabine de passagem · cinza especial"), 124, 68);
+    g.fillStyle = "#4a5868"; g.font = "17px Arial, sans-serif"; g.fillText(tr("Granalha 2 × 11 kW  ·  jato húmido 2 bicos"), 124, 96);
   });
   const warnTex = plateTex(200, 260, (g, w, h) => {
     g.fillStyle = "#f4f4f2"; g.fillRect(0, 0, w, h); g.strokeStyle = "#333"; g.lineWidth = 4; g.strokeRect(2, 2, w - 4, h - 4);
     g.fillStyle = "#f2c200"; g.beginPath(); g.moveTo(100, 14); g.lineTo(176, 140); g.lineTo(24, 140); g.closePath(); g.fill();
     g.lineWidth = 7; g.strokeStyle = "#111"; g.stroke();
     g.fillStyle = "#111"; g.font = "800 70px Arial"; g.textAlign = "center"; g.textBaseline = "middle"; g.fillText("!", 100, 96);
-    g.font = "800 26px Arial"; g.fillText("PERIGO", 100, 170);
-    g.font = "600 16px Arial"; g.fillText("Projecção de abrasivo", 100, 196);
-    g.fillText("Não abrir em marcha", 100, 218); g.fillStyle = "#1f5fd6"; g.fillText("Use protecção auditiva", 100, 242);
+    g.font = "800 26px Arial"; g.fillText(tr("PERIGO"), 100, 170);
+    g.font = "600 16px Arial"; g.fillText(tr("Projecção de abrasivo"), 100, 196);
+    g.fillText(tr("Não abrir em marcha"), 100, 218); g.fillStyle = "#1f5fd6"; g.fillText(tr("Use protecção auditiva"), 100, 242);
   });
   const turbTex = (n) => plateTex(200, 120, (g, w, h) => {
     g.fillStyle = "#dfe4e9"; g.fillRect(0, 0, w, h); g.strokeStyle = "#2b3644"; g.lineWidth = 4; g.strokeRect(2, 2, w - 4, h - 4);
-    g.fillStyle = "#16202c"; g.textAlign = "center"; g.textBaseline = "middle"; g.font = "800 28px Arial"; g.fillText(`TURBINA ${n}`, w / 2, 32);
-    g.font = "18px Arial"; g.fillText("11 kW · 3000 rpm", w / 2, 66); g.fillStyle = "#4a5868"; g.fillText("roda Ø 360 · 8 pás", w / 2, 94);
+    g.fillStyle = "#16202c"; g.textAlign = "center"; g.textBaseline = "middle"; g.font = "800 28px Arial"; g.fillText(tr(`TURBINA ${n}`), w / 2, 32);
+    g.font = "18px Arial"; g.fillText(tr("11 kW · 3000 rpm"), w / 2, 66); g.fillStyle = "#4a5868"; g.fillText(tr("roda Ø 360 · 8 pás"), w / 2, 94);
   });
   const textPlate = (txt, sub, w = 320, h = 70) => plateTex(w, h, (g) => {
     g.fillStyle = "#e9edf1"; g.fillRect(0, 0, w, h); g.strokeStyle = "#2b3644"; g.lineWidth = 4; g.strokeRect(2, 2, w - 4, h - 4);
-    g.fillStyle = "#16202c"; g.textAlign = "center"; g.textBaseline = "middle"; g.font = `800 ${sub ? 24 : 28}px Arial`; g.fillText(txt, w / 2, sub ? h * 0.36 : h / 2);
-    if (sub) { g.font = "17px Arial"; g.fillStyle = "#4a5868"; g.fillText(sub, w / 2, h * 0.74); }
+    g.fillStyle = "#16202c"; g.textAlign = "center"; g.textBaseline = "middle"; g.font = `800 ${sub ? 24 : 28}px Arial`; g.fillText(tr(txt), w / 2, sub ? h * 0.36 : h / 2);
+    if (sub) { g.font = "17px Arial"; g.fillStyle = "#4a5868"; g.fillText(tr(sub), w / 2, h * 0.74); }
   });
 
   // =====================================================================
@@ -417,7 +417,7 @@
     put(new THREE.Mesh(new THREE.PlaneGeometry(204, 127.5), new THREE.MeshBasicMaterial({ map: panelTex, toneMapped: false })), 0, 24, 41.2, hd);
     const ctex = plateTex(512, 112, (g, w, h) => {
       g.fillStyle = "#d9dde1"; g.fillRect(0, 0, w, h); g.fillStyle = "#16202c"; g.font = "700 17px Arial"; g.textAlign = "center"; g.textBaseline = "middle";
-      [["GRANALHA", -94], ["HÚMIDO", -50], ["LIGAR", 4], ["PARAR", 48], ["EMERG.", 98]].forEach(([t, x]) => g.fillText(t, ((x + 120) / 240) * w, 18));
+      [["GRANALHA", -94], ["HÚMIDO", -50], ["LIGAR", 4], ["PARAR", 48], ["EMERG.", 98]].forEach(([t, x]) => g.fillText(tr(t), ((x + 120) / 240) * w, 18));
     });
     put(plate(ctex, 240, 52), 0, -70, 39.4, hd);
     const btn = (r, h, m, x) => { const o = cyl(r, h, m, hd, 20); o.rotation.x = Math.PI / 2; o.position.set(x, -78, 39 + h / 2); return o; };
@@ -571,7 +571,7 @@
   // ---------- HMI da consola
   const hex = (c) => "#" + c.getHexString();
   const _tc = new THREE.Color();
-  const dec = (v, n = 1) => v.toFixed(n).replace(".", ",");
+  const dec = (v, n = 1) => (LANG.cur === "en" ? v.toFixed(n) : v.toFixed(n).replace(".", ","));
   function phaseText(mode, s) {
     if (UP.waiting) return "Linha em espera (caixa cheia)";
     if (s < 0) return UP.phase === "move" ? "A avançar · lima a entrar" : "Sem lima na câmara";
@@ -583,35 +583,35 @@
     const g = pg, shot = mode === "shot", acc = shot ? "#f59e0b" : "#38bdf8";
     g.fillStyle = "#0a111d"; g.fillRect(0, 0, HW, HH);
     g.fillStyle = "#15294b"; g.fillRect(0, 0, HW, 38);
-    g.textBaseline = "middle"; g.textAlign = "left"; g.fillStyle = "#eaf1fd"; g.font = "700 19px Arial, sans-serif"; g.fillText("JATEAMENTO · cinza especial", 12, 20);
-    g.textAlign = "right"; g.fillStyle = "#9fb3d1"; g.font = "15px Arial, sans-serif"; g.fillText(`Limas jateadas: ${st.n}`, HW - 12, 20);
+    g.textBaseline = "middle"; g.textAlign = "left"; g.fillStyle = "#eaf1fd"; g.font = "700 19px Arial, sans-serif"; g.fillText(tr("JATEAMENTO · cinza especial"), 12, 20);
+    g.textAlign = "right"; g.fillStyle = "#9fb3d1"; g.font = "15px Arial, sans-serif"; g.fillText(tr("Limas jateadas: ") + st.n, HW - 12, 20);
     // modo
     g.fillStyle = "#101c31"; g.fillRect(12, 48, 270, 92); g.fillStyle = acc; g.fillRect(12, 48, 7, 92);
-    g.textAlign = "left"; g.fillStyle = "#7f93b3"; g.font = "600 13px Arial"; g.fillText("MODO", 30, 62);
-    g.fillStyle = "#ffffff"; g.font = "800 29px Arial"; g.fillText(shot ? "GRANALHA SECA" : "JATO HÚMIDO", 30, 93);
-    g.fillStyle = acc; g.font = "600 16px Arial"; g.fillText(shot ? "→ cinza mate especial" : "→ cinza metálico", 30, 123);
+    g.textAlign = "left"; g.fillStyle = "#7f93b3"; g.font = "600 13px Arial"; g.fillText(tr("MODO"), 30, 62);
+    g.fillStyle = "#ffffff"; g.font = "800 29px Arial"; g.fillText(tr(shot ? "GRANALHA SECA" : "JATO HÚMIDO"), 30, 93);
+    g.fillStyle = acc; g.font = "600 16px Arial"; g.fillText(tr(shot ? "→ cinza mate especial" : "→ cinza metálico"), 30, 123);
     // leituras
     const rows = shot
       ? [["Turbina 1", `${dec(read.a1)} A`], ["Turbina 2", `${dec(read.a2)} A`], ["Granalha", "S230 · 2 × 90 kg/min"], ["Colector ΔP", "1,2 kPa"]]
       : [["Bomba de lama", `${dec(read.bar)} bar`], ["Ar dos bicos", read.air > 0 ? `${dec(read.air)} bar` : "fechado"], ["Bicos", "2 × Ø 8 mm · oscilam"], ["Lama", "óxido de alumínio"]];
     rows.forEach(([k, v], i) => {
-      const y = 60 + i * 23; g.textAlign = "left"; g.fillStyle = "#8fa3c0"; g.font = "14px Arial"; g.fillText(k, 296, y);
-      g.textAlign = "right"; g.fillStyle = "#e6eefb"; g.font = "700 14px Arial"; g.fillText(v, HW - 12, y);
+      const y = 60 + i * 23; g.textAlign = "left"; g.fillStyle = "#8fa3c0"; g.font = "14px Arial"; g.fillText(tr(k), 296, y);
+      g.textAlign = "right"; g.fillStyle = "#e6eefb"; g.font = "700 14px Arial"; g.fillText(tr(v), HW - 12, y);
     });
     // fase + progresso
     const ph = phaseText(mode, s), prog = s < 0 ? 0 : Math.max(0, Math.min(1, (s - B0) / (B1 - B0)));
-    g.textAlign = "left"; g.fillStyle = s >= B0 && s < B1 ? acc : "#c9d6ea"; g.font = "700 17px Arial"; g.fillText(ph, 12, 162);
+    g.textAlign = "left"; g.fillStyle = s >= B0 && s < B1 ? acc : "#c9d6ea"; g.font = "700 17px Arial"; g.fillText(tr(ph), 12, 162);
     g.fillStyle = "#1a2740"; g.fillRect(12, 178, HW - 24, 12); g.fillStyle = acc; g.fillRect(12, 178, (HW - 24) * prog, 12);
     // amostras de cor: entrada → agora → alvo
     g.fillStyle = "#101c31"; g.fillRect(0, 204, HW, HH - 204);
     const sw = [["Entrada", hex(st.from)], ["Lima agora", l ? hex(l.color) : "#333a44"], ["Alvo", hex(_tc.set(UP.FINISH[mode].color))]];
     sw.forEach(([t, c], i) => {
       const x = 20 + i * 166; g.fillStyle = c; g.fillRect(x, 230, 120, 52); g.strokeStyle = "#3a4d6e"; g.lineWidth = 2; g.strokeRect(x, 230, 120, 52);
-      g.fillStyle = "#8fa3c0"; g.font = "600 13px Arial"; g.textAlign = "left"; g.fillText(t, x, 218);
+      g.fillStyle = "#8fa3c0"; g.font = "600 13px Arial"; g.textAlign = "left"; g.fillText(tr(t), x, 218);
       if (i < 2) { g.fillStyle = "#5d7396"; g.font = "700 26px Arial"; g.fillText("→", x + 128, 256); }
     });
     g.fillStyle = "#c9d6ea"; g.font = "14px Arial"; g.textAlign = "left";
-    g.fillText(shot ? "Acabamento: cinza mate (Ra ≈ 1,6 µm)" : "Acabamento: cinza metálico acetinado", 20, 302);
+    g.fillText(tr(shot ? "Acabamento: cinza mate (Ra ≈ 1,6 µm)" : "Acabamento: cinza metálico acetinado"), 20, 302);
     panelTex.needsUpdate = true;
   }
 
@@ -712,7 +712,7 @@
       const now = performance.now();
       if (now - panelT > 100) {
         read.a1 = amps * (1 + Math.sin(clock * 3.3) * 0.01); read.a2 = amps * (0.985 + Math.sin(clock * 2.7) * 0.01); read.bar = gaugeP; read.air = air;
-        const key = `${mode}|${phaseText(mode, s)}|${st.n}|${here ? here.color.getHex() : 0}|${dec(read.a1)}|${dec(gaugeP)}|${dec(air)}`;
+        const key = `${LANG.rev}|${mode}|${phaseText(mode, s)}|${st.n}|${here ? here.color.getHex() : 0}|${dec(read.a1)}|${dec(gaugeP)}|${dec(air)}`;
         if (key !== panelKey) { panelKey = key; panelT = now; drawPanel(mode, s, read, s >= 0 ? here : null); }
       }
     },

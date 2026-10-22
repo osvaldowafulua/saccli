@@ -46,6 +46,14 @@
   button { background: #18284a; color: var(--ink); border: 1px solid var(--line); border-radius: 8px; padding: 6px 10px; font: inherit; cursor: pointer; }
   button:hover { background: #22365f; }
   button.primary { background: #2f6fdc; border-color: #2f6fdc; }
+  button.active { background: #2f6fdc; border-color: #2f6fdc; }
+  button.fast { background: #b45309; border-color: #d97706; }
+  .lang { position: absolute; top: 10px; right: 12px; display: flex; gap: 4px; }
+  .lang button { padding: 3px 8px; font-size: 11px; }
+  #hud > h1 { padding-right: 92px; }
+  #stationViews { gap: 5px; }
+  button.area { font-size: 12.5px; font-weight: 600; padding: 8px 11px; background: #1b315c; border-color: #2f6fdc; }
+  button.area:hover { background: #2f6fdc; }
   .note { font-size: 11px; color: var(--dim); margin-top: 8px; }
   .bad { color: var(--red); }
   .good { color: var(--green); }
@@ -67,8 +75,11 @@
 <div id="view"></div>
 
 <div id="hud" class="panel">
+  <div class="lang"><button id="langPt" class="active" title="Português">PT</button><button id="langEn" title="English">EN</button></div>
   <h1>SACCLI · Linha de correção de limas</h1>
   <div class="sub">0 barras → 1 laminagem → 2 picagem → 3 têmpera → 4 dureza → 5 jateamento → 6 SACCLI (scanner 1 manda · 2 pares seguram, 1 corrige · scanner 2 controla) → 7 embalagem + palete → 8 expedição AMR</div>
+  <h2 style="margin:8px 0 2px">Ver cada área</h2>
+  <div class="btns" id="stationViews" style="margin-top:4px"></div>
   <div class="phase"><span class="dot" id="phaseDot"></span><span id="phase">—</span></div>
   <div class="order" id="order">À espera da primeira lima…</div>
   <div class="grid">
@@ -98,7 +109,6 @@
     <button id="viewTop">Topo</button>
     <button id="panels">Painéis</button>
   </div>
-  <div class="btns" id="stationViews"></div>
   <div class="note">Arraste para rodar · roda para zoom · botão direito para mover · espaço pausa.</div>
 </div>
 
@@ -132,7 +142,8 @@
   <label class="s">Erro máx. das limas tortas <b id="vE0"></b><input id="e0" type="range" min="1" max="1000" step="1" value="500"></label>
   <label class="s">Tolerância <b id="vTol"></b><input id="tol" type="range" min="0.5" max="200" step="0.5" value="50"></label>
   <label class="s">Ampliação visual do erro <b id="vExag"></b><input id="exag" type="range" min="1" max="3000" step="1" value="15"></label>
-  <label class="s">Velocidade <b id="vSpeed"></b><input id="speed" type="range" min="0.25" max="4" step="0.25" value="1"></label>
+  <label class="s">Velocidade da linha <b id="vSpeed"></b><input id="speed" type="range" min="0.25" max="6" step="0.25" value="1"></label>
+  <div class="btns" id="speedBtns" style="margin-top:0"><button data-speed="0.5">0,5×</button><button data-speed="1" class="active">1×</button><button data-speed="2">2×</button><button data-speed="4">4×</button><button data-speed="6">6×</button></div>
   <h2>Resultado do modelo (lima nominal)</h2>
   <div class="res" id="res"></div>
   <div class="note" id="explain"></div>

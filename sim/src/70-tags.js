@@ -6,7 +6,7 @@ const runLog = [];
 const limaAt = (k) => limas.find((l) => l.state === "belt" && l.k === k);
 const fillingCrate = () => outCrates.find((c) => c.state === "filling" || c.state === "arriving");
 [
-  { text: "Scanner 1 · Keyence LJ-S640 fixo (lê a lima inteira)", at: () => V(SCAN1_X, 1440, 0), max: 4500 },
+  { text: "Scanner 1 · Keyence LJ-S640 fixo (lê a lima inteira)", at: () => V(SCAN1_X, 960, 0), max: 4500 },
   { text: () => { const l = limaAt(SCAN1_K); return l ? `Medição 3D · comprimento ${limaLen().toFixed(2)} mm · largura ${P.b.toFixed(2)} mm · espessura ${P.h.toFixed(2)} mm · flecha ${l.meas1 !== undefined ? fmtUm(um(l.meas1)) + " em " + l.pt : "…"}` : ""; },
     at: () => V(SCAN1_X, 120, 0), max: 3500, when: () => phase === "work" && limaAt(SCAN1_K) && t > 0.3 && t < DUR.scan + 0.8 },
   { text: "Módulos A1·B1·C1", at: () => V(MOD_X, 130, -(HOUSE_IN + HOUSE_D / 2)), max: 3200 },

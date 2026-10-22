@@ -36,14 +36,14 @@ function keyenceHead(w, h, d, parent) {
   for (const s of [-1, 1]) cyl(Math.min(12, w * 0.05), 30, mat.chrome, g, 12).position.set(s * w * 0.25, h / 2 + 15, 0);
   return g;
 }
-// Scanner 1: LJ-S640 fixo, centrado sobre a lima, a ~1116 mm: um disparo lê a lima inteira
-const SCAN1_K = -2, SCAN1_X = SCAN1_K * PITCH, S1_LENS = 1150;
+// Scanner 1: Keyence LJ-S fixo, centrado sobre a lima, logo antes do módulo (1 passo = 400 mm), a 620 mm: um disparo lê a lima inteira
+const SCAN1_K = -1, SCAN1_X = SCAN1_K * PITCH, S1_LENS = 620;
 const g1 = new THREE.Group(); g1.position.set(SCAN1_X, 0, 0); scene.add(g1);
-for (const z of [-(BELT_W / 2 + 190), BELT_W / 2 + 190]) { box(50, 1380 - FLOOR, 50, mat.alu, 0, (1380 + FLOOR) / 2, z, g1); box(120, 12, 120, mat.dark, 0, FLOOR + 6, z, g1); }
-box(60, 50, BELT_W + 440, mat.alu, 0, 1380, 0, g1);
-box(50, 120, 50, mat.alu, 0, 1300, 0, g1);
-keyenceHead(300, 130, 210, g1).position.set(0, S1_LENS + 75, 0);
-const fr1 = frustum(0x3b82f6, 0.13), fr1cam = frustum(0xdbeafe, 0.04);
+for (const z of [-(BELT_W / 2 + 190), BELT_W / 2 + 190]) { box(60, 900 - FLOOR, 60, mat.alu, 0, (900 + FLOOR) / 2, z, g1); box(140, 12, 140, mat.dark, 0, FLOOR + 6, z, g1); }
+box(70, 60, BELT_W + 440, mat.alu, 0, 900, 0, g1);
+box(60, 110, 60, mat.alu, 0, 815, 0, g1);
+keyenceHead(380, 160, 250, g1).position.set(0, S1_LENS + 80, 0);
+const fr1 = frustum(0x3b82f6, 0.24), fr1cam = frustum(0xdbeafe, 0.07);
 
 // =====================================================================
 // Módulos A1–C2: dois blocos, um de cada lado da esteira, com a lima a passar ao meio

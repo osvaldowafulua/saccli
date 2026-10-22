@@ -102,10 +102,10 @@
     const t = canvasTex(512, 200, (g2, w2, h2) => {
       g2.fillStyle = "#e9edf1"; g2.fillRect(0, 0, w2, h2); g2.strokeStyle = "#22303f"; g2.lineWidth = 6; g2.strokeRect(5, 5, w2 - 10, h2 - 10);
       g2.fillStyle = "#1f5fd6"; g2.fillRect(5, 5, w2 - 10, 54);
-      g2.fillStyle = "#fff"; g2.font = "800 34px Arial, sans-serif"; g2.textBaseline = "middle"; g2.fillText("LAMINADOR DUO  L1", 20, 33);
+      g2.fillStyle = "#fff"; g2.font = "800 34px Arial, sans-serif"; g2.textBaseline = "middle"; g2.fillText(tr("LAMINADOR DUO  L1"), 20, 33);
       g2.fillStyle = "#16202c"; g2.font = "600 26px Arial, sans-serif";
-      g2.fillText("Cilindros Ø330 × 420 mm", 20, 88); g2.fillText("Força máx. 600 kN · 18 rpm", 20, 124);
-      g2.fillStyle = "#4a5868"; g2.font = "22px Arial, sans-serif"; g2.fillText("Aperto hidráulico AGC · 2 × 300 kN", 20, 162);
+      g2.fillText(tr("Cilindros Ø330 × 420 mm"), 20, 88); g2.fillText(tr("Força máx. 600 kN · 18 rpm"), 20, 124);
+      g2.fillStyle = "#4a5868"; g2.font = "22px Arial, sans-serif"; g2.fillText(tr("Aperto hidráulico AGC · 2 × 300 kN"), 20, 162);
     });
     plate(t, 230, 90, XG + 278, 300, ZOS + HT / 2 + 0.6);
   }
@@ -212,8 +212,8 @@
     box(600, 60, 240, mBase, x0 + 10, FLOOR + 30, -1130);                           // base
     const t = canvasTex(400, 160, (g, W, Hh) => {
       g.fillStyle = "#e7ebef"; g.fillRect(0, 0, W, Hh); g.strokeStyle = "#2b3644"; g.lineWidth = 5; g.strokeRect(4, 4, W - 8, Hh - 8);
-      g.fillStyle = "#16202c"; g.font = "700 28px Arial, sans-serif"; g.fillText("REDUTOR + CAIXA DE PINHÕES", 16, 44);
-      g.font = "24px Arial, sans-serif"; g.fillText("i = 40 · 2 saídas Ø150", 16, 88); g.fillStyle = "#4a5868"; g.fillText("Óleo ISO VG 320 · 38 L", 16, 128);
+      g.fillStyle = "#16202c"; g.font = "700 28px Arial, sans-serif"; g.fillText(tr("REDUTOR + CAIXA DE PINHÕES"), 16, 44);
+      g.font = "24px Arial, sans-serif"; g.fillText(tr("i = 40 · 2 saídas Ø150"), 16, 88); g.fillStyle = "#4a5868"; g.fillText(tr("Óleo ISO VG 320 · 38 L"), 16, 128);
     });
     plate(t, 200, 80, x0 - 120, 330, GZ + 0.8);
   }
@@ -237,7 +237,7 @@
     box(120, 80, 110, mMotor, XG + 470, yc + 160, zc);                              // caixa de terminais
     box(40, 40, 40, mat.dark, XG + 470, yc + 160, zc - 70);
     for (const sx of [-1, 1]) box(60, 110, 250, mMotor, XG + 483 + sx * 80, yc - 160, zc);   // patas
-    box(420, 70, 250, mBase, XG + 500, FLOOR + 35, zc);
+    box(380, 70, 250, mBase, XG + 480, FLOOR + 35, zc);   // termina em x = -8715 (folga para a estação 2)
     box(130, 34, 3, mat.label, XG + 483, yc + 40, zc + 136);                        // chapa de características
     // conduta eléctrica do motor ao armário de comando
     // tubo de cabos (conduta rígida) da caixa de terminais ao armário do variador, por cima do redutor
@@ -255,7 +255,7 @@
       g.fillStyle = "#f2c200"; g.fillRect(0, 0, w, h); g.fillStyle = "#111"; g.lineWidth = 8; g.strokeStyle = "#111";
       g.beginPath(); g.moveTo(64, 18); g.lineTo(112, 104); g.lineTo(16, 104); g.closePath(); g.stroke();
       g.font = "800 60px Arial"; g.textAlign = "center"; g.textBaseline = "middle"; g.fillText("!", 64, 72);
-      g.font = "700 26px Arial"; g.textAlign = "left"; g.fillText("400 V", 132, 50); g.font = "20px Arial"; g.fillText("Variador", 132, 86);
+      g.font = "700 26px Arial"; g.textAlign = "left"; g.fillText("400 V", 132, 50); g.font = "20px Arial"; g.fillText(tr("Variador"), 132, 86);
     });
     plate(t, 110, 55, x, FLOOR + 1150, z + 100.6);
   }
@@ -475,10 +475,10 @@
     const g = hg, W = HW, Hh = HHt;
     g.fillStyle = "#0a111d"; g.fillRect(0, 0, W, Hh);
     g.fillStyle = "#15294b"; g.fillRect(0, 0, W, 46);
-    g.textBaseline = "middle"; g.textAlign = "left"; g.fillStyle = "#eaf1fd"; g.font = "700 22px Arial, sans-serif"; g.fillText("LAMINADOR DUO L1 · LAMINAGEM", 16, 24);
-    g.textAlign = "right"; g.fillStyle = "#9fb3d1"; g.font = "18px Arial, sans-serif"; g.fillText(`Esboços: ${st.n}`, W - 16, 24);
+    g.textBaseline = "middle"; g.textAlign = "left"; g.fillStyle = "#eaf1fd"; g.font = "700 22px Arial, sans-serif"; g.fillText(tr("LAMINADOR DUO L1 · LAMINAGEM"), 16, 24);
+    g.textAlign = "right"; g.fillStyle = "#9fb3d1"; g.font = "18px Arial, sans-serif"; g.fillText(tr("Esboços: ") + st.n, W - 16, 24);
     const gap = st.yrNow - 2, rpm = OMEGA * 60 / (2 * Math.PI);
-    const cells = [["VELOCIDADE", rpm.toFixed(1), "rpm"], ["FOLGA", gap.toFixed(1), "mm"], ["FORÇA", st.forceNow.toFixed(0), "kN"]];
+    const cells = [[tr("VELOCIDADE"), rpm.toFixed(1), "rpm"], [tr("FOLGA"), gap.toFixed(1), "mm"], [tr("FORÇA"), st.forceNow.toFixed(0), "kN"]];
     cells.forEach(([k, v, u], i) => {
       const x = 16 + i * 205;
       g.fillStyle = "#101c31"; g.fillRect(x, 58, 192, 92);
@@ -488,17 +488,17 @@
     });
     // fase
     const s = st.sNow;
-    const phase = s < 0 ? (UP.phase === "move" ? "Barra a entrar no batente" : "Em espera") : s < S_DOWN ? "Barra na mordedura" : s < S_A ? "Aperto hidráulico (AGC)" : s <= sB() ? "A laminar · espigão → corpo → ponta" : "Esboço pronto · folga a abrir";
+    const phase = s < 0 ? (UP.phase === "move" ? tr("Barra a entrar no batente") : tr("Em espera")) : s < S_DOWN ? tr("Barra na mordedura") : s < S_A ? tr("Aperto hidráulico (AGC)") : s <= sB() ? tr("A laminar · espigão → corpo → ponta") : tr("Esboço pronto · folga a abrir");
     g.textAlign = "left"; g.fillStyle = st.rollingNow ? "#fbbf24" : "#8fa3c0"; g.font = "600 18px Arial, sans-serif"; g.fillText(phase, 16, 172);
     const pr = s < S_A ? 0 : clamp01(1 - st.xig);
     g.fillStyle = "#1a2740"; g.fillRect(16, 188, W - 32, 12); g.fillStyle = "#38bdf8"; g.fillRect(16, 188, (W - 32) * pr, 12);
     // perfil da lima (vista lateral, espessura × 6)
     const px = 16, py = 214, pw = W - 32, ph = 170;
     g.fillStyle = "#0e1a2d"; g.fillRect(px, py, pw, ph); g.strokeStyle = "#3a4d6e"; g.lineWidth = 1.5; g.strokeRect(px, py, pw, ph);
-    g.fillStyle = "#7f93b3"; g.font = "13px Arial, sans-serif"; g.fillText("Perfil da peça (espessura ×6) · alvo a tracejado", px + 8, py + 14);
+    g.fillStyle = "#7f93b3"; g.font = "13px Arial, sans-serif"; g.fillText(tr("Perfil da peça (espessura ×6) · alvo a tracejado"), px + 8, py + 14);
     const x0w = XG - 260, sc = pw / 620, X = (x) => px + (x - x0w) * sc, Y = (y) => py + ph - 30 - (y - 2) * 6;
     g.strokeStyle = "#22324d"; g.beginPath(); g.moveTo(X(XG), py + 22); g.lineTo(X(XG), py + ph - 6); g.stroke();
-    g.fillStyle = "#5d6f8c"; g.fillText("eixo dos cilindros", X(XG) + 6, py + ph - 12);
+    g.fillStyle = "#5d6f8c"; g.fillText(tr("eixo dos cilindros"), X(XG) + 6, py + ph - 12);
     // alvo
     g.setLineDash([5, 4]); g.strokeStyle = "#4ade80"; g.beginPath();
     for (let i = 0; i < NR; i++) { const x = X(SX + rings[i].xf), y = Y(rings[i].top); i ? g.lineTo(x, y) : g.moveTo(x, y); }
@@ -577,7 +577,7 @@
       lampG.emissiveIntensity = 1.6; lampO.emissiveIntensity = st.rollingNow ? 2.2 : 0;
       // HMI (≈ 10×/s)
       const now = performance.now();
-      const key = `${st.n}|${st.yrNow.toFixed(1)}|${Math.round(st.forceNow)}|${s.toFixed(2)}|${UP.phase}`;
+      const key = `${st.n}|${st.yrNow.toFixed(1)}|${Math.round(st.forceNow)}|${s.toFixed(2)}|${UP.phase}|${LANG.rev}`;
       if (key !== hmiKey && now - hmiT > 90) { hmiKey = key; hmiT = now; drawHMI(); }
     },
   });

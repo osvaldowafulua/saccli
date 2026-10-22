@@ -34,7 +34,7 @@
     g.fillStyle = "#c9cfd5"; g.fillRect(0, 0, w, h); g.strokeStyle = "#9aa3ad"; g.lineWidth = 4; g.strokeRect(2, 2, w - 4, h - 4);
     g.fillStyle = "#8d969f"; for (const [x, y] of [[16, 16], [w - 16, 16], [16, h - 16], [w - 16, h - 16]]) { g.beginPath(); g.arc(x, y, 7, 0, 7); g.fill(); }
     g.fillStyle = "#1f3550"; g.font = "800 54px Arial, sans-serif"; g.textAlign = "center"; g.fillText("HRC", w / 2, 104);
-    g.font = "600 26px Arial, sans-serif"; g.fillStyle = "#3d4b5c"; g.fillText("cabeça de ensaio", w / 2, 150); g.fillText("célula 2 kN", w / 2, 186);
+    g.font = "600 26px Arial, sans-serif"; g.fillStyle = "#3d4b5c"; g.fillText(tr("cabeça de ensaio"), w / 2, 150); g.fillText(tr("célula 2 kN"), w / 2, 186);
   }) });
   const mCurtainLed = M(0x3a0808, 0.3, 0.25, { emissive: 0xff2020, emissiveIntensity: 0.18 });
   const lamp = (c) => { const m = M(c, 0, 0.35, { emissive: c, emissiveIntensity: 0 }); m.userData.on = new THREE.Color(c); m.userData.off = new THREE.Color(c).multiplyScalar(0.22); return m; };
@@ -91,9 +91,10 @@
       g.strokeStyle = "#2b3644"; g.lineWidth = 6; g.strokeRect(6, 6, w - 12, h - 12);
       g.fillStyle = "#1f5fd6"; g.fillRect(6, 6, 120, h - 12);
       g.fillStyle = "#fff"; g.font = "800 54px Arial, sans-serif"; g.textAlign = "center"; g.textBaseline = "middle"; g.fillText("HRC", 66, h / 2);
-      g.textAlign = "left"; g.fillStyle = "#16202c"; g.font = "700 30px Arial, sans-serif"; g.fillText("DURÓMETRO ROCKWELL", 142, 48);
+      g.textAlign = "left"; g.fillStyle = "#16202c"; g.font = "700 30px Arial, sans-serif";
+      { const t1 = tr("DURÓMETRO ROCKWELL"), mw = w - 156, tw = g.measureText(t1).width; if (tw > mw) g.font = `700 ${Math.floor((30 * mw) / tw)}px Arial, sans-serif`; g.fillText(t1, 142, 48); }   // encolhe para caber (EN é mais comprido)
       g.font = "24px Arial, sans-serif"; g.fillText("F₀ 98 N · F 1471 N (150 kgf)", 142, 92);
-      g.fillStyle = "#4a5868"; g.font = "20px Arial, sans-serif"; g.fillText("diamante 120° · EN ISO 6508", 142, 126);
+      g.fillStyle = "#4a5868"; g.font = "20px Arial, sans-serif"; g.fillText(tr("diamante 120° · EN ISO 6508"), 142, 126);
     });
     const p = new THREE.Mesh(new THREE.PlaneGeometry(250, 78), M(0xffffff, 0.1, 0.5, { map: t }));
     p.rotation.y = Math.PI / 2; p.position.set(X0 + 119, 700, -845); scene.add(p);
@@ -128,7 +129,7 @@
       g.fillStyle = "#f2c200"; g.fillRect(0, 0, w, h); g.fillStyle = "#111";
       g.beginPath(); g.moveTo(64, 18); g.lineTo(112, 104); g.lineTo(16, 104); g.closePath(); g.lineWidth = 8; g.strokeStyle = "#111"; g.stroke();
       g.font = "800 60px Arial"; g.textAlign = "center"; g.textBaseline = "middle"; g.fillText("!", 64, 72);
-      g.font = "700 26px Arial"; g.textAlign = "left"; g.fillText("400 V", 132, 50); g.font = "20px Arial"; g.fillText("Comando", 132, 86);
+      g.font = "700 26px Arial"; g.textAlign = "left"; g.fillText("400 V", 132, 50); g.font = "20px Arial"; g.fillText(tr("Comando"), 132, 86);
     });
     const p = new THREE.Mesh(new THREE.PlaneGeometry(110, 55), M(0xffffff, 0, 0.6, { map: t }));
     p.rotation.y = Math.PI / 2; p.position.set(X0 + 250.5, 110, -860); scene.add(p);
@@ -370,13 +371,13 @@
     g.textBaseline = "middle"; g.textAlign = "left";
     g.fillStyle = "#eaf1fd"; g.font = "700 22px Arial, sans-serif"; g.fillText("ROCKWELL C · HRC", 16, 23);
     g.textAlign = "right"; g.fillStyle = "#9fb3d1"; g.font = "18px Arial, sans-serif";
-    g.fillText("Ensaio n.º " + (st.n + (s >= 0 && !st.done ? 1 : 0)), HW - 16, 23);
+    g.fillText(tr("Ensaio n.º ") + (st.n + (s >= 0 && !st.done ? 1 : 0)), HW - 16, 23);
     // força ao vivo
-    g.textAlign = "left"; g.fillStyle = "#7f93b3"; g.font = "600 15px Arial, sans-serif"; g.fillText("FORÇA DE ENSAIO", 18, 66);
+    g.textAlign = "left"; g.fillStyle = "#7f93b3"; g.font = "600 15px Arial, sans-serif"; g.fillText(tr("FORÇA DE ENSAIO"), 18, 66);
     g.fillStyle = F > 0.5 ? "#ffffff" : "#5d6f8c"; g.font = "700 66px Menlo, Consolas, monospace";
     const fs = String(Math.round(F)); g.fillText(fs, 18, 116);
     const fw = g.measureText(fs).width; g.font = "700 30px Arial, sans-serif"; g.fillText("N", 26 + fw, 124);
-    g.fillStyle = s >= 0 && s < 0.9 ? "#fbbf24" : "#8fa3c0"; g.font = "600 17px Arial, sans-serif"; g.fillText(PH[ph], 18, 164);
+    g.fillStyle = s >= 0 && s < 0.9 ? "#fbbf24" : "#8fa3c0"; g.font = "600 17px Arial, sans-serif"; g.fillText(tr(PH[ph]), 18, 164);
     // etapas
     g.font = "700 17px Arial, sans-serif"; g.textAlign = "center";
     for (let k = 0; k < 4; k++) {
@@ -386,7 +387,7 @@
     }
     g.textAlign = "left";
     g.fillStyle = "#6b7f9f"; g.font = "14px Arial, sans-serif";
-    g.fillText("Bigorna: " + (anvilAt(s) > -12 ? "em apoio" : "em baixo") + "  ·  rejeitadas: " + rej.n, 18, 238);
+    g.fillText(tr("Bigorna: ") + tr(anvilAt(s) > -12 ? "em apoio" : "em baixo") + tr("  ·  rejeitadas: ") + rej.n, 18, 238);
     // curva força × tempo
     g.fillStyle = "#0e1a2d"; g.fillRect(px, py, pw, ph2);
     g.strokeStyle = "#22324d"; g.lineWidth = 1;
@@ -411,18 +412,18 @@
     g.fillStyle = "#101c31"; g.fillRect(0, 260, HW, HH - 260);
     const cur = s >= 0 && st.result, val = cur ? st.hrc : st.last;
     g.fillStyle = "#7f93b3"; g.font = "600 15px Arial, sans-serif";
-    g.fillText(cur || val == null ? "RESULTADO" : "RESULTADO ANTERIOR", 18, 284);
+    g.fillText(tr(cur || val == null ? "RESULTADO" : "RESULTADO ANTERIOR"), 18, 284);
     if (val == null) { g.fillStyle = "#5d6f8c"; g.font = "700 54px Arial, sans-serif"; g.fillText("— HRC", 18, 336); }
     else {
       const good = val >= HRC_MIN, vs = dec(val, 1);
       g.fillStyle = good ? "#4ade80" : "#ef5350"; g.font = "700 60px Arial, sans-serif"; g.fillText(vs, 18, 334);
       const w = g.measureText(vs).width; g.font = "700 30px Arial, sans-serif"; g.fillText("HRC", 30 + w, 342);
-      g.font = "700 22px Arial, sans-serif"; g.fillText(good ? "✓ OK  (mín. 55 HRC)" : "✗ MACIA → rejeição", 18, 380);
+      g.font = "700 22px Arial, sans-serif"; g.fillText(tr(good ? "✓ OK  (mín. 55 HRC)" : "✗ MACIA → rejeição"), 18, 380);
       g.textAlign = "right"; g.fillStyle = "#c9d6ea"; g.font = "18px Arial, sans-serif";
       g.fillText("h = " + dec((100 - val) * 0.002, 3) + " mm", HW - 18, 292);
-      g.fillText("HRC = 100 − h / 0,002 mm", HW - 18, 322);
-      g.fillStyle = "#8fa3c0"; g.fillText(st.n ? "n = " + st.n + " · média " + dec(st.sum / st.n, 1) + " HRC" : "n = 0", HW - 18, 352);
-      g.fillText(good ? "Lima aprovada" : "Lima rejeitada", HW - 18, 380);
+      g.fillText(tr("HRC = 100 − h / 0,002 mm"), HW - 18, 322);
+      g.fillStyle = "#8fa3c0"; g.fillText(st.n ? "n = " + st.n + tr(" · média ") + dec(st.sum / st.n, 1) + " HRC" : "n = 0", HW - 18, 352);
+      g.fillText(tr(good ? "Lima aprovada" : "Lima rejeitada"), HW - 18, 380);
       g.textAlign = "left";
     }
     hmiTex.needsUpdate = true;
@@ -437,7 +438,7 @@
 
   // ---------- animação
   let clock = 0, hmiT = 0;
-  let kF = -1, kPh = -1, kRes = false, kN = -1, kS = -1, kAnv = false, kRej = -1;
+  let kF = -1, kPh = -1, kRes = false, kN = -1, kS = -1, kAnv = false, kRej = -1, kLang = -1;
   addSystem({
     update(dt) {
       // rejeição: uma lima macia que chega ao slot 17 é empurrada para a rampa e sai da linha
@@ -491,8 +492,8 @@
       const now = performance.now();
       const F = active ? forceAt(s) : 0;
       const fR = Math.round(F), ph = phaseIdx(s, here !== null), anv = ay > -12;
-      if ((fR !== kF || ph !== kPh || st.result !== kRes || st.n !== kN || nSamp !== kS || anv !== kAnv || rej.n !== kRej) && now - hmiT > 80) {
-        kF = fR; kPh = ph; kRes = st.result; kN = st.n; kS = nSamp; kAnv = anv; kRej = rej.n; hmiT = now;
+      if ((fR !== kF || ph !== kPh || st.result !== kRes || st.n !== kN || nSamp !== kS || anv !== kAnv || rej.n !== kRej || LANG.rev !== kLang) && now - hmiT > 80) {
+        kF = fR; kPh = ph; kRes = st.result; kN = st.n; kS = nSamp; kAnv = anv; kRej = rej.n; kLang = LANG.rev; hmiT = now;
         drawHMI(s, F, ph);
       }
     },
