@@ -399,7 +399,9 @@ $("viewMod").onclick = () => view("mod");
 $("viewExp").onclick = () => view("exp");
 $("viewTop").onclick = () => view("top");
 $("panels").onclick = () => ["ctrl", "charts", "motors"].forEach((id) => $(id).classList.toggle("hidden"));
-$("play").onclick = () => { paused = !paused; $("play").textContent = tr(paused ? "▶ Continuar" : "❚❚ Pausa"); };
+const renderPlay = () => { $("play").innerHTML = paused ? icon("play") + tr("Continuar") : icon("pause") + tr("Pausa"); };
+$("play").onclick = () => { paused = !paused; renderPlay(); };
+renderPlay();
 // velocidade da linha: botões 0,5×…6× no painel de parâmetros
 function setSpeed(v) {
   setVal("speed", v); readUI();
@@ -502,9 +504,11 @@ function renderTour() {
   $("docStep").textContent = tr("Documentação 3D · passo") + ` ${tour.i + 1} / ${TOUR.length}`;
   $("docTitle").textContent = tr(title);
   $("docText").textContent = LANG.cur === "en" ? en : pt;
-  $("docPrev").textContent = tr("◀ Anterior"); $("docNext").textContent = tr(tour.i === TOUR.length - 1 ? "↺ Recomeçar" : "Seguinte ▶");
-  $("docAuto").textContent = tr(tour.auto ? "⏸ Parar automático" : "⏵ Automático"); $("docClose").textContent = tr("✕ Fechar");
-  $("docBtn").textContent = tr("📖 Documentação 3D");
+  $("docPrev").innerHTML = icon("chevron-left") + tr("Anterior");
+  $("docNext").innerHTML = tour.i === TOUR.length - 1 ? icon("rotate-ccw") + tr("Recomeçar") : tr("Seguinte") + icon("chevron-right").replace('class="ic"', 'class="ic r"');
+  $("docAuto").innerHTML = tour.auto ? icon("pause") + tr("Parar automático") : icon("play") + tr("Automático");
+  $("docClose").innerHTML = icon("x") + tr("Fechar");
+  $("docBtn").innerHTML = icon("book-open") + tr("Documentação 3D");
 }
 function tourGo(i) { tour.i = (i + TOUR.length) % TOUR.length; tour.t = 0; flyTo(TOUR[tour.i][0]); renderTour(); }
 function tourOpen(open) {
@@ -527,6 +531,6 @@ function tourTick(dt) {
   else $("docBar").style.width = "0";
 }
 LANG.hooks.push(() => { renderTour(); });
-LANG.hooks.push(() => { renderResults(); renderHUD(); renderMotors(); $("play").textContent = tr(paused ? "▶ Continuar" : "❚❚ Pausa"); setSpeed(P.speed); });
+LANG.hooks.push(() => { renderResults(); renderHUD(); renderMotors(); renderPlay(); setSpeed(P.speed); });
 i18nInit();
 window.__saccli = { tags: World.tags, FL, rackSlots, cartons, packer, runLog, P, limas, get job() { return job; }, bend, forceFor, robotIn, robotOut, camera, controls, amr, station, outCrates, cobot };

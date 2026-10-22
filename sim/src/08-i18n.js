@@ -80,8 +80,8 @@ const I18N_EXACT = {
   "Sobe elástico, cede, alivia em linha recta: o que fica é a correção": "Rises elastically, yields, unloads in a straight line: what remains is the correction",
   "Perfil da lima (A → C)": "File profile (A → C)",
   // ---- 90-ui.js
-  "📖 Documentação 3D": "📖 3D documentation", "Documentação 3D · passo": "3D documentation · step", "◀ Anterior": "◀ Previous", "Seguinte ▶": "Next ▶", "↺ Recomeçar": "↺ Restart",
-  "⏵ Automático": "⏵ Auto-play", "⏸ Parar automático": "⏸ Stop auto-play", "✕ Fechar": "✕ Close", "1 · Molde de corte": "1 · Blanking die",
+  "Documentação 3D": "3D documentation", "Documentação 3D · passo": "3D documentation · step", "Anterior": "Previous", "Seguinte": "Next", "Recomeçar": "Restart",
+  "Automático": "Auto-play", "Parar automático": "Stop auto-play", "Fechar": "Close", "Pausa": "Pause", "Continuar": "Resume", "1 · Molde de corte": "1 · Blanking die",
   "0 · Bobina de banda de aço": "0 · Steel strip coil", "1 · Laminagem — rolo de aço giratório": "1 · Rolling — rotating steel roll", "1 · Molde de corte — a forma da lima": "1 · Blanking die — the file shape",
   "2 · Picagem dos dentes": "2 · Tooth cutting", "3 · Têmpera por indução → choque em água": "3 · Induction hardening → water quench", "3 · Painel do gerador de indução": "3 · Induction generator panel",
   "4 · Medição de dureza / rigidez": "4 · Hardness / stiffness test", "5 · Jateamento — cinza especial": "5 · Blasting — special grey", "6 · SACCLI — correcção automática": "6 · SACCLI — automatic correction",

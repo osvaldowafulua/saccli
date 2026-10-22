@@ -47,6 +47,8 @@
   button:hover { background: #22365f; }
   button.primary { background: #2f6fdc; border-color: #2f6fdc; }
   button.active { background: #2f6fdc; border-color: #2f6fdc; }
+  button .ic { width: 14px; height: 14px; vertical-align: -2px; margin-right: 6px; }
+  button .ic.r { margin: 0 0 0 6px; }
   button.fast { background: #b45309; border-color: #d97706; }
   #doc { z-index: 20; left: 50%; bottom: 16px; transform: translateX(-50%); width: min(720px, calc(100% - 28px)); padding: 14px 18px; border-color: #2f6fdc; box-shadow: 0 10px 40px rgba(0,0,0,.45); }
   #doc .step { font-size: 11px; color: var(--dim); text-transform: uppercase; letter-spacing: .08em; }
@@ -108,14 +110,14 @@
   <div class="legend"></div>
   <div class="legend-l"><span>azul = dentro da tolerância</span><span>vermelho = fora / tensão alta</span></div>
   <div class="btns">
-    <button class="primary" id="play">❚❚ Pausa</button>
+    <button class="primary" id="play">Pausa</button>
     <button id="viewFab">Fábrica</button>
     <button id="viewCell">Célula</button>
     <button id="viewMod">Módulo</button>
     <button id="viewExp">Expedição</button>
     <button id="viewTop">Topo</button>
     <button id="panels">Painéis</button>
-    <button class="primary" id="docBtn">📖 Documentação 3D</button>
+    <button class="primary" id="docBtn">Documentação 3D</button>
   </div>
   <div class="note">Arraste para rodar · roda para zoom · botão direito para mover · espaço pausa.</div>
 </div>
@@ -125,7 +127,7 @@
   <h1 id="docTitle"></h1>
   <p id="docText"></p>
   <div class="bar"><i id="docBar"></i></div>
-  <div class="btns"><span><button id="docPrev">◀ Anterior</button> <button id="docNext" class="primary">Seguinte ▶</button></span><span><button id="docAuto">⏵ Automático</button> <button id="docClose">✕ Fechar</button></span></div>
+  <div class="btns"><span><button id="docPrev">Anterior</button> <button id="docNext" class="primary">Seguinte</button></span><span><button id="docAuto">Automático</button> <button id="docClose">Fechar</button></span></div>
 </div>
 
 <div id="ctrl" class="panel">

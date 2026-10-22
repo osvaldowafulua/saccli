@@ -47,6 +47,8 @@
   button:hover { background: #22365f; }
   button.primary { background: #2f6fdc; border-color: #2f6fdc; }
   button.active { background: #2f6fdc; border-color: #2f6fdc; }
+  button .ic { width: 14px; height: 14px; vertical-align: -2px; margin-right: 6px; }
+  button .ic.r { margin: 0 0 0 6px; }
   button.fast { background: #b45309; border-color: #d97706; }
   #doc { z-index: 20; left: 50%; bottom: 16px; transform: translateX(-50%); width: min(720px, calc(100% - 28px)); padding: 14px 18px; border-color: #2f6fdc; box-shadow: 0 10px 40px rgba(0,0,0,.45); }
   #doc .step { font-size: 11px; color: var(--dim); text-transform: uppercase; letter-spacing: .08em; }
@@ -108,14 +110,14 @@
   <div class="legend"></div>
   <div class="legend-l"><span>azul = dentro da tolerância</span><span>vermelho = fora / tensão alta</span></div>
   <div class="btns">
-    <button class="primary" id="play">❚❚ Pausa</button>
+    <button class="primary" id="play">Pausa</button>
     <button id="viewFab">Fábrica</button>
     <button id="viewCell">Célula</button>
     <button id="viewMod">Módulo</button>
     <button id="viewExp">Expedição</button>
     <button id="viewTop">Topo</button>
     <button id="panels">Painéis</button>
-    <button class="primary" id="docBtn">📖 Documentação 3D</button>
+    <button class="primary" id="docBtn">Documentação 3D</button>
   </div>
   <div class="note">Arraste para rodar · roda para zoom · botão direito para mover · espaço pausa.</div>
 </div>
@@ -125,7 +127,7 @@
   <h1 id="docTitle"></h1>
   <p id="docText"></p>
   <div class="bar"><i id="docBar"></i></div>
-  <div class="btns"><span><button id="docPrev">◀ Anterior</button> <button id="docNext" class="primary">Seguinte ▶</button></span><span><button id="docAuto">⏵ Automático</button> <button id="docClose">✕ Fechar</button></span></div>
+  <div class="btns"><span><button id="docPrev">Anterior</button> <button id="docNext" class="primary">Seguinte</button></span><span><button id="docAuto">Automático</button> <button id="docClose">Fechar</button></span></div>
 </div>
 
 <div id="ctrl" class="panel">
@@ -276,6 +278,15 @@ function addTag(t) {
   return tag;
 }
 
+// Ícones Lucide (SVG inline, traço 2 px, cor do texto) para os botões — sem emojis
+const LUCIDE = {
+  "book-open": '<path d="M12 7v14"/><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"/>',
+  "chevron-left": '<path d="m15 18-6-6 6-6"/>', "chevron-right": '<path d="m9 18 6-6-6-6"/>',
+  play: '<polygon points="6 3 20 12 6 21 6 3"/>', pause: '<rect x="14" y="4" width="4" height="16" rx="1"/><rect x="6" y="4" width="4" height="16" rx="1"/>',
+  x: '<path d="M18 6 6 18"/><path d="m6 6 12 12"/>', "rotate-ccw": '<path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/>',
+};
+function icon(name) { return `<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${LUCIDE[name]}</svg>`; }
+
 // ----- 08-i18n.js -----
 // =====================================================================
 // Idioma: PT (por omissão) / EN. tr(s) traduz uma frase; setLang(l) muda o idioma em toda a página.
@@ -359,8 +370,8 @@ const I18N_EXACT = {
   "Sobe elástico, cede, alivia em linha recta: o que fica é a correção": "Rises elastically, yields, unloads in a straight line: what remains is the correction",
   "Perfil da lima (A → C)": "File profile (A → C)",
   // ---- 90-ui.js
-  "📖 Documentação 3D": "📖 3D documentation", "Documentação 3D · passo": "3D documentation · step", "◀ Anterior": "◀ Previous", "Seguinte ▶": "Next ▶", "↺ Recomeçar": "↺ Restart",
-  "⏵ Automático": "⏵ Auto-play", "⏸ Parar automático": "⏸ Stop auto-play", "✕ Fechar": "✕ Close", "1 · Molde de corte": "1 · Blanking die",
+  "Documentação 3D": "3D documentation", "Documentação 3D · passo": "3D documentation · step", "Anterior": "Previous", "Seguinte": "Next", "Recomeçar": "Restart",
+  "Automático": "Auto-play", "Parar automático": "Stop auto-play", "Fechar": "Close", "Pausa": "Pause", "Continuar": "Resume", "1 · Molde de corte": "1 · Blanking die",
   "0 · Bobina de banda de aço": "0 · Steel strip coil", "1 · Laminagem — rolo de aço giratório": "1 · Rolling — rotating steel roll", "1 · Molde de corte — a forma da lima": "1 · Blanking die — the file shape",
   "2 · Picagem dos dentes": "2 · Tooth cutting", "3 · Têmpera por indução → choque em água": "3 · Induction hardening → water quench", "3 · Painel do gerador de indução": "3 · Induction generator panel",
   "4 · Medição de dureza / rigidez": "4 · Hardness / stiffness test", "5 · Jateamento — cinza especial": "5 · Blasting — special grey", "6 · SACCLI — correcção automática": "6 · SACCLI — automatic correction",
@@ -5908,7 +5919,9 @@ $("viewMod").onclick = () => view("mod");
 $("viewExp").onclick = () => view("exp");
 $("viewTop").onclick = () => view("top");
 $("panels").onclick = () => ["ctrl", "charts", "motors"].forEach((id) => $(id).classList.toggle("hidden"));
-$("play").onclick = () => { paused = !paused; $("play").textContent = tr(paused ? "▶ Continuar" : "❚❚ Pausa"); };
+const renderPlay = () => { $("play").innerHTML = paused ? icon("play") + tr("Continuar") : icon("pause") + tr("Pausa"); };
+$("play").onclick = () => { paused = !paused; renderPlay(); };
+renderPlay();
 // velocidade da linha: botões 0,5×…6× no painel de parâmetros
 function setSpeed(v) {
   setVal("speed", v); readUI();
@@ -6011,9 +6024,11 @@ function renderTour() {
   $("docStep").textContent = tr("Documentação 3D · passo") + ` ${tour.i + 1} / ${TOUR.length}`;
   $("docTitle").textContent = tr(title);
   $("docText").textContent = LANG.cur === "en" ? en : pt;
-  $("docPrev").textContent = tr("◀ Anterior"); $("docNext").textContent = tr(tour.i === TOUR.length - 1 ? "↺ Recomeçar" : "Seguinte ▶");
-  $("docAuto").textContent = tr(tour.auto ? "⏸ Parar automático" : "⏵ Automático"); $("docClose").textContent = tr("✕ Fechar");
-  $("docBtn").textContent = tr("📖 Documentação 3D");
+  $("docPrev").innerHTML = icon("chevron-left") + tr("Anterior");
+  $("docNext").innerHTML = tour.i === TOUR.length - 1 ? icon("rotate-ccw") + tr("Recomeçar") : tr("Seguinte") + icon("chevron-right").replace('class="ic"', 'class="ic r"');
+  $("docAuto").innerHTML = tour.auto ? icon("pause") + tr("Parar automático") : icon("play") + tr("Automático");
+  $("docClose").innerHTML = icon("x") + tr("Fechar");
+  $("docBtn").innerHTML = icon("book-open") + tr("Documentação 3D");
 }
 function tourGo(i) { tour.i = (i + TOUR.length) % TOUR.length; tour.t = 0; flyTo(TOUR[tour.i][0]); renderTour(); }
 function tourOpen(open) {
@@ -6036,7 +6051,7 @@ function tourTick(dt) {
   else $("docBar").style.width = "0";
 }
 LANG.hooks.push(() => { renderTour(); });
-LANG.hooks.push(() => { renderResults(); renderHUD(); renderMotors(); $("play").textContent = tr(paused ? "▶ Continuar" : "❚❚ Pausa"); setSpeed(P.speed); });
+LANG.hooks.push(() => { renderResults(); renderHUD(); renderMotors(); renderPlay(); setSpeed(P.speed); });
 i18nInit();
 window.__saccli = { tags: World.tags, FL, rackSlots, cartons, packer, runLog, P, limas, get job() { return job; }, bend, forceFor, robotIn, robotOut, camera, controls, amr, station, outCrates, cobot };
 
