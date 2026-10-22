@@ -3,7 +3,7 @@
 Simulação 3D interactiva (Three.js, um único ficheiro HTML, funciona sem internet) de uma fábrica de limas
 de aço, centrada na célula SACCLI de correcção automática de limas tortas.
 
-**Ver online:** https://osvaldowafulua.github.io/saccli/ · **Ficheiro:** [`index.html`](index.html)
+**Ver online:** https://saccli.vercel.app · https://osvaldowafulua.github.io/saccli/ · **Ficheiro:** [`index.html`](index.html)
 (abre directamente no browser).
 
 ## Documentação 3D (visita guiada)
