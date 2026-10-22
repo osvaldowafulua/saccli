@@ -48,7 +48,7 @@ const ease = (s) => s * s * (3 - 2 * s);
 // Renderer, câmara, luz
 // =====================================================================
 const FLOOR = -620;
-const HALL = { x: 10000, z: 7000, h: 7600 };
+const HALL = { x: 11600, z: 7000, h: 7600 };   // nave alongada em x para a bobina/desbobinador no início da linha
 const host = document.getElementById("view");
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setPixelRatio(Math.min(devicePixelRatio, 1.75));

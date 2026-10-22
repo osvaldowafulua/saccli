@@ -383,7 +383,7 @@ VIEWS.feed = [[-10500, 1500, 1500], [-9650, 0, -420]];
 VIEWS.pack = [[2500, 2000, 2100], [3600, -150, -150]];
 VIEWS.crates = [[-2400, 1900, 2300], [-900, -200, 200]];
 const AREAS = [
-  ["feed", "0 · Alimentação"], ["lam", "1 · Laminagem"], ["pic", "2 · Picagem"], ["ind", "3 · Têmpera"], ["indHmi", "3 · Painel da têmpera"],
+  ["feed", "0 · Bobina de banda"], ["lam", "1 · Laminagem"], ["pic", "2 · Picagem"], ["ind", "3 · Têmpera"], ["indHmi", "3 · Painel da têmpera"],
   ["dur", "4 · Dureza"], ["jato", "5 · Jateamento"], ["cell", "6 · SACCLI"], ["mod", "6 · Módulos A–C"], ["crates", "6 · Caixas e robôs"],
   ["pack", "7 · Embalagem e palete"], ["exp", "8 · Expedição (AMR)"], ["kmf", "8 · Armário (KMF 1500P)"],
 ];
@@ -462,10 +462,10 @@ renderer.setAnimationLoop((now) => {
 // Documentação 3D: visita guiada por todo o processo — a câmara voa até cada área e o painel explica (PT/EN)
 // =====================================================================
 const TOUR = [
-  ["feed", "0 · Alimentação de barras de aço", "O processo começa com barras chatas de aço-carbono (secção rectangular — a lima nunca é redonda). Um alimentador coloca uma barra de cada vez na esteira da linha a montante, que avança por passos: pára em cada estação, a estação trabalha, e a esteira avança para o passo seguinte.",
-    "The process starts with flat carbon-steel bars (rectangular section — a file is never round). A feeder places one bar at a time on the upstream conveyor, which indexes step by step: it stops at each station, the station works, and the conveyor moves to the next step."],
-  ["lam", "1 · Laminagem — rolo de aço giratório", "Um laminador duo com dois cilindros de aço Ø330 mm, accionados por motor, redutor e veios cardã, aperta a barra: o aperto hidráulico (AGC) fecha a folga e os cilindros giratórios puxam a barra, reduzindo a espessura até à cota final. A barra sai como uma tira chata, direita e calibrada.",
-    "A two-high rolling mill with two Ø330 mm steel rolls, driven by a motor, gearbox and cardan shafts, squeezes the bar: the hydraulic screw-down (AGC) closes the gap and the rotating rolls pull the bar through, reducing its thickness to the final size. The bar leaves as a flat, straight, sized strip."],
+  ["feed", "0 · Bobina de banda de aço", "A matéria-prima é uma banda contínua de aço-carbono com secção rectangular (a lima nunca é redonda), enrolada numa bobina de cerca de 90 m. O desbobinador desenrola a banda, que passa num endireitador de rolos e entra direita no laminador. Não há barras soltas: a banda só é cortada no molde.",
+    "The raw material is a continuous carbon-steel strip with a rectangular section (a file is never round), wound on a coil of about 90 m. The decoiler unwinds the strip, which passes through a roller straightener and enters the rolling mill straight. There are no loose bars: the strip is only cut at the die."],
+  ["lam", "1 · Laminagem — rolo de aço giratório", "Um laminador duo com dois cilindros de aço Ø330 mm, accionados por motor, redutor e veios cardã, aperta a banda até à espessura final: sai uma tira chata, direita e calibrada. Os cilindros rodam sincronizados com o molde — avançam a banda exactamente um passo de cada vez e param enquanto o molde corta.",
+    "A two-high rolling mill with two Ø330 mm steel rolls, driven by a motor, gearbox and cardan shafts, squeezes the strip to its final thickness: a flat, straight, sized strip comes out. The rolls turn in sync with the die — they feed the strip exactly one pitch at a time and stop while the die cuts."],
   ["molde", "1 · Molde de corte — a forma da lima", "Logo a seguir, uma prensa hidráulica fecha o molde de corte: a matriz inferior está embutida na esteira e o punção superior tem a silhueta da lima em negativo. O punção desce, corta na tira a lâmina afunilada com o espigão, e as aparas caem pela calha para o contentor. A partir daqui a peça já tem a forma de lima.",
     "Right after, a hydraulic press closes the blanking die: the lower die is embedded in the conveyor and the upper punch carries the file outline in negative. The punch comes down, cuts the tapered blade with its tang out of the strip, and the scrap slides down the chute into the bin. From here on the part has the shape of a file."],
   ["pic", "2 · Picagem dos dentes", "A máquina de picar prende a lima e um cinzel, accionado a alta cadência, pica os dentes ao longo de todo o comprimento, do espigão até à ponta. A HMI mostra os golpes por minuto, os dentes por centímetro e o avanço da picagem.",

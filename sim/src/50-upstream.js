@@ -104,6 +104,7 @@ const _heat = new THREE.Color();
 function drawUpLima(l) {
   const x = UP.xOf(l.slot + (UP.phase === "move" ? UP.shift : 0));
   l.g.position.set(x, UP.TOP, UP.Z);
+  l.g.visible = l.slot > 2 || (l.slot === 2 && !!l.cut);   // antes do corte no molde a peça faz parte da banda contínua (55-a0)
   const len = limaLen();
   l.bar.visible = l.form < 0.5;
   l.strip.visible = l.form >= 0.5 && !l.cut;
@@ -145,13 +146,7 @@ addSystem({
   },
   draw() { for (const l of UP.limas) drawUpLima(l); },
 });
-// alimentador de barras no início da linha
-{
-  const x = UP.xOf(UP.FIRST) - 60;
-  box(260, 400, 420, mat.steelBlue, x - 120, 200 - 0, UP.Z, scene);
-  for (let i = 0; i < 6; i++) box(limaLen() * 0.72, P.h * 1.6, P.b * 0.9, mat.steel, x - 120, 410 + P.h * 0.8, UP.Z - 110 + i * 44);   // barras chatas à espera
-  addTag({ text: "0 · Alimentação de barras de aço", at: () => V(x - 120, 560, UP.Z), max: 6000 });
-}
+// (a alimentação é uma banda contínua a partir de uma bobina: ver 55-a0-banda.js)
 addTag({ text: () => (UP.waiting ? "Linha a montante · em espera (caixa azul cheia)" : (UP.made === 1 ? "Linha a montante · 1 lima produzida" : `Linha a montante · ${UP.made} limas produzidas`)), at: () => V(UP.xOf(14), 1950, UP.Z), min: 2500, big: true });
 addView("up", "Linha a montante", [-5200, 2600, 3000], [-5600, 0, -420]);
 window.__UP = UP;

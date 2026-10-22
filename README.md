@@ -17,8 +17,8 @@ no painel de parâmetros (0,5× a 6×).
 
 | Nº | Estação | O que acontece |
 |---|---|---|
-| 0 | Alimentação | barras chatas de aço (secção rectangular — a lima nunca é redonda) |
-| 1 | Laminagem + molde | o rolo de aço giratório aperta a barra até uma tira chata e direita; a seguir o molde de corte (prensa) corta a silhueta da lima — lâmina afunilada com espigão — e as aparas caem para o contentor |
+| 0 | Bobina de banda | banda contínua de aço (≈90 m, secção rectangular — a lima nunca é redonda) num desbobinador, endireitada por rolos; não há barras soltas |
+| 1 | Laminagem + molde | os cilindros de aço apertam a banda até uma tira chata e direita e rodam sincronizados com o molde (avançam um passo e param); o molde de corte (prensa) corta a silhueta da lima — lâmina afunilada com espigão — e as aparas caem para o contentor |
 | 2 | Picagem | cinzel pica os dentes ao longo do comprimento |
 | 3 | Têmpera por indução | bobina de cobre aquece até **1200 °C** → choque térmico em **água** em fracções de segundo → revenido; HMI virada para o corredor do operador |
 | 4 | Dureza / rigidez | ensaio Rockwell C (força em N) com HMI e rejeição |

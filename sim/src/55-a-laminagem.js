@@ -475,7 +475,7 @@
     g.fillStyle = "#15294b"; g.fillRect(0, 0, W, 46);
     g.textBaseline = "middle"; g.textAlign = "left"; g.fillStyle = "#eaf1fd"; g.font = "700 22px Arial, sans-serif"; g.fillText(tr("LAMINADOR DUO L1 · LAMINAGEM"), 16, 24);
     g.textAlign = "right"; g.fillStyle = "#9fb3d1"; g.font = "18px Arial, sans-serif"; g.fillText(tr("Esboços: ") + st.n, W - 16, 24);
-    const gap = st.yrNow - 2, rpm = OMEGA * 60 / (2 * Math.PI);
+    const gap = st.yrNow - 2, rpm = st.rollingNow ? UP.PITCH / UP.move / R * 60 / (2 * Math.PI) : 0;
     const cells = [[tr("VELOCIDADE"), rpm.toFixed(1), "rpm"], [tr("FOLGA"), gap.toFixed(1), "mm"], [tr("FORÇA"), st.forceNow.toFixed(0), "kN"]];
     cells.forEach(([k, v, u], i) => {
       const x = 16 + i * 205;
@@ -486,9 +486,9 @@
     });
     // fase
     const s = st.sNow;
-    const phase = s < 0 ? (UP.phase === "move" ? tr("Barra a entrar no batente") : tr("Em espera")) : s < S_DOWN ? tr("Barra na mordedura") : s < S_A ? tr("Aperto hidráulico (AGC)") : s <= sB() ? tr("A laminar · barra apertada até à tira direita") : tr("Tira direita pronta · folga a abrir");
+    const phase = s < 0 ? (UP.phase === "move" && !UP.waiting ? tr("A laminar · banda avança um passo (sincronizado com o molde)") : UP.waiting ? tr("Em espera") : tr("Banda parada · molde a cortar")) : s < S_DOWN ? tr("Barra na mordedura") : s < S_A ? tr("Aperto hidráulico (AGC)") : s <= sB() ? tr("A laminar · barra apertada até à tira direita") : tr("Tira direita pronta · folga a abrir");
     g.textAlign = "left"; g.fillStyle = st.rollingNow ? "#fbbf24" : "#8fa3c0"; g.font = "600 18px Arial, sans-serif"; g.fillText(phase, 16, 172);
-    const pr = s < S_A ? 0 : clamp01(1 - st.xig);
+    const pr = UP.phase === "move" ? UP.shift : 0;
     g.fillStyle = "#1a2740"; g.fillRect(16, 188, W - 32, 12); g.fillStyle = "#38bdf8"; g.fillRect(16, 188, (W - 32) * pr, 12);
     // perfil da lima (vista lateral, espessura × 6)
     const px = 16, py = 214, pw = W - 32, ph = 170;
@@ -519,7 +519,7 @@
   addTag({ text: () => `Aperto hidráulico (AGC) · folga ${(st.yrNow - 2).toFixed(1)} mm`, at: () => V(XG, 900, ZDS), max: 3000 });
   addTag({ text: "Motor 22 kW + redutor / caixa de pinhões", at: () => V(XG + 480, -120, -1120), max: 3000 });
   addTag({ text: "Veios cardã", at: () => V(XG, 400, -930), max: 3000 });
-  addTag({ text: () => (st.rollingNow ? `A laminar · ${(16).toFixed(0)} → ${(st.yrNow - 2).toFixed(1)} mm` : "Barra chata → tira direita e calibrada (o molde corta a forma)"), at: () => V(SX + 330, 40, Z0 + 140), max: 3000 });
+  addTag({ text: () => (st.rollingNow ? `A laminar · ${(16).toFixed(0)} → ${(st.yrNow - 2).toFixed(1)} mm` : "Banda contínua → tira direita e calibrada (o molde corta a forma)"), at: () => V(SX + 330, 40, Z0 + 140), max: 3000 });
   addView("lam", "Laminagem", [-8350, 1650, 350], [-9350, 60, -430]);
 
   // ---------- animação
@@ -536,7 +536,9 @@
   }
   addSystem({
     update(dt) {
-      ang += OMEGA * dt;
+      // os cilindros só rodam enquanto a banda avança um passo (phase "move"): velocidade periférica = velocidade da banda
+      if (UP.phase === "move" && !UP.waiting) ang += (UP.PITCH / UP.move / R) * dt;
+      if (UP.phase === "move" && !st.moving) { st.moving = true; st.n++; } else if (UP.phase !== "move") st.moving = false;
       stepParticles(dt);
     },
     draw() {
@@ -548,7 +550,7 @@
       const here = UP.limaAt(SLOT);
       // primeiro frame da paragem (antes de onDwell): a barra continua no batente, sem saltar para o slot
       if (UP.phase === "dwell" && here && st.lima !== here && st.staged === here) { st.lima = here; st.from = PRE; st.s = 0; st.done = false; }
-      const active = UP.phase === "dwell" && here && st.lima === here;
+      const active = false;   // banda contínua (55-a0-banda.js): a tira passa sempre entre os cilindros, sem esboços soltos
       const s = active ? st.s : -1;
       st.sNow = s;
       if (active) {
@@ -560,7 +562,9 @@
         st.yrNow = st.yr; st.forceNow = st.force; st.rollingNow = st.rolling;
       } else {
         morph.visible = false; st.drawn = false;
-        st.yrNow = OPEN; st.forceNow = 0; st.rollingNow = false;
+        st.rollingNow = UP.phase === "move" && !UP.waiting;
+        st.yrNow = 2 + H;                                                        // folga fechada na espessura final da tira
+        st.forceNow = st.rollingNow ? 420 * B * Math.sqrt(R * (HB - H)) * 1.1 / 1000 : 0;
       }
       // cilindros, mancais, hastes do AGC
       const yU = st.yrNow + R;
