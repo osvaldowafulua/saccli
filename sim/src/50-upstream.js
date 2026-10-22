@@ -31,7 +31,8 @@ UP.blendFinish = (l, name, k) => {
 };
 // garantia do processo: depois de cada estação a lima tem sempre o estado certo (mesmo sem a animação da estação)
 UP.guarantee = (l) => {
-  if (l.slot >= 3) l.form = 1;                     // depois da laminagem: forma completa de lima (afunilada, com espigão)
+  if (l.slot >= 2) l.form = 1;                     // depois da laminagem: tira chata direita, calibrada
+  if (l.slot >= 3) l.cut = true;                   // depois do molde de corte: silhueta de lima (afunilada, com espigão)
   if (l.slot >= 6) l.teeth = 1;                    // depois da picagem: dentes em todo o comprimento
   if (l.slot >= 13 && l.finishName === "raw") { l.heat = 0; UP.blendFinish(l, "scale", 1); l.finishName = "scale"; }   // depois da têmpera
   if (l.slot >= 14) l.heat = 0;
@@ -39,7 +40,7 @@ UP.guarantee = (l) => {
   if (l.slot >= 20 && l.finishName !== P.finish) { UP.blendFinish(l, P.finish, 1); l.finishName = P.finish; }          // depois do jateamento
 };
 UP.reset = (l) => {
-  l.form = 0; l.teeth = 0; l.heat = 0; l.tested = false; l.hrc = 0; l.finishName = "raw";
+  l.form = 0; l.cut = false; l.teeth = 0; l.heat = 0; l.tested = false; l.hrc = 0; l.finishName = "raw";
   l.color.set(UP.FINISH.raw.color); l.metal = UP.FINISH.raw.metal; l.rough = UP.FINISH.raw.rough;
 };
 
@@ -75,9 +76,10 @@ function upBlankGeometry() {
   g.computeVertexNormals();
   return g;
 }
-const upGeo = { bar: null, blank: null, tang: null, teeth: new THREE.PlaneGeometry(1, 1) };
+const upGeo = { bar: null, strip: null, blank: null, tang: null, teeth: new THREE.PlaneGeometry(1, 1) };
 function rebuildUpGeometry() {
   upGeo.bar = new THREE.BoxGeometry(limaLen() * 0.72, P.h * 1.6, P.b * 0.9);   // barra chata de aço (secção rectangular): mais curta e grossa, a laminagem alonga-a
+  upGeo.strip = new THREE.BoxGeometry(limaLen() + 60, P.h, P.b);        // tira chata direita que sai do laminador (antes do corte no molde)
   upGeo.blank = upBlankGeometry();
   upGeo.tang = new THREE.BoxGeometry(60, P.h * 0.6, P.b * 0.42);
 }
@@ -87,12 +89,12 @@ function makeUpLima(slot) {
   const g = new THREE.Group(); scene.add(g);
   const m = new THREE.MeshStandardMaterial({ color: 0xb3bac2, metalness: 0.85, roughness: 0.32 });
   const tm = new THREE.MeshStandardMaterial({ map: upTeethTex, metalness: 0.85, roughness: 0.4, transparent: true, opacity: 0.9 });
-  const bar = new THREE.Mesh(upGeo.bar, m), blank = new THREE.Mesh(upGeo.blank, m), tang = new THREE.Mesh(upGeo.tang, m);
+  const bar = new THREE.Mesh(upGeo.bar, m), strip = new THREE.Mesh(upGeo.strip, m), blank = new THREE.Mesh(upGeo.blank, m), tang = new THREE.Mesh(upGeo.tang, m);
   const teethPlane = new THREE.Mesh(upGeo.teeth, tm); teethPlane.rotation.x = -Math.PI / 2;
   const mark = new THREE.Mesh(new THREE.SphereGeometry(5, 10, 8), mat.ledG);
-  for (const o of [bar, blank, tang]) { o.castShadow = true; o.receiveShadow = true; }
-  g.add(bar, blank, tang, teethPlane, mark);
-  const l = { g, m, tm, bar, blank, tang, teethPlane, mark, slot, color: new THREE.Color(), metal: 0, rough: 0 };
+  for (const o of [bar, strip, blank, tang]) { o.castShadow = true; o.receiveShadow = true; }
+  g.add(bar, strip, blank, tang, teethPlane, mark);
+  const l = { g, m, tm, bar, strip, blank, tang, teethPlane, mark, slot, color: new THREE.Color(), metal: 0, rough: 0 };
   UP.reset(l);
   UP.limas.push(l);
   return l;
@@ -104,11 +106,13 @@ function drawUpLima(l) {
   l.g.position.set(x, UP.TOP, UP.Z);
   const len = limaLen();
   l.bar.visible = l.form < 0.5;
-  l.blank.visible = l.tang.visible = l.form >= 0.5;
+  l.strip.visible = l.form >= 0.5 && !l.cut;
+  l.blank.visible = l.tang.visible = !!l.cut;
   l.bar.position.set(0, 2 + P.h * 0.8, 0);
+  l.strip.scale.set(1, 1 + (1 - l.form) * 1.4, 1); l.strip.position.set(30, 2 + (P.h * l.strip.scale.y) / 2, 0);
   l.blank.scale.set(1, 1 + (1 - l.form) * 1.4, 1); l.blank.position.set(0, 2 + (P.h * l.blank.scale.y) / 2, 0);
   l.tang.position.set(len / 2 + 30, 2 + P.h * 0.3, 0);
-  l.teethPlane.visible = l.form >= 0.5 && l.teeth > 0.01;
+  l.teethPlane.visible = !!l.cut && l.teeth > 0.01;
   l.teethPlane.scale.set(Math.max(1, len * 0.85 * l.teeth), P.b * 0.8, 1);
   l.teethPlane.position.set(-len / 2 + 10 + (len * 0.85 * l.teeth) / 2, 2 + P.h + 0.4, 0);
   upTeethTex.repeat.set(8, 1);

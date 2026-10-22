@@ -324,11 +324,9 @@
 
   // ---------- lima em laminagem: malha deformável (barra chata → esboço afunilado com espigão)
   const rings = [];
-  const section = (xf, o) => {
-    if (xf > L / 2 + 1e-6) { o.bot = 2; o.top = 2 + 0.6 * H; o.hw = 0.21 * B; return o; }     // espigão
-    const u = Math.max(0, -xf / (L / 2)), hh = (H / 2) * (1 - 0.3 * u * u);
-    o.bot = 2 + H / 2 - hh; o.top = 2 + H / 2 + hh; o.hw = (B / 2) * (1 - 0.42 * u * u); return o;
-  };
+  // secção depois dos cilindros: tira chata DIREITA e calibrada (rectângulo constante em todo o comprimento, incluindo a zona
+  // do futuro espigão) — a silhueta afunilada com espigão é cortada a seguir, no molde
+  const section = (xf, o) => { o.bot = 2; o.top = 2 + H; o.hw = B / 2; return o; };
   for (let i = 0; i <= 30; i++) rings.push(section(-L / 2 + (i * L) / 30, { xf: -L / 2 + (i * L) / 30 }));
   for (let i = 0; i <= 6; i++) { const r = section(L / 2 + 1 + (i * LT) / 6, {}); r.xf = L / 2 + (i * LT) / 6; rings.push(r); }
   for (const r of rings) r.xi = (r.xf + L / 2) / LF;
@@ -488,7 +486,7 @@
     });
     // fase
     const s = st.sNow;
-    const phase = s < 0 ? (UP.phase === "move" ? tr("Barra a entrar no batente") : tr("Em espera")) : s < S_DOWN ? tr("Barra na mordedura") : s < S_A ? tr("Aperto hidráulico (AGC)") : s <= sB() ? tr("A laminar · espigão → corpo → ponta") : tr("Esboço pronto · folga a abrir");
+    const phase = s < 0 ? (UP.phase === "move" ? tr("Barra a entrar no batente") : tr("Em espera")) : s < S_DOWN ? tr("Barra na mordedura") : s < S_A ? tr("Aperto hidráulico (AGC)") : s <= sB() ? tr("A laminar · barra apertada até à tira direita") : tr("Tira direita pronta · folga a abrir");
     g.textAlign = "left"; g.fillStyle = st.rollingNow ? "#fbbf24" : "#8fa3c0"; g.font = "600 18px Arial, sans-serif"; g.fillText(phase, 16, 172);
     const pr = s < S_A ? 0 : clamp01(1 - st.xig);
     g.fillStyle = "#1a2740"; g.fillRect(16, 188, W - 32, 12); g.fillStyle = "#38bdf8"; g.fillRect(16, 188, (W - 32) * pr, 12);
@@ -521,7 +519,7 @@
   addTag({ text: () => `Aperto hidráulico (AGC) · folga ${(st.yrNow - 2).toFixed(1)} mm`, at: () => V(XG, 900, ZDS), max: 3000 });
   addTag({ text: "Motor 22 kW + redutor / caixa de pinhões", at: () => V(XG + 480, -120, -1120), max: 3000 });
   addTag({ text: "Veios cardã", at: () => V(XG, 400, -930), max: 3000 });
-  addTag({ text: () => (st.rollingNow ? `A laminar · ${(16).toFixed(0)} → ${(st.yrNow - 2).toFixed(1)} mm` : "Barra chata → esboço afunilado com espigão"), at: () => V(SX + 330, 40, Z0 + 140), max: 3000 });
+  addTag({ text: () => (st.rollingNow ? `A laminar · ${(16).toFixed(0)} → ${(st.yrNow - 2).toFixed(1)} mm` : "Barra chata → tira direita e calibrada (o molde corta a forma)"), at: () => V(SX + 330, 40, Z0 + 140), max: 3000 });
   addView("lam", "Laminagem", [-8350, 1650, 350], [-9350, 60, -430]);
 
   // ---------- animação

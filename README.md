@@ -6,12 +6,19 @@ de aço, centrada na célula SACCLI de correcção automática de limas tortas.
 **Ver online:** https://osvaldowafulua.github.io/saccli/ · **Ficheiro:** [`index.html`](index.html)
 (abre directamente no browser).
 
+## Documentação 3D (visita guiada)
+
+Na página, o botão **📖 Documentação 3D** abre uma visita guiada em 14 passos: a câmara voa até cada área e um painel
+explica o que acontece (em português ou inglês, conforme o botão **PT | EN**). Pode avançar passo a passo ou deixar em
+**Automático**. Os botões **Ver cada área** levam directamente a qualquer estação, e a velocidade da linha ajusta-se
+no painel de parâmetros (0,5× a 6×).
+
 ## O que a simulação mostra
 
 | Nº | Estação | O que acontece |
 |---|---|---|
 | 0 | Alimentação | barras chatas de aço (secção rectangular — a lima nunca é redonda) |
-| 1 | Laminagem | rolo de aço giratório dá a forma da lima (afunilada, com espigão) |
+| 1 | Laminagem + molde | o rolo de aço giratório aperta a barra até uma tira chata e direita; a seguir o molde de corte (prensa) corta a silhueta da lima — lâmina afunilada com espigão — e as aparas caem para o contentor |
 | 2 | Picagem | cinzel pica os dentes ao longo do comprimento |
 | 3 | Têmpera por indução | bobina de cobre aquece até **1200 °C** → choque térmico em **água** em fracções de segundo → revenido; HMI virada para o corredor do operador |
 | 4 | Dureza / rigidez | ensaio Rockwell C (força em N) com HMI e rejeição |

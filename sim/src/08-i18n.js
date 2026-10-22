@@ -80,6 +80,13 @@ const I18N_EXACT = {
   "Sobe elástico, cede, alivia em linha recta: o que fica é a correção": "Rises elastically, yields, unloads in a straight line: what remains is the correction",
   "Perfil da lima (A → C)": "File profile (A → C)",
   // ---- 90-ui.js
+  "📖 Documentação 3D": "📖 3D documentation", "Documentação 3D · passo": "3D documentation · step", "◀ Anterior": "◀ Previous", "Seguinte ▶": "Next ▶", "↺ Recomeçar": "↺ Restart",
+  "⏵ Automático": "⏵ Auto-play", "⏸ Parar automático": "⏸ Stop auto-play", "✕ Fechar": "✕ Close", "1 · Molde de corte": "1 · Blanking die",
+  "0 · Alimentação de barras de aço": "0 · Steel bar feed", "1 · Laminagem — rolo de aço giratório": "1 · Rolling — rotating steel roll", "1 · Molde de corte — a forma da lima": "1 · Blanking die — the file shape",
+  "2 · Picagem dos dentes": "2 · Tooth cutting", "3 · Têmpera por indução → choque em água": "3 · Induction hardening → water quench", "3 · Painel do gerador de indução": "3 · Induction generator panel",
+  "4 · Medição de dureza / rigidez": "4 · Hardness / stiffness test", "5 · Jateamento — cinza especial": "5 · Blasting — special grey", "6 · SACCLI — correcção automática": "6 · SACCLI — automatic correction",
+  "6 · Módulos A1–C2 e scanner 2": "6 · Modules A1–C2 and scanner 2", "7 · Embalagem em cartão e paletização": "7 · Cartoning and palletising", "8 · Expedição — AMR": "8 · Shipping — AMR",
+  "8 · Armário de paletes — KUKA KMF 1500P": "8 · Pallet rack — KUKA KMF 1500P",
   "Ver cada área": "View each area", "0 · Alimentação": "0 · Bar feed", "1 · Laminagem": "1 · Rolling", "2 · Picagem": "2 · Tooth cutting", "3 · Têmpera": "3 · Hardening",
   "3 · Painel da têmpera": "3 · Hardening panel", "4 · Dureza": "4 · Hardness", "5 · Jateamento": "5 · Blasting", "6 · SACCLI": "6 · SACCLI", "6 · Módulos A–C": "6 · Modules A–C",
   "6 · Caixas e robôs": "6 · Crates and robots", "7 · Embalagem e palete": "7 · Packing and pallet", "8 · Expedição (AMR)": "8 · Shipping (AMR)", "8 · Armário (KMF 1500P)": "8 · Rack (KMF 1500P)",
@@ -183,8 +190,8 @@ const I18N_EXACT = {
   "Linha a montante · em espera (caixa azul cheia)": "Upstream line · waiting (blue crate full)",
   "Linha a montante": "Upstream line",
   // ---- 55-a laminagem
-  "MOLDE DE CALIBRAGEM · MATRIZ": "SIZING DIE · LOWER DIE", "MOLDE DE CALIBRAGEM · PUNÇÃO": "SIZING DIE · PUNCH",
-  "Molde de calibragem · forma final da lima (lâmina + espigão)": "Sizing die · final file shape (blade + tang)", "A calibrar no molde": "Sizing in the die", "Molde aberto": "Die open",
+  "MOLDE DE CORTE · MATRIZ": "BLANKING DIE · LOWER DIE", "MOLDE DE CORTE · PUNÇÃO": "BLANKING DIE · PUNCH", "Aparas": "Scrap",
+  "Molde de corte · corta a silhueta da lima na tira (lâmina + espigão)": "Blanking die · cuts the file outline from the strip (blade + tang)", "A cortar no molde": "Cutting in the die", "Molde aberto": "Die open", "Aparas do corte": "Cutting scrap",
   "em espera": "idle",
   "LAMINADOR DUO  L1": "DUO ROLLING MILL  L1",
   "Cilindros Ø330 × 420 mm": "Rolls Ø330 × 420 mm",
@@ -204,14 +211,14 @@ const I18N_EXACT = {
   "Barra na mordedura": "Bar in the roll bite",
   "Aperto hidráulico (AGC)": "Hydraulic screw-down (AGC)",
   "A laminar · espigão → corpo → ponta": "Rolling · tang → body → tip",
-  "Esboço pronto · folga a abrir": "Blank done · gap opening",
+  "Esboço pronto · folga a abrir": "Blank done · gap opening", "Tira direita pronta · folga a abrir": "Straight strip done · gap opening", "A laminar · barra apertada até à tira direita": "Rolling · bar squeezed into a straight strip",
   "Perfil da peça (espessura ×6) · alvo a tracejado": "Part profile (thickness ×6) · target dashed",
   "eixo dos cilindros": "roll axis",
   "1 · Laminagem — rolo de aço giratório": "1 · Rolling — rotating steel roll",
   "Cilindros de trabalho Ø330 × 420 mm · 18 rpm": "Work rolls Ø330 × 420 mm · 18 rpm",
   "Motor 22 kW + redutor / caixa de pinhões": "22 kW motor + gearbox / pinion stand",
   "Veios cardã": "Cardan shafts",
-  "Barra chata → esboço afunilado com espigão": "Flat bar → tapered blank with tang",
+  "Barra chata → esboço afunilado com espigão": "Flat bar → tapered blank with tang", "Barra chata → tira direita e calibrada (o molde corta a forma)": "Flat bar → straight, sized strip (the die cuts the shape)",
   "Laminagem": "Rolling",
   // ---- 55-b picagem
   "PICADORA DE LIMAS": "FILE CUTTING MACHINE",
@@ -378,6 +385,7 @@ const I18N_EXACT = {
 
 // fragmentos para frases dinâmicas com números (substituição de sub-frases inteiras, da mais longa para a mais curta)
 const I18N_PHRASES = [
+  ["Aparas do corte · ", "Cutting scrap · "],
   // notas do painel de resultados (frases com números)
   ["O actuador de correção precisa de ~", "The correction actuator needs ~"], [" a lima só flete de forma elástica e volta torta.", " the file only bends elastically and springs back bent."], [". Com ", ". With "],
   [" tem repetibilidade de ", " has a repeatability of "], [" µm: não consegue garantir ±", " µm: it cannot guarantee ±"], [" µm. Para 0,5 µm é preciso um sensor de deslocamento/confocal de alta precisão.", " µm. For 0.5 µm a high-precision displacement/confocal sensor is needed."],

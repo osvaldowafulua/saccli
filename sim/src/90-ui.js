@@ -387,6 +387,8 @@ const AREAS = [
   ["dur", "4 · Dureza"], ["jato", "5 · Jateamento"], ["cell", "6 · SACCLI"], ["mod", "6 · Módulos A–C"], ["crates", "6 · Caixas e robôs"],
   ["pack", "7 · Embalagem e palete"], ["exp", "8 · Expedição (AMR)"], ["kmf", "8 · Armário (KMF 1500P)"],
 ];
+VIEWS.molde = [[-8300, 650, 500], [-8950, 100, -380]];
+AREAS.splice(2, 0, ["molde", "1 · Molde de corte"]);
 for (const [key, label] of AREAS) {
   if (!VIEWS[key]) continue;
   const b = document.createElement("button"); b.className = "area"; b.textContent = label; b.onclick = () => view(key); $("stationViews").appendChild(b);   // texto traduzido por i18nInit()
@@ -446,6 +448,7 @@ renderer.setAnimationLoop((now) => {
   update(dt);
   frameScene(paused ? 0 : dt * P.speed);
   for (const s of World.systems) { if (!paused && s.update) s.update(dt * P.speed); if (s.draw) s.draw(paused ? 0 : dt * P.speed); }
+  tourTick(dt);
   controls.update();
   camera.position.x = Math.max(-HALL.x + 300, Math.min(HALL.x - 300, camera.position.x));
   camera.position.z = Math.max(-HALL.z + 300, Math.min(HALL.z - 300, camera.position.z));
@@ -455,6 +458,75 @@ renderer.setAnimationLoop((now) => {
   if ((hudTick += dt) > 0.05) { hudTick = 0; renderHUD(); }
   if ((drawHMI.t = (drawHMI.t || 0) + dt) > 0.25) { drawHMI.t = 0; drawHMI(); }
 });
+// =====================================================================
+// Documentação 3D: visita guiada por todo o processo — a câmara voa até cada área e o painel explica (PT/EN)
+// =====================================================================
+const TOUR = [
+  ["feed", "0 · Alimentação de barras de aço", "O processo começa com barras chatas de aço-carbono (secção rectangular — a lima nunca é redonda). Um alimentador coloca uma barra de cada vez na esteira da linha a montante, que avança por passos: pára em cada estação, a estação trabalha, e a esteira avança para o passo seguinte.",
+    "The process starts with flat carbon-steel bars (rectangular section — a file is never round). A feeder places one bar at a time on the upstream conveyor, which indexes step by step: it stops at each station, the station works, and the conveyor moves to the next step."],
+  ["lam", "1 · Laminagem — rolo de aço giratório", "Um laminador duo com dois cilindros de aço Ø330 mm, accionados por motor, redutor e veios cardã, aperta a barra: o aperto hidráulico (AGC) fecha a folga e os cilindros giratórios puxam a barra, reduzindo a espessura até à cota final. A barra sai como uma tira chata, direita e calibrada.",
+    "A two-high rolling mill with two Ø330 mm steel rolls, driven by a motor, gearbox and cardan shafts, squeezes the bar: the hydraulic screw-down (AGC) closes the gap and the rotating rolls pull the bar through, reducing its thickness to the final size. The bar leaves as a flat, straight, sized strip."],
+  ["molde", "1 · Molde de corte — a forma da lima", "Logo a seguir, uma prensa hidráulica fecha o molde de corte: a matriz inferior está embutida na esteira e o punção superior tem a silhueta da lima em negativo. O punção desce, corta na tira a lâmina afunilada com o espigão, e as aparas caem pela calha para o contentor. A partir daqui a peça já tem a forma de lima.",
+    "Right after, a hydraulic press closes the blanking die: the lower die is embedded in the conveyor and the upper punch carries the file outline in negative. The punch comes down, cuts the tapered blade with its tang out of the strip, and the scrap slides down the chute into the bin. From here on the part has the shape of a file."],
+  ["pic", "2 · Picagem dos dentes", "A máquina de picar prende a lima e um cinzel, accionado a alta cadência, pica os dentes ao longo de todo o comprimento, do espigão até à ponta. A HMI mostra os golpes por minuto, os dentes por centímetro e o avanço da picagem.",
+    "The cutting machine clamps the file and a high-cadence chisel cuts the teeth along the whole length, from the tang to the tip. The HMI shows strokes per minute, teeth per centimetre and the cutting progress."],
+  ["ind", "3 · Têmpera por indução → choque em água", "Uma pinça eleva a lima até ao eixo da bobina de cobre (arrefecida a água). O gerador de média frequência faz passar corrente na bobina e a lima aquece por indução até 1200 °C em segundos. De seguida cai no tanque de água: o choque térmico em fracções de segundo endurece o aço (martensite). Um revenido por indução a ~200 °C alivia tensões.",
+    "A gripper lifts the file to the axis of the water-cooled copper coil. The medium-frequency generator drives current through the coil and the file heats by induction to 1200 °C in seconds. It then drops into the water tank: the thermal shock within fractions of a second hardens the steel (martensite). An induction temper at ~200 °C relieves stresses."],
+  ["indHmi", "3 · Painel do gerador de indução", "O armário do gerador (fonte AC, 120 kW, 10–30 kHz) tem a HMI, a paragem de emergência, o interruptor geral e a coluna luminosa virados para o corredor do operador; do lado da máquina só entram os cabos e as mangueiras de água. O refrigerador de circuito fechado mantém a água da bobina a ~21 °C.",
+    "The generator cabinet (AC source, 120 kW, 10–30 kHz) has its HMI, emergency stop, main switch and light column facing the operator aisle; only the cables and water hoses enter on the machine side. The closed-loop chiller keeps the coil water at ~21 °C."],
+  ["dur", "4 · Medição de dureza / rigidez", "Um durómetro Rockwell C ensaia cada lima: o indentador de diamante penetra o aço com uma força de ensaio de 1471 N e a profundidade dá a dureza (58–62 HRC esperados). As limas abaixo de 55 HRC são empurradas pela rampa para a caixa vermelha de rejeição; as aprovadas recebem a marca verde no espigão.",
+    "A Rockwell C tester checks every file: the diamond indenter penetrates the steel with a 1471 N test force and the depth gives the hardness (58–62 HRC expected). Files below 55 HRC are pushed down the ramp into the red reject crate; approved ones get a green mark on the tang."],
+  ["jato", "5 · Jateamento — cinza especial", "Na cabina de jateamento a lima recebe o acabamento: granalha seca projectada por turbina dá o cinza mate especial; o jato húmido (líquido abrasivo) dá o cinza metálico. O acabamento escolhe-se no painel de parâmetros. No fim da linha a lima cai na caixa azul.",
+    "In the blasting cabinet the file gets its finish: dry shot thrown by a turbine gives the special matte grey; wet blasting (abrasive slurry) gives the metallic grey. The finish is chosen in the parameters panel. At the end of the line the file drops into the blue crate."],
+  ["cell", "6 · SACCLI — correcção automática", "Um KUKA KR DELTA tira as limas da caixa azul e deita-as na esteira de rolos. O scanner 1 Keyence LJ-S (fixo, 2D/3D) lê a lima inteira num disparo e decide: se está direita dentro da tolerância, passa OK sem correcção; se está torta, diz onde (A, B ou C) e dá a ordem aos módulos.",
+    "A KUKA KR DELTA takes the files from the blue crate and lays them on the roller conveyor. Scanner 1, a fixed Keyence LJ-S (2D/3D), reads the whole file in one shot and decides: if it is straight within tolerance it passes OK without correction; if it is bent it says where (A, B or C) and issues the order to the modules."],
+  ["mod", "6 · Módulos A1–C2 e scanner 2", "Seis módulos, três de cada lado da esteira. Dois pares seguram a lima com guias lineares de 250 N e ficam bloqueados; o par do ponto torto corrige com o actuador de kN. O scanner 2 lê metade da lima em cada cabeça e controla em tempo real: a força sobe até o retorno elástico previsto (δ − F/K) igualar o erro — e pára. A lima sai direita (azul = dentro da tolerância, vermelho = fora).",
+    "Six modules, three on each side of the conveyor. Two pairs clamp the file with 250 N linear guides and lock; the pair at the bent point corrects with the kN actuator. Scanner 2 reads half the file with each head and controls in real time: the force rises until the predicted spring-back (δ − F/K) equals the error — then stops. The file leaves straight (blue = within tolerance, red = out)."],
+  ["crates", "6 · Caixas e robôs", "Um segundo KR DELTA coloca cada lima na caixa verde (OK) ou vermelha (NOK). As caixas azuis, verdes e vermelhas circulam em ciclo fechado: enchem, avançam na fila, esvaziam e voltam vazias pelos corredores de retorno e elevadores. As NOK vão para a bancada de retrabalho.",
+    "A second KR DELTA places each file in the green (OK) or red (NOK) crate. Blue, green and red crates run in closed loops: they fill, queue, empty and return empty along the return lanes and lifts. NOK files go to the rework bench."],
+  ["pack", "7 · Embalagem em cartão e paletização", "Um robô delta passa as limas da caixa verde para caixas de cartão de 6; as abas fecham e a caixa segue para o fim do transportador. O cobot KUKA LBR iisy pega em cada caixa e paletiza 3 × 4 por camada, 2 camadas: 24 caixas por palete.",
+    "A delta robot moves the files from the green crate into cartons of 6; the flaps close and the carton travels to the end of the conveyor. The KUKA LBR iisy cobot picks each carton and palletises 3 × 4 per layer, 2 layers: 24 cartons per pallet."],
+  ["exp", "8 · Expedição — AMR", "Quando a palete está completa, o AMR entra por baixo, levanta-a e leva-a até ao posto de expedição, seguindo as faixas no chão. Uma palete vazia é reposta no posto de paletização.",
+    "When the pallet is complete, the AMR drives underneath, lifts it and carries it to the shipping stand, following the floor markings. An empty pallet is put back at the palletising stand."],
+  ["kmf", "8 · Armário de paletes — KUKA KMF 1500P", "O KUKA KMF 1500P, empilhador autónomo de 1500 kg com navegação laser, vai buscar a palete ao posto de expedição e arruma-a no armário de paletes, no primeiro lugar livre dos três níveis. Quando o armário está cheio, a palete mais antiga sai para o camião.",
+    "The KUKA KMF 1500P, a 1500 kg autonomous forklift with laser navigation, collects the pallet from the shipping stand and stores it in the pallet rack, in the first free slot of the three levels. When the rack is full, the oldest pallet leaves for the truck."],
+];
+const fly = { on: false, t: 0, p0: new THREE.Vector3(), t0: new THREE.Vector3(), p1: new THREE.Vector3(), t1: new THREE.Vector3() };
+function flyTo(key, dur = 1.8) {
+  const [p, tg] = VIEWS[key];
+  fly.p0.copy(camera.position); fly.t0.copy(controls.target); fly.p1.set(...p); fly.t1.set(...tg); fly.t = 0; fly.dur = dur; fly.on = true;
+}
+const tour = { i: 0, open: false, auto: false, t: 0, STEP: 11 };
+function renderTour() {
+  const [, title, pt, en] = TOUR[tour.i];
+  $("docStep").textContent = tr("Documentação 3D · passo") + ` ${tour.i + 1} / ${TOUR.length}`;
+  $("docTitle").textContent = tr(title);
+  $("docText").textContent = LANG.cur === "en" ? en : pt;
+  $("docPrev").textContent = tr("◀ Anterior"); $("docNext").textContent = tr(tour.i === TOUR.length - 1 ? "↺ Recomeçar" : "Seguinte ▶");
+  $("docAuto").textContent = tr(tour.auto ? "⏸ Parar automático" : "⏵ Automático"); $("docClose").textContent = tr("✕ Fechar");
+  $("docBtn").textContent = tr("📖 Documentação 3D");
+}
+function tourGo(i) { tour.i = (i + TOUR.length) % TOUR.length; tour.t = 0; flyTo(TOUR[tour.i][0]); renderTour(); }
+function tourOpen(open) {
+  tour.open = open; $("doc").classList.toggle("hidden", !open);
+  for (const id of ["ctrl", "charts", "motors"]) $(id).classList.toggle("hidden", open);   // durante a visita só fica o painel principal e a documentação
+  if (open) tourGo(tour.i); else tour.auto = false;
+}
+$("docBtn").onclick = () => tourOpen(!tour.open);
+$("docClose").onclick = () => tourOpen(false);
+$("docPrev").onclick = () => tourGo(tour.i - 1);
+$("docNext").onclick = () => tourGo(tour.i + 1);
+$("docAuto").onclick = () => { tour.auto = !tour.auto; tour.t = 0; renderTour(); };
+function tourTick(dt) {
+  if (fly.on) {
+    fly.t += dt; const k = ease(Math.min(1, fly.t / fly.dur));
+    camera.position.lerpVectors(fly.p0, fly.p1, k); controls.target.lerpVectors(fly.t0, fly.t1, k);
+    if (fly.t >= fly.dur) fly.on = false;
+  }
+  if (tour.open && tour.auto) { tour.t += dt; $("docBar").style.width = Math.min(100, (100 * tour.t) / tour.STEP) + "%"; if (tour.t >= tour.STEP) tourGo(tour.i + 1); }
+  else $("docBar").style.width = "0";
+}
+LANG.hooks.push(() => { renderTour(); });
 LANG.hooks.push(() => { renderResults(); renderHUD(); renderMotors(); $("play").textContent = tr(paused ? "▶ Continuar" : "❚❚ Pausa"); setSpeed(P.speed); });
 i18nInit();
 window.__saccli = { tags: World.tags, FL, rackSlots, cartons, packer, runLog, P, limas, get job() { return job; }, bend, forceFor, robotIn, robotOut, camera, controls, amr, station, outCrates, cobot };
