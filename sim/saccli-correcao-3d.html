@@ -370,6 +370,10 @@ const I18N_EXACT = {
   "Sobe elástico, cede, alivia em linha recta: o que fica é a correção": "Rises elastically, yields, unloads in a straight line: what remains is the correction",
   "Perfil da lima (A → C)": "File profile (A → C)",
   // ---- 68-exterior.js
+  "Painéis solares fotovoltaicos · nave e escritório": "Photovoltaic solar panels · hall and office", "Unidades exteriores · AC inverter calor/frio (6 × 50 kW)": "Outdoor units · inverter AC heating/cooling (6 × 50 kW)",
+  "AZOTO LÍQUIDO": "LIQUID NITROGEN", "Tanque de azoto líquido · N₂ −196 °C · vaporizador": "Liquid nitrogen tank · N₂ −196 °C · vaporiser", "Poço de água subterrânea · bomba submersível · depósito 10 m³": "Groundwater well · submersible pump · 10 m³ tank",
+  "Central de ar comprimido · compressor de parafuso 37 kW · secador · depósito 2000 L": "Compressed-air plant · 37 kW screw compressor · dryer · 2000 L receiver", "Utilidades exteriores": "Outdoor utilities", "10 · Utilidades": "10 · Utilities",
+  "Climatização · AC inverter calor/frio · cassetes de tecto + conduta de ar novo": "Climate control · inverter AC heating/cooling · ceiling cassettes + fresh-air duct",
   "PISO 0": "FLOOR 0", "PISO 1": "FLOOR 1", "PISO 2": "FLOOR 2", "Recepção · Sala de visitas de clientes": "Reception · Client visiting room", "Administração · HSA + RH · contabilidade · compras": "Administration · HSE + HR · accounting · purchasing", "Sala de reunião executiva · direcção": "Executive meeting room · management",
   "10 · Exterior": "10 · Exterior", "10 · Escritório": "10 · Office", "10 · Cais · camião": "10 · Dock · truck", "Exterior": "Exterior", "Escritório": "Office", "Cais · camião": "Dock · truck",
   "10 · Exterior — SACFILE": "10 · Exterior — SACFILE", "10 · Cais — camião de encomendas": "10 · Dock — delivery truck", "10 · Exterior · SACFILE": "10 · Exterior · SACFILE",
@@ -5583,7 +5587,7 @@ for (let i = 0; i < 6; i++) {
     }
     const sign = new THREE.Mesh(new THREE.PlaneGeometry(2000, 500), new THREE.MeshBasicMaterial({ map: signTex(label, sub, band) }));
     sign.position.set(dx > 0 ? Math.max(-len / 2 + 1100, dx - 1500) : Math.min(len / 2 - 1100, dx + 1500), CH - 330, F + 60); g.add(sign);
-    if (!opts.noAC) box(640, 520, 320, mAC, len / 2 - 600, CH + 330, -CD / 2 + 400, g);   // unidade de ar condicionado no tecto
+    if (!opts.noAC) box(640, 520, 320, mAC, len / 2 - 600, CH + 330, -CD / 2 + 400, g);   // unidade AC inverter (calor/frio) no tecto do contentor
     const lamp = cyl(50, 90, mat.lamp, g, 12); lamp.rotation.x = Math.PI / 2; lamp.position.set(dx, 2350, F + 50);
     if (level === 1) {                                                                 // passadiço à frente com guarda-corpos e escada metálica
       // passadiço de 1,1 m com guarda-corpos; o guarda-corpos tem uma ABERTURA de 1,4 m onde começa a escada
@@ -5689,33 +5693,26 @@ for (let i = 0; i < 6; i++) {
     const bc = cyl(60, 120, mat.ledO, scene, 16); bc.position.set(GX + GW / 2 + 120, FLOOR + GH + 560, GZ - 60);   // pirilampo do portão
   }
 
-  // ---------- ventilação da nave: extractores de cobertura, ventiladores HVLS de tecto e ventiladores axiais de parede com persianas
+  // ---------- climatização: AC inverter calor/frio — unidades interiores de tecto (cassete 4 vias) suspensas na nave,
+  //            consola de parede em cada contentor, ventiladores das unidades a rodar; as unidades exteriores ficam fora (68-exterior.js)
   const fans = [];
   {
-    const RY = FLOOR + HALL.h - 160, mFan = M(0x9aa3ad, 0.6, 0.45), mBlade = M(0x374151, 0.3, 0.6);
-    for (const x of [-8000, -3000, 2000, 7000]) for (const z of [-4200, 3600]) {          // 8 extractores de cobertura (turbina)
-      cyl(420, 260, mFan, roofG, 24).position.set(x, RY, z);
-      const cap = cyl(470, 60, mFan, roofG, 24); cap.position.set(x, RY + 160, z);
-      const rot = new THREE.Group(); rot.position.set(x, RY - 140, z); roofG.add(rot);
-      for (let i = 0; i < 6; i++) { const b = box(360, 14, 120, mBlade, 0, 0, 0, rot, false); b.position.set(Math.cos(i * Math.PI / 3) * 200, 0, Math.sin(i * Math.PI / 3) * 200); b.rotation.y = -i * Math.PI / 3; b.rotation.x = 0.5; }
-      fans.push({ g: rot, w: 9 });
+    const mCas = M(0xf4f5f7, 0.2, 0.5), mGrille = M(0x3b4148, 0.3, 0.6);
+    for (const x of [-8000, -3000, 2000, 7000]) for (const z of [-4200, 0, 3600]) {          // 12 cassetes de tecto, suspensas por tirantes
+      const g = new THREE.Group(); g.position.set(x, FLOOR + 5600, z); scene.add(g);
+      for (const sx of [-1, 1]) for (const sz of [-1, 1]) cyl(14, 1100, mat.alu, g, 8).position.set(sx * 400, 700, sz * 400);   // tirantes à asna
+      box(900, 300, 900, mCas, 0, 150, 0, g);
+      box(1050, 40, 1050, mCas, 0, -20, 0, g, false);                                           // painel decorativo
+      for (const [ox, oz, w, d] of [[0, -420, 760, 120], [0, 420, 760, 120], [-420, 0, 120, 760], [420, 0, 120, 760]]) { const v = box(w, 24, d, mGrille, ox, -46, oz, g, false); v.rotation.x = oz ? Math.sign(oz) * 0.5 : 0; v.rotation.z = ox ? -Math.sign(ox) * 0.5 : 0; }   // 4 aletas
+      const ret = box(500, 10, 500, mGrille, 0, -46, 0, g, false);                               // grelha de retorno
+      const rot = new THREE.Group(); rot.position.set(0, 60, 0); g.add(rot);
+      for (let i = 0; i < 5; i++) { const b = box(220, 10, 60, mGrille, 0, 0, 0, rot, false); b.position.set(Math.cos(i * TAU_ / 5) * 130, 0, Math.sin(i * TAU_ / 5) * 130); b.rotation.y = -i * TAU_ / 5; }
+      fans.push({ g: rot, w: 14 });
+      box(90, 90, 1400, mat.alu, 0, 330, 700, g, false);                                          // tubagem de refrigerante / condensados
+      const led = box(40, 6, 40, mat.ledG, 300, -26, 300, g, false);
     }
-    for (const [x, z] of [[-5500, 1800], [3500, -3200]]) {                                 // 2 ventiladores HVLS (Ø 5 m, lentos), acima dos contentores de 1.º andar
-      const hub = new THREE.Group(); hub.position.set(x, FLOOR + 6100, z); scene.add(hub);
-      cyl(40, 1300, mPost, scene, 10).position.set(x, FLOOR + 6800, z);
-      cyl(220, 220, M(0xe5e7eb, 0.4, 0.4), hub, 24);
-      for (let i = 0; i < 6; i++) { const b = box(2400, 20, 220, M(0xcbd5e1, 0.5, 0.4), 0, 0, 0, hub, false); b.position.set(Math.cos(i * Math.PI / 3) * 1350, 0, Math.sin(i * Math.PI / 3) * 1350); b.rotation.y = -i * Math.PI / 3; b.rotation.x = 0.18; }
-      fans.push({ g: hub, w: 1.2 });
-    }
-    const louv = canvasTex(128, 256, (g, w, h) => { g.fillStyle = "#b9bfc5"; g.fillRect(0, 0, w, h); g.fillStyle = "#3b4148"; for (let y = 8; y < h - 6; y += 18) g.fillRect(8, y, w - 16, 9); });
-    for (const [x, z, rot] of [[-6000, -HALL.z + 70, 0], [6000, -HALL.z + 70, 0], [HALL.x - 70, -3500, -Math.PI / 2], [-HALL.x + 70, 5000, Math.PI / 2]]) {   // ventiladores axiais de parede
-      const g = new THREE.Group(); g.position.set(x, FLOOR + 4200, z); g.rotation.y = rot; scene.add(g);
-      box(1300, 1300, 160, mFan, 0, 0, 0, g);
-      const pl = new THREE.Mesh(new THREE.PlaneGeometry(1200, 1200), M(0xffffff, 0.5, 0.5, { map: louv })); pl.position.z = 85; g.add(pl);
-      const rot2 = new THREE.Group(); rot2.position.z = -40; g.add(rot2);
-      for (let i = 0; i < 5; i++) { const b = box(520, 150, 10, mBlade, 0, 0, 0, rot2, false); b.position.set(Math.cos(i * TAU_ / 5) * 300, Math.sin(i * TAU_ / 5) * 300, 0); b.rotation.z = i * TAU_ / 5; }
-      fans.push({ g: rot2, w: 6, axis: "z" });
-    }
+    // conduta de ar novo com grelhas ao longo da asna central (renovação de ar da nave)
+    box(2 * HALL.x - 2000, 500, 500, M(0xcfd4da, 0.6, 0.4), 0, FLOOR + 6000, -1750); for (let x = -9000; x <= 9000; x += 1500) box(700, 160, 520, mGrille, x, FLOOR + 5820, -1750, scene, false);
   }
   addSystem({ draw(dt) { for (const f of fans) { if (f.axis === "z") f.g.rotation.z += f.w * dt; else f.g.rotation.y += f.w * dt; } } });
 
@@ -5792,7 +5789,7 @@ for (let i = 0; i < 6; i++) {
   for (const [text, x, z, lv] of T) addTag({ text, at: () => V(x, FLOOR + CH + 650 + lv * (CH + 70), z), max: 9000 });
   addTag({ text: "Corredor do KMF 1500P · 2,5 m livres (linha de segurança)", at: () => V(5500, FLOOR + 400, -4250), max: 7000 });
   addTag({ text: "Faixa do AMR · circulação livre", at: () => V(5200, FLOOR + 400, 600), max: 6000 });
-  addTag({ text: "Ventilação · extractores de cobertura, HVLS e ventiladores de parede", at: () => V(-5500, FLOOR + 5800, 1800), min: 1500, max: 12000 });
+  addTag({ text: "Climatização · AC inverter calor/frio · cassetes de tecto + conduta de ar novo", at: () => V(-3000, FLOOR + 5300, 0), min: 1500, max: 12000 });
   addTag({ text: () => `9 · Instalações de apoio (contentores) · ${hhmm(SHIFT.min)}`, at: () => V(-6500, FLOOR + 6600, 5200), min: 3500, big: true });
   addTag({ text: () => (SHIFT.alarm === "lunch" ? "Sirene · ALMOÇO" : SHIFT.alarm === "end" ? "Sirene · FIM DE TURNO" : `Relógio de turno · ${hhmm(SHIFT.min)}`), at: () => V(5000, FLOOR + 4900, HALL.z - 300), max: 9000 });
   addView("inst", "Instalações", [-3500, 4200, -1500], [-7500, 800, 4500]);
@@ -5806,7 +5803,8 @@ for (let i = 0; i < 6; i++) {
 // arruamentos, passeios e vegetação. A câmara pode sair da nave (vistas "Exterior" e "Escritório").
 // =====================================================================
 {
-  const GY = FLOOR - 2, X = HALL.x, Z = HALL.z, H = HALL.h, TOP = FLOOR + H;
+  const GY = FLOOR - 2, X = HALL.x, Z = HALL.z, H = HALL.h, TOP = FLOOR + H, W_ = 8000;
+  const acRot = [];
   const mAsph = M(0x3f4347, 0.05, 0.9), mKerb = M(0xc9ccd0, 0.1, 0.8), mGrass = M(0x4f7d3a, 0, 0.95), mConc = M(0xb8b4ad, 0.05, 0.75);
   const mPost = M(0x3b4148, 0.4, 0.5);
   const mGlassF = M(0x6fa8d6, 0.9, 0.08, { transparent: true, opacity: 0.55 }), mMullion = M(0x1f2933, 0.6, 0.4), mPanel = M(0xd3d8de, 0.4, 0.55);
@@ -5939,8 +5937,67 @@ for (let i = 0; i < 6; i++) {
     for (let x = -X - 14000; x <= X + 14000; x += 2500) { cyl(40, 2000, mat.dark, scene, 8).position.set(x, GY + 1000, Z + 15200); cyl(40, 2000, mat.dark, scene, 8).position.set(x, GY + 1000, -Z - 15200); }
     for (const z of [-Z - 15200, Z + 15200]) box(2 * X + 28000, 1800, 20, M(0x4b5563, 0.2, 0.6, { transparent: true, opacity: 0.35, side: THREE.DoubleSide }), 0, GY + 1100, z, scene, false);
     const tree = (x, z, s = 1) => { cyl(90 * s, 1800 * s, M(0x5b3a1e, 0, 0.9), scene, 8).position.set(x, GY + 900 * s, z); const c = new THREE.Mesh(new THREE.SphereGeometry(1500 * s, 12, 10), M(0x3f7a33, 0, 0.9)); c.position.set(x, GY + 2900 * s, z); c.castShadow = true; scene.add(c); };
-    [[-16000, 2000, 1.1], [-16000, -3000, 1], [-16000, 7000, 0.9], [-9000, 12500, 1], [-13000, 12500, 1.2], [20000, -9000, 1], [16000, -12000, 1.1], [-4000, -12500, 1], [4000, -12500, 1.1]].forEach(([x, z, s]) => tree(x, z, s));
+    [[-18500, -11000, 1.1], [-9000, 12500, 1], [-13000, 12500, 1.2], [-20500, 13500, 1], [20000, -9000, 1], [16000, -12000, 1.1], [-4000, -12500, 1], [4000, -12500, 1.1]].forEach(([x, z, s]) => tree(x, z, s));
   }
+
+  // ---------- cobertura: painéis solares fotovoltaicos na nave (duas águas) e no escritório; unidades exteriores dos AC inverter
+  {
+    const mPV = M(0x0f2440, 0.7, 0.25), mPVf = M(0x9aa3ad, 0.5, 0.5);
+    const pvTex = canvasTex(256, 256, (g, w, h) => { g.fillStyle = "#0e2a4a"; g.fillRect(0, 0, w, h); g.strokeStyle = "#6c8db3"; g.lineWidth = 3; for (let i = 0; i <= w; i += 32) { g.beginPath(); g.moveTo(i, 0); g.lineTo(i, h); g.stroke(); g.beginPath(); g.moveTo(0, i); g.lineTo(w, i); g.stroke(); } });
+    const pv = (x, y, z, w, d, rx, parent = roofG) => { const t = pvTex.clone(); t.needsUpdate = true; t.repeat.set(w / 1000, d / 1700); const m = new THREE.Mesh(new THREE.BoxGeometry(w, 50, d), M(0xffffff, 0.7, 0.3, { map: t })); m.position.set(x, y, z); m.rotation.x = rx; m.castShadow = true; parent.add(m); const f = box(w + 60, 30, d + 60, mPVf, 0, -40, 0, m, false); return m; };
+    const pitch = Math.atan2(700, Z);
+    for (const s of [-1, 1]) for (let x = -X + 1500; x < X - 1500; x += 2200) for (const zz of [1400, 3700]) pv(x, TOP + 420 + 350 + Math.cos(pitch) * 60 + (Z / 2 + 50 - s * zz) * 0 + (zz - Z / 2 - 50) * -s * Math.sin(pitch) * 0 + (s * zz - s * (Z / 2 + 50)) * -Math.tan(pitch) * 0, s * zz, 2000, 1700, s * pitch);
+    // correção de altura: a cobertura desce do cume (z=0, TOP+1200) para os beirais (|z|=Z, TOP+500)
+    for (const m of roofG.children.slice(-2 * 2 * Math.floor((2 * X - 3000) / 2200))) { const zz = Math.abs(m.position.z); m.position.y = TOP + 1200 - (zz / Z) * 700 + 90; }
+    for (let x = -W_ + 1200; x < W_; x += 2200) pv(-2500 + x, FLOOR + 3 * 3600 + 420, Z + 9500 - 1500, 2000, 1700, 0.3, scene);   // escritório: painéis inclinados a sul
+    // unidades exteriores dos AC inverter (calor/frio) em linha junto à parede −z da nave, em maciços de betão
+    for (let i = 0; i < 6; i++) {
+      const x = -8000 + i * 3200, z = -Z - 1500;
+      box(1400, 200, 900, mConc, x, GY + 100, z, scene, false);
+      box(1200, 1400, 450, M(0xe5e7eb, 0.3, 0.5), x, GY + 900, z);
+      for (const sx of [-1, 1]) { cyl(260, 30, M(0x111827, 0.3, 0.6), scene, 24).rotation.x = Math.PI / 2; const r = cyl(260, 30, M(0x111827, 0.3, 0.6), scene, 24); r.rotation.x = Math.PI / 2; r.position.set(x + sx * 300, GY + 1000, z + 240); const rot = new THREE.Group(); rot.position.set(x + sx * 300, GY + 1000, z + 250); scene.add(rot); for (let k = 0; k < 4; k++) { const b = box(200, 70, 8, M(0x374151, 0.3, 0.6), 0, 0, 0, rot, false); b.position.set(Math.cos(k * Math.PI / 2) * 130, Math.sin(k * Math.PI / 2) * 130, 0); b.rotation.z = k * Math.PI / 2; } acRot.push(rot); }
+      box(1200, 10, 10, mat.alu, x, GY + 1700, z + 230, scene, false);
+      cyl(30, 1500, mat.alu, scene, 10).rotation.z = 0;
+      const pipe = cyl(30, 1500, M(0x9ca3af, 0.6, 0.4), scene, 10); pipe.rotation.x = Math.PI / 2; pipe.position.set(x + 500, GY + 500, z + 750);
+    }
+    addTag({ text: "Painéis solares fotovoltaicos · nave e escritório", at: () => V(0, TOP + 2600, 2500), min: 3000, max: 90000 });
+    addTag({ text: "Unidades exteriores · AC inverter calor/frio (6 × 50 kW)", at: () => V(0, GY + 2800, -Z - 1500), max: 60000 });
+  }
+  // ---------- utilidades exteriores (lado −x, junto à recepção logística): tanque de azoto líquido, poço de água subterrânea, compressor de ar
+  {
+    const UX = -X - 4500;
+    // tanque criogénico de azoto líquido (vertical, isolado, com vaporizador de ar)
+    box(3000, 300, 3000, mConc, UX, GY + 150, -3500, scene, false);
+    const tank = cyl(900, 5200, M(0xf1f5f9, 0.4, 0.3), scene, 32); tank.position.set(UX, GY + 300 + 2600, -3500);
+    const cap = new THREE.Mesh(new THREE.SphereGeometry(900, 32, 16, 0, Math.PI * 2, 0, Math.PI / 2), M(0xf1f5f9, 0.4, 0.3)); cap.position.set(UX, GY + 300 + 5200, -3500); scene.add(cap);
+    for (let i = 0; i < 4; i++) box(120, 300, 120, mat.dark, UX + Math.cos(i * Math.PI / 2 + 0.785) * 950, GY + 450, -3500 + Math.sin(i * Math.PI / 2 + 0.785) * 950);
+    box(600, 600, 60, M(0xffffff, 0.1, 0.5, { map: canvasTex(256, 256, (g) => { g.fillStyle = "#fff"; g.fillRect(0, 0, 256, 256); g.fillStyle = "#1d4ed8"; g.font = "800 46px Arial"; g.fillText("N₂", 90, 110); g.fillStyle = "#111"; g.font = "700 28px Arial"; g.fillText(tr("AZOTO LÍQUIDO"), 22, 170); g.fillText("−196 °C", 70, 215); }) }), UX, GY + 2300, -3500 + 905, scene, false);
+    const vap = new THREE.Group(); vap.position.set(UX + 1900, GY + 300, -3500); scene.add(vap);      // vaporizador atmosférico (alhetas)
+    for (let i = 0; i < 3; i++) for (let k = 0; k < 3; k++) { cyl(40, 2600, mat.alu, vap, 10).position.set(i * 260 - 260, 1300, k * 260 - 260); for (let y = 100; y < 2600; y += 130) box(220, 6, 220, mat.alu, i * 260 - 260, y, k * 260 - 260, vap, false); }
+    const pipeN = cyl(40, 2400, M(0x9ca3af, 0.6, 0.4), scene, 10); pipeN.rotation.z = Math.PI / 2; pipeN.position.set(UX + 1200, GY + 2900, -3500);
+    for (const z of [-5500, -1500]) box(60, 1400, 4200, M(0x4b5563, 0.2, 0.6, { transparent: true, opacity: 0.35, side: THREE.DoubleSide }), UX + 2900, GY + 700, -3500 + (z + 3500) * 0 + 0, scene, false);
+    addTag({ text: "Tanque de azoto líquido · N₂ −196 °C · vaporizador", at: () => V(UX, GY + 6800, -3500), max: 60000 });
+    // poço de água subterrânea: tampa de betão, bomba submersível (cabeça do furo), depósito de água e quadro
+    box(1600, 250, 1600, mConc, UX, GY + 125, 2500); cyl(320, 400, M(0x2563eb, 0.3, 0.5), scene, 20).position.set(UX, GY + 450, 2500);
+    cyl(60, 900, M(0x9ca3af, 0.6, 0.4), scene, 10).rotation.z = Math.PI / 2; const pw = cyl(60, 1600, M(0x9ca3af, 0.6, 0.4), scene, 10); pw.rotation.z = Math.PI / 2; pw.position.set(UX + 900, GY + 600, 2500);
+    const wt = cyl(1100, 2600, M(0x1e3a8a, 0.3, 0.5), scene, 32); wt.position.set(UX, GY + 300 + 1300, 5200); box(2600, 300, 2600, mConc, UX, GY + 150, 5200, scene, false);
+    box(500, 700, 250, mat.dark, UX + 1500, GY + 700, 2500);
+    addTag({ text: "Poço de água subterrânea · bomba submersível · depósito 10 m³", at: () => V(UX, GY + 4200, 3800), max: 60000 });
+    // central de ar comprimido: compressor de parafuso, secador, depósito horizontal, abrigo
+    const CX2 = UX, CZ2 = 9500;
+    box(5000, 200, 3600, mConc, CX2, GY + 100, CZ2, scene, false);
+    for (const [sx, sz] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) box(160, 3200, 160, M(0x2f6a9e, 0.3, 0.5), CX2 + sx * 2400, GY + 1800, CZ2 + sz * 1700);
+    box(5400, 120, 4000, M(0x9aa0a6, 0.3, 0.6), CX2, GY + 3450, CZ2, scene, false);                   // cobertura do abrigo
+    box(1600, 1500, 1000, M(0x1f6f9e, 0.3, 0.5), CX2 - 1400, GY + 950, CZ2 - 700);                     // compressor de parafuso
+    box(500, 300, 60, mat.black, CX2 - 1400, GY + 1400, CZ2 - 190, scene, false); for (let y = 400; y < 1300; y += 180) box(1200, 60, 10, mat.dark, CX2 - 1400, GY + y, CZ2 - 195, scene, false);
+    box(800, 1500, 700, M(0xe5e7eb, 0.3, 0.5), CX2 + 100, GY + 950, CZ2 - 800);                        // secador frigorífico
+    const rec = cyl(600, 3000, M(0x1d4ed8, 0.4, 0.4), scene, 28); rec.rotation.z = Math.PI / 2; rec.position.set(CX2 + 800, GY + 1000, CZ2 + 900);   // depósito de ar 2000 L
+    for (const sx of [-1, 1]) box(200, 400, 700, mat.dark, CX2 + 800 + sx * 1000, GY + 350, CZ2 + 900);
+    const air = cyl(35, 4000, M(0x9ca3af, 0.6, 0.4), scene, 10); air.rotation.z = Math.PI / 2; air.position.set(CX2 + 2400, GY + 2800, CZ2 + 900);   // linha de ar para a nave
+    addTag({ text: "Central de ar comprimido · compressor de parafuso 37 kW · secador · depósito 2000 L", at: () => V(CX2, GY + 4600, CZ2), max: 60000 });
+  }
+  addSystem({ draw(dt) { for (const r of acRot) r.rotation.z += 10 * dt; } });
+  addView("util", "Utilidades exteriores", [-X - 12000, 5000, 9000], [-X - 4500, 1500, 2500]);
 
   addTag({ text: "10 · Exterior · SACFILE", at: () => V(0, FLOOR + H + 3200, Z + 2500), min: 4000, max: 80000, big: true });
   addTag({ text: "Portaria · controlo de acessos", at: () => V(X + 9000, GY + 4200, Z + 13000), max: 40000 });
@@ -6387,7 +6444,7 @@ VIEWS.crates = [[-2400, 1900, 2300], [-900, -200, 200]];
 const AREAS = [
   ["feed", "0 · Bobina de banda"], ["lam", "1 · Laminagem"], ["pic", "2 · Picagem"], ["ind", "3 · Têmpera"], ["indHmi", "3 · Painel da têmpera"],
   ["dur", "4 · Dureza"], ["jato", "5 · Jateamento"], ["cell", "6 · SACCLI"], ["mod", "6 · Módulos A–C"], ["crates", "6 · Caixas e robôs"],
-  ["pack", "7 · Embalagem e palete"], ["exp", "8 · Expedição (AMR)"], ["kmf", "8 · Armário (KMF 1500P)"], ["inst", "9 · Instalações"], ["cais", "9 · Cais e portão"], ["ext", "10 · Exterior"], ["office", "10 · Escritório"], ["dock", "10 · Cais · camião"],
+  ["pack", "7 · Embalagem e palete"], ["exp", "8 · Expedição (AMR)"], ["kmf", "8 · Armário (KMF 1500P)"], ["inst", "9 · Instalações"], ["cais", "9 · Cais e portão"], ["ext", "10 · Exterior"], ["office", "10 · Escritório"], ["dock", "10 · Cais · camião"], ["util", "10 · Utilidades"],
 ];
 VIEWS.molde = [[-8300, 650, 500], [-8950, 100, -380]];
 AREAS.splice(2, 0, ["molde", "1 · Molde de corte"]);
@@ -6496,12 +6553,14 @@ const TOUR = [
     "A delta robot moves the files from the green crate into cartons of 6; the flaps close and the carton travels to the end of the conveyor. The KUKA LBR iisy cobot picks each carton and palletises 3 × 4 per layer, 2 layers: 24 cartons per pallet."],
   ["exp", "8 · Expedição — AMR", "Quando a palete está completa, o AMR entra por baixo, levanta-a e leva-a até ao posto de expedição, seguindo as faixas no chão. Uma palete vazia é reposta no posto de paletização.",
     "When the pallet is complete, the AMR drives underneath, lifts it and carries it to the shipping stand, following the floor markings. An empty pallet is put back at the palletising stand."],
-  ["inst", "9 · Instalações de apoio em contentores", "Dentro da nave, num bloco compacto à esquerda, só as instalações de intervenção rápida: sala de almoço e manutenção no rés-do-chão, sala dos engenheiros e armazém de EPI no 1.º andar; WC, recepção logística e sala de limpeza na parede; WC/balneários, armazém de EPI e sala de limpeza junto à parede; recepção logística, zona de emergência (ponto de encontro, primeiros socorros, lava-olhos, extintores) e manutenção atrás da linha. A administração, HSA + RH, a sala de reunião executiva e a sala de visitas de clientes ficam no escritório central, fora da nave. A ventilação faz-se com extractores de cobertura, ventiladores HVLS de tecto e ventiladores axiais de parede. O relógio de turno acciona a sirene e as luzes de alarme ao almoço (12:00) e no fim do turno (17:00).",
-    "Inside the hall, in a compact block on the left, only the rapid-response facilities: canteen and maintenance on the ground floor, engineers' room and PPE store on the first floor; WC, logistics reception and cleaning room along the wall; WC/changing rooms, PPE store and cleaning room by the wall; logistics reception, emergency zone (assembly point, first aid, eyewash, extinguishers) and maintenance behind the line. Administration, HSE + HR, the executive meeting room and the client visiting room are in the central office outside the hall. Ventilation is provided by roof extractors, HVLS ceiling fans and wall-mounted axial fans. The shift clock triggers the siren and alarm lights at lunch (12:00) and at the end of the shift (17:00)."],
+  ["inst", "9 · Instalações de apoio em contentores", "Dentro da nave, num bloco compacto à esquerda, só as instalações de intervenção rápida: sala de almoço e manutenção no rés-do-chão, sala dos engenheiros e armazém de EPI no 1.º andar; WC, recepção logística e sala de limpeza na parede; WC/balneários, armazém de EPI e sala de limpeza junto à parede; recepção logística, zona de emergência (ponto de encontro, primeiros socorros, lava-olhos, extintores) e manutenção atrás da linha. A administração, HSA + RH, a sala de reunião executiva e a sala de visitas de clientes ficam no escritório central, fora da nave. A climatização é por AC inverter calor/frio: cassetes de tecto na nave, consolas nos contentores e unidades exteriores atrás da nave. O relógio de turno acciona a sirene e as luzes de alarme ao almoço (12:00) e no fim do turno (17:00).",
+    "Inside the hall, in a compact block on the left, only the rapid-response facilities: canteen and maintenance on the ground floor, engineers' room and PPE store on the first floor; WC, logistics reception and cleaning room along the wall; WC/changing rooms, PPE store and cleaning room by the wall; logistics reception, emergency zone (assembly point, first aid, eyewash, extinguishers) and maintenance behind the line. Administration, HSE + HR, the executive meeting room and the client visiting room are in the central office outside the hall. Climate control is by inverter AC heating/cooling: ceiling cassettes in the hall, wall units in the containers and outdoor units behind the hall. The shift clock triggers the siren and alarm lights at lunch (12:00) and at the end of the shift (17:00)."],
   ["cais", "9 · Cais de carga e portão sandwich", "Na porta da parede lateral está o cais de carga: o camião encosta por fora, a rampa niveladora faz a ponte e as paletes de caixas prontas, trazidas pelo KMF 1500P, entram no reboque. Ao lado, a entrada principal é um portão seccional de painéis sandwich com porta de peões e pirilampo.",
     "At the side-wall door is the loading dock: the truck backs in from outside, the dock leveler bridges the gap and the pallets of finished cartons, brought by the KMF 1500P, go into the trailer. Next to it, the main entrance is a sectional sandwich-panel gate with a pedestrian door and a beacon."],
   ["ext", "10 · Exterior — SACFILE", "Vista de fora: a nave em painel sandwich com cobertura a duas águas e o letreiro luminoso SACFILE em letras vermelhas sobre a entrada e sobre o cais. À frente, o escritório central em vidro e betão com 3 pisos — recepção e sala de visitas de clientes, administração (direcção, contabilidade, compras) e sala de reunião executiva —, o estacionamento de colaboradores e visitantes, a portaria com barreira e a vedação do recinto.",
     "Seen from outside: the sandwich-panel hall with a gabled roof and the illuminated SACFILE sign in red letters above the entrance and the dock. In front, the central office in glass and concrete with 3 floors — reception and client visiting room, administration (management, accounting, purchasing) and the executive meeting room —, the staff and visitor car park, the gatehouse with barrier and the site fence."],
+  ["util", "10 · Utilidades exteriores e energia", "No telhado da nave e do escritório há painéis solares fotovoltaicos. Atrás da nave estão as unidades exteriores dos AC inverter. Do lado da recepção logística ficam as utilidades: o tanque criogénico de azoto líquido (−196 °C, com vaporizador) para a têmpera e a inertização, o poço de água subterrânea com bomba submersível e depósito, e a central de ar comprimido (compressor de parafuso, secador e depósito) que alimenta os actuadores e as pinças da linha.",
+    "The hall and office roofs carry photovoltaic solar panels. Behind the hall are the inverter AC outdoor units. On the logistics side are the utilities: the cryogenic liquid-nitrogen tank (−196 °C, with vaporiser) for hardening and inerting, the groundwater well with submersible pump and tank, and the compressed-air plant (screw compressor, dryer and receiver) feeding the line's actuators and grippers."],
   ["dock", "10 · Cais — camião de encomendas", "No cais lateral o camião de encomendas (tractor + semi-reboque SACFILE) está encostado à porta: a traseira do reboque entra na nave, a rampa niveladora faz a ponte e o KMF 1500P carrega as paletes de limas embaladas para expedição.",
     "At the side dock the delivery truck (tractor + SACFILE semi-trailer) is backed against the door: the rear of the trailer enters the hall, the dock leveler bridges the gap and the KMF 1500P loads the pallets of packed files for shipping."],
   ["kmf", "8 · Armário de paletes — KUKA KMF 1500P", "O KUKA KMF 1500P, empilhador autónomo de 1500 kg com navegação laser, vai buscar a palete ao posto de expedição e arruma-a no armário de paletes, no primeiro lugar livre dos três níveis. Quando o armário está cheio, a palete mais antiga sai para o camião.",

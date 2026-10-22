@@ -39,7 +39,7 @@
     }
     const sign = new THREE.Mesh(new THREE.PlaneGeometry(2000, 500), new THREE.MeshBasicMaterial({ map: signTex(label, sub, band) }));
     sign.position.set(dx > 0 ? Math.max(-len / 2 + 1100, dx - 1500) : Math.min(len / 2 - 1100, dx + 1500), CH - 330, F + 60); g.add(sign);
-    if (!opts.noAC) box(640, 520, 320, mAC, len / 2 - 600, CH + 330, -CD / 2 + 400, g);   // unidade de ar condicionado no tecto
+    if (!opts.noAC) box(640, 520, 320, mAC, len / 2 - 600, CH + 330, -CD / 2 + 400, g);   // unidade AC inverter (calor/frio) no tecto do contentor
     const lamp = cyl(50, 90, mat.lamp, g, 12); lamp.rotation.x = Math.PI / 2; lamp.position.set(dx, 2350, F + 50);
     if (level === 1) {                                                                 // passadiço à frente com guarda-corpos e escada metálica
       // passadiço de 1,1 m com guarda-corpos; o guarda-corpos tem uma ABERTURA de 1,4 m onde começa a escada
@@ -145,33 +145,26 @@
     const bc = cyl(60, 120, mat.ledO, scene, 16); bc.position.set(GX + GW / 2 + 120, FLOOR + GH + 560, GZ - 60);   // pirilampo do portão
   }
 
-  // ---------- ventilação da nave: extractores de cobertura, ventiladores HVLS de tecto e ventiladores axiais de parede com persianas
+  // ---------- climatização: AC inverter calor/frio — unidades interiores de tecto (cassete 4 vias) suspensas na nave,
+  //            consola de parede em cada contentor, ventiladores das unidades a rodar; as unidades exteriores ficam fora (68-exterior.js)
   const fans = [];
   {
-    const RY = FLOOR + HALL.h - 160, mFan = M(0x9aa3ad, 0.6, 0.45), mBlade = M(0x374151, 0.3, 0.6);
-    for (const x of [-8000, -3000, 2000, 7000]) for (const z of [-4200, 3600]) {          // 8 extractores de cobertura (turbina)
-      cyl(420, 260, mFan, roofG, 24).position.set(x, RY, z);
-      const cap = cyl(470, 60, mFan, roofG, 24); cap.position.set(x, RY + 160, z);
-      const rot = new THREE.Group(); rot.position.set(x, RY - 140, z); roofG.add(rot);
-      for (let i = 0; i < 6; i++) { const b = box(360, 14, 120, mBlade, 0, 0, 0, rot, false); b.position.set(Math.cos(i * Math.PI / 3) * 200, 0, Math.sin(i * Math.PI / 3) * 200); b.rotation.y = -i * Math.PI / 3; b.rotation.x = 0.5; }
-      fans.push({ g: rot, w: 9 });
+    const mCas = M(0xf4f5f7, 0.2, 0.5), mGrille = M(0x3b4148, 0.3, 0.6);
+    for (const x of [-8000, -3000, 2000, 7000]) for (const z of [-4200, 0, 3600]) {          // 12 cassetes de tecto, suspensas por tirantes
+      const g = new THREE.Group(); g.position.set(x, FLOOR + 5600, z); scene.add(g);
+      for (const sx of [-1, 1]) for (const sz of [-1, 1]) cyl(14, 1100, mat.alu, g, 8).position.set(sx * 400, 700, sz * 400);   // tirantes à asna
+      box(900, 300, 900, mCas, 0, 150, 0, g);
+      box(1050, 40, 1050, mCas, 0, -20, 0, g, false);                                           // painel decorativo
+      for (const [ox, oz, w, d] of [[0, -420, 760, 120], [0, 420, 760, 120], [-420, 0, 120, 760], [420, 0, 120, 760]]) { const v = box(w, 24, d, mGrille, ox, -46, oz, g, false); v.rotation.x = oz ? Math.sign(oz) * 0.5 : 0; v.rotation.z = ox ? -Math.sign(ox) * 0.5 : 0; }   // 4 aletas
+      const ret = box(500, 10, 500, mGrille, 0, -46, 0, g, false);                               // grelha de retorno
+      const rot = new THREE.Group(); rot.position.set(0, 60, 0); g.add(rot);
+      for (let i = 0; i < 5; i++) { const b = box(220, 10, 60, mGrille, 0, 0, 0, rot, false); b.position.set(Math.cos(i * TAU_ / 5) * 130, 0, Math.sin(i * TAU_ / 5) * 130); b.rotation.y = -i * TAU_ / 5; }
+      fans.push({ g: rot, w: 14 });
+      box(90, 90, 1400, mat.alu, 0, 330, 700, g, false);                                          // tubagem de refrigerante / condensados
+      const led = box(40, 6, 40, mat.ledG, 300, -26, 300, g, false);
     }
-    for (const [x, z] of [[-5500, 1800], [3500, -3200]]) {                                 // 2 ventiladores HVLS (Ø 5 m, lentos), acima dos contentores de 1.º andar
-      const hub = new THREE.Group(); hub.position.set(x, FLOOR + 6100, z); scene.add(hub);
-      cyl(40, 1300, mPost, scene, 10).position.set(x, FLOOR + 6800, z);
-      cyl(220, 220, M(0xe5e7eb, 0.4, 0.4), hub, 24);
-      for (let i = 0; i < 6; i++) { const b = box(2400, 20, 220, M(0xcbd5e1, 0.5, 0.4), 0, 0, 0, hub, false); b.position.set(Math.cos(i * Math.PI / 3) * 1350, 0, Math.sin(i * Math.PI / 3) * 1350); b.rotation.y = -i * Math.PI / 3; b.rotation.x = 0.18; }
-      fans.push({ g: hub, w: 1.2 });
-    }
-    const louv = canvasTex(128, 256, (g, w, h) => { g.fillStyle = "#b9bfc5"; g.fillRect(0, 0, w, h); g.fillStyle = "#3b4148"; for (let y = 8; y < h - 6; y += 18) g.fillRect(8, y, w - 16, 9); });
-    for (const [x, z, rot] of [[-6000, -HALL.z + 70, 0], [6000, -HALL.z + 70, 0], [HALL.x - 70, -3500, -Math.PI / 2], [-HALL.x + 70, 5000, Math.PI / 2]]) {   // ventiladores axiais de parede
-      const g = new THREE.Group(); g.position.set(x, FLOOR + 4200, z); g.rotation.y = rot; scene.add(g);
-      box(1300, 1300, 160, mFan, 0, 0, 0, g);
-      const pl = new THREE.Mesh(new THREE.PlaneGeometry(1200, 1200), M(0xffffff, 0.5, 0.5, { map: louv })); pl.position.z = 85; g.add(pl);
-      const rot2 = new THREE.Group(); rot2.position.z = -40; g.add(rot2);
-      for (let i = 0; i < 5; i++) { const b = box(520, 150, 10, mBlade, 0, 0, 0, rot2, false); b.position.set(Math.cos(i * TAU_ / 5) * 300, Math.sin(i * TAU_ / 5) * 300, 0); b.rotation.z = i * TAU_ / 5; }
-      fans.push({ g: rot2, w: 6, axis: "z" });
-    }
+    // conduta de ar novo com grelhas ao longo da asna central (renovação de ar da nave)
+    box(2 * HALL.x - 2000, 500, 500, M(0xcfd4da, 0.6, 0.4), 0, FLOOR + 6000, -1750); for (let x = -9000; x <= 9000; x += 1500) box(700, 160, 520, mGrille, x, FLOOR + 5820, -1750, scene, false);
   }
   addSystem({ draw(dt) { for (const f of fans) { if (f.axis === "z") f.g.rotation.z += f.w * dt; else f.g.rotation.y += f.w * dt; } } });
 
@@ -248,7 +241,7 @@
   for (const [text, x, z, lv] of T) addTag({ text, at: () => V(x, FLOOR + CH + 650 + lv * (CH + 70), z), max: 9000 });
   addTag({ text: "Corredor do KMF 1500P · 2,5 m livres (linha de segurança)", at: () => V(5500, FLOOR + 400, -4250), max: 7000 });
   addTag({ text: "Faixa do AMR · circulação livre", at: () => V(5200, FLOOR + 400, 600), max: 6000 });
-  addTag({ text: "Ventilação · extractores de cobertura, HVLS e ventiladores de parede", at: () => V(-5500, FLOOR + 5800, 1800), min: 1500, max: 12000 });
+  addTag({ text: "Climatização · AC inverter calor/frio · cassetes de tecto + conduta de ar novo", at: () => V(-3000, FLOOR + 5300, 0), min: 1500, max: 12000 });
   addTag({ text: () => `9 · Instalações de apoio (contentores) · ${hhmm(SHIFT.min)}`, at: () => V(-6500, FLOOR + 6600, 5200), min: 3500, big: true });
   addTag({ text: () => (SHIFT.alarm === "lunch" ? "Sirene · ALMOÇO" : SHIFT.alarm === "end" ? "Sirene · FIM DE TURNO" : `Relógio de turno · ${hhmm(SHIFT.min)}`), at: () => V(5000, FLOOR + 4900, HALL.z - 300), max: 9000 });
   addView("inst", "Instalações", [-3500, 4200, -1500], [-7500, 800, 4500]);

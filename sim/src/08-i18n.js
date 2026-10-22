@@ -80,6 +80,10 @@ const I18N_EXACT = {
   "Sobe elástico, cede, alivia em linha recta: o que fica é a correção": "Rises elastically, yields, unloads in a straight line: what remains is the correction",
   "Perfil da lima (A → C)": "File profile (A → C)",
   // ---- 68-exterior.js
+  "Painéis solares fotovoltaicos · nave e escritório": "Photovoltaic solar panels · hall and office", "Unidades exteriores · AC inverter calor/frio (6 × 50 kW)": "Outdoor units · inverter AC heating/cooling (6 × 50 kW)",
+  "AZOTO LÍQUIDO": "LIQUID NITROGEN", "Tanque de azoto líquido · N₂ −196 °C · vaporizador": "Liquid nitrogen tank · N₂ −196 °C · vaporiser", "Poço de água subterrânea · bomba submersível · depósito 10 m³": "Groundwater well · submersible pump · 10 m³ tank",
+  "Central de ar comprimido · compressor de parafuso 37 kW · secador · depósito 2000 L": "Compressed-air plant · 37 kW screw compressor · dryer · 2000 L receiver", "Utilidades exteriores": "Outdoor utilities", "10 · Utilidades": "10 · Utilities",
+  "Climatização · AC inverter calor/frio · cassetes de tecto + conduta de ar novo": "Climate control · inverter AC heating/cooling · ceiling cassettes + fresh-air duct",
   "PISO 0": "FLOOR 0", "PISO 1": "FLOOR 1", "PISO 2": "FLOOR 2", "Recepção · Sala de visitas de clientes": "Reception · Client visiting room", "Administração · HSA + RH · contabilidade · compras": "Administration · HSE + HR · accounting · purchasing", "Sala de reunião executiva · direcção": "Executive meeting room · management",
   "10 · Exterior": "10 · Exterior", "10 · Escritório": "10 · Office", "10 · Cais · camião": "10 · Dock · truck", "Exterior": "Exterior", "Escritório": "Office", "Cais · camião": "Dock · truck",
   "10 · Exterior — SACFILE": "10 · Exterior — SACFILE", "10 · Cais — camião de encomendas": "10 · Dock — delivery truck", "10 · Exterior · SACFILE": "10 · Exterior · SACFILE",
