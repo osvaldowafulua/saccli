@@ -385,13 +385,14 @@ VIEWS.feed = [[-10500, 1500, 1500], [-9650, 0, -420]];
 VIEWS.pack = [[2500, 2000, 2100], [3600, -150, -150]];
 VIEWS.crates = [[-2400, 1900, 2300], [-900, -200, 200]];
 const AREAS = [
-  ["feed", "0 · Bobina de banda"], ["lam", "1 · Laminagem"], ["pic", "2 · Picagem"], ["ind", "3 · Têmpera"], ["indHmi", "3 · Painel da têmpera"],
-  ["dur", "4 · Dureza"], ["jato", "5 · Jateamento"], ["cell", "6 · SACCLI"], ["mod", "6 · Módulos A–C"], ["crates", "6 · Caixas e robôs"],
-  ["pack", "7 · Embalagem e palete"], ["exp", "8 · Expedição (AMR)"], ["kmf", "8 · Armário (KMF 1500P)"], ["inst", "9 · Instalações"], ["cais", "9 · Cais e portão"], ["ext", "10 · Exterior"], ["office", "10 · Escritório"], ["dock", "10 · Cais · camião"], ["util", "10 · Utilidades"],
+  ["#", "Produção da lima"], ["feed", "0 · Bobina de banda"], ["lam", "1 · Laminagem"], ["molde", "1 · Molde de corte"], ["pic", "2 · Picagem"], ["ind", "3 · Têmpera"], ["indHmi", "3 · Painel da têmpera"], ["dur", "4 · Dureza"], ["jato", "5 · Jateamento"],
+  ["#", "Correcção SACCLI"], ["cell", "6 · SACCLI"], ["mod", "6 · Módulos A–C"], ["crates", "6 · Caixas e robôs"],
+  ["#", "Embalagem e expedição"], ["pack", "7 · Embalagem e palete"], ["exp", "8 · Expedição (AMR)"], ["kmf", "8 · Armário (KMF 1500P)"], ["cais", "8 · Cais e portão"], ["dock", "8 · Camião"], ["gate", "8 · Portão · entrada"],
+  ["#", "Instalações e exterior"], ["inst", "9 · Instalações"], ["ext", "10 · Exterior"], ["office", "10 · Escritório"], ["util", "10 · Utilidades"],
 ];
 VIEWS.molde = [[-8300, 650, 500], [-8950, 100, -380]];
-AREAS.splice(2, 0, ["molde", "1 · Molde de corte"]);
 for (const [key, label] of AREAS) {
+  if (key === "#") { const h = document.createElement("div"); h.className = "area-h"; h.textContent = label; $("stationViews").appendChild(h); continue; }
   if (!VIEWS[key]) continue;
   const b = document.createElement("button"); b.className = "area"; b.textContent = label; b.onclick = () => view(key); $("stationViews").appendChild(b);   // texto traduzido por i18nInit()
 }
@@ -524,11 +525,13 @@ function renderTour() {
   $("docNext").innerHTML = tour.i === TOUR.length - 1 ? icon("rotate-ccw") + tr("Recomeçar") : tr("Seguinte") + icon("chevron-right").replace('class="ic"', 'class="ic r"');
   $("docAuto").innerHTML = tour.auto ? icon("pause") + tr("Parar automático") : icon("play") + tr("Automático");
   $("docClose").innerHTML = icon("x") + tr("Fechar");
+  $("docHide").innerHTML = (document.body.classList.contains("present") ? icon("eye") + tr("Mostrar painéis") : icon("eye-off") + tr("Ocultar tudo")); $("showUi").innerHTML = icon("eye") + tr("Mostrar painéis");
   $("docBtn").innerHTML = icon("book-open") + tr("Documentação 3D");
 }
 function tourGo(i) { tour.i = (i + TOUR.length) % TOUR.length; tour.t = 0; flyTo(TOUR[tour.i][0]); renderTour(); }
 function tourOpen(open) {
   tour.open = open; $("doc").classList.toggle("hidden", !open);
+  if (!open) setPresent(false);
   for (const id of ["ctrl", "charts", "motors"]) $(id).classList.toggle("hidden", open);   // durante a visita só fica o painel principal e a documentação
   if (open) tourGo(tour.i); else tour.auto = false;
 }
@@ -537,6 +540,11 @@ $("docClose").onclick = () => tourOpen(false);
 $("docPrev").onclick = () => tourGo(tour.i - 1);
 $("docNext").onclick = () => tourGo(tour.i + 1);
 $("docAuto").onclick = () => { tour.auto = !tour.auto; tour.t = 0; renderTour(); };
+// modo apresentação: esconde painéis e etiquetas, fica só a documentação guiada (tecla H alterna)
+function setPresent(on) { document.body.classList.toggle("present", on); renderTour(); }
+$("docHide").onclick = () => setPresent(!document.body.classList.contains("present"));
+$("showUi").onclick = () => setPresent(false);
+addEventListener("keydown", (e) => { if (e.key === "h" || e.key === "H") { if (!["INPUT", "SELECT"].includes(e.target.tagName)) setPresent(!document.body.classList.contains("present")); } });
 function tourTick(dt) {
   if (fly.on) {
     fly.t += dt; const k = ease(Math.min(1, fly.t / fly.dur));

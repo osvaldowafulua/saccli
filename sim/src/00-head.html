@@ -57,10 +57,19 @@
   #doc .bar { height: 4px; background: rgba(255,255,255,.1); border-radius: 2px; margin-bottom: 10px; overflow: hidden; }
   #doc .bar i { display: block; height: 100%; background: #2f6fdc; width: 0; }
   #doc .btns { margin-top: 0; justify-content: space-between; }
+  .panel { box-shadow: 0 12px 40px rgba(0,0,0,.35); border-color: rgba(120,150,200,.25); background: linear-gradient(180deg, rgba(14,22,38,.94), rgba(10,16,28,.94)); }
+  .panel h1 { letter-spacing: .01em; }
+  .panel::-webkit-scrollbar { width: 8px; } .panel::-webkit-scrollbar-thumb { background: rgba(120,150,200,.25); border-radius: 4px; }
+  h2 { border-bottom: 1px solid rgba(120,150,200,.14); padding-bottom: 3px; }
+  body.present #hud, body.present #ctrl, body.present #charts, body.present #motors, body.present .tag { display: none !important; }
+  body.present #doc { bottom: 24px; }
+  #showUi { position: fixed; top: 12px; left: 12px; z-index: 30; display: none; }
+  body.present #showUi { display: block; }
   .lang { position: absolute; top: 10px; right: 12px; display: flex; gap: 4px; }
   .lang button { padding: 3px 8px; font-size: 11px; }
   #hud > h1 { padding-right: 92px; }
   #stationViews { gap: 5px; }
+  .area-h { flex-basis: 100%; font-size: 10px; color: var(--dim); text-transform: uppercase; letter-spacing: .08em; font-weight: 700; margin: 6px 0 -1px; }
   button.area { font-size: 12.5px; font-weight: 600; padding: 8px 11px; background: #1b315c; border-color: #2f6fdc; }
   button.area:hover { background: #2f6fdc; }
   .note { font-size: 11px; color: var(--dim); margin-top: 8px; }
@@ -122,12 +131,13 @@
   <div class="note">Arraste para rodar · roda para zoom · botão direito para mover · espaço pausa.</div>
 </div>
 
+<button id="showUi" title="Mostrar painéis">Mostrar painéis</button>
 <div id="doc" class="panel hidden">
   <div class="step" id="docStep"></div>
   <h1 id="docTitle"></h1>
   <p id="docText"></p>
   <div class="bar"><i id="docBar"></i></div>
-  <div class="btns"><span><button id="docPrev">Anterior</button> <button id="docNext" class="primary">Seguinte</button></span><span><button id="docAuto">Automático</button> <button id="docClose">Fechar</button></span></div>
+  <div class="btns"><span><button id="docPrev">Anterior</button> <button id="docNext" class="primary">Seguinte</button></span><span><button id="docAuto">Automático</button> <button id="docHide">Ocultar tudo</button> <button id="docClose">Fechar</button></span></div>
 </div>
 
 <div id="ctrl" class="panel">

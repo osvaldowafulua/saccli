@@ -4,18 +4,33 @@
 // arruamentos, passeios e vegetação. A câmara pode sair da nave (vistas "Exterior" e "Escritório").
 // =====================================================================
 {
-  const GY = FLOOR - 2, X = HALL.x, Z = HALL.z, H = HALL.h, TOP = FLOOR + H, W_ = 8000;
+  const GY = FLOOR - 2, X = HALL.x, Z = HALL.z, H = HALL.h, TOP = FLOOR + H, W_ = 8000, DZ_ = 2200;
   const acRot = [];
+  let person = null;
   const mAsph = M(0x3f4347, 0.05, 0.9), mKerb = M(0xc9ccd0, 0.1, 0.8), mGrass = M(0x4f7d3a, 0, 0.95), mConc = M(0xb8b4ad, 0.05, 0.75);
   const mPost = M(0x3b4148, 0.4, 0.5);
   const mGlassF = M(0x6fa8d6, 0.9, 0.08, { transparent: true, opacity: 0.55 }), mMullion = M(0x1f2933, 0.6, 0.4), mPanel = M(0xd3d8de, 0.4, 0.55);
   const mRed = M(0xe11d2e, 0.1, 0.45, { emissive: 0xff2030, emissiveIntensity: 1.6 });
+  const carGlass = new THREE.MeshPhysicalMaterial({ color: 0x1b2a3a, metalness: 0.2, roughness: 0.05, transparent: true, opacity: 0.75, clearcoat: 1 });
+  const mTyre = M(0x15171a, 0.1, 0.9), mRim = M(0xd7dbe0, 0.95, 0.25), mTrim = M(0x111318, 0.3, 0.6), mLamp = M(0xfff7e0, 0.2, 0.2, { emissive: 0xfff1c8, emissiveIntensity: 1.2 });
 
   // ---------- terreno: asfalto à volta da nave, relva mais longe, passeios
   const ground = new THREE.Mesh(new THREE.PlaneGeometry(2 * X + 70000, 2 * Z + 70000), mGrass); ground.rotation.x = -Math.PI / 2; ground.position.y = GY - 40; ground.receiveShadow = true; scene.add(ground);
-  const yard = new THREE.Mesh(new THREE.PlaneGeometry(2 * X + 30000, 2 * Z + 30000), mAsph); yard.rotation.x = -Math.PI / 2; yard.position.y = GY - 20; yard.receiveShadow = true; scene.add(yard);
-  box(2 * X + 30000, 150, 300, mKerb, 0, GY + 55, Z + 15000, scene, false); box(2 * X + 30000, 150, 300, mKerb, 0, GY + 55, -Z - 15000, scene, false);
-  box(300, 150, 2 * Z + 30000, mKerb, X + 15000, GY + 55, 0, scene, false); box(300, 150, 2 * Z + 30000, mKerb, -X - 15000, GY + 55, 0, scene, false);
+  // recinto: x de −X−15000 a X+24000, z de −Z−15000 a Z+30000 (o escritório e a avenida ficam dentro do muro)
+  const XE = X + 24000, XWw = -X - 15000, ZS = Z + 30000, ZN = -Z - 15000;
+  const yard = new THREE.Mesh(new THREE.PlaneGeometry(XE - XWw, ZS - ZN), mAsph); yard.rotation.x = -Math.PI / 2; yard.position.set((XE + XWw) / 2, GY - 20, (ZS + ZN) / 2); yard.receiveShadow = true; scene.add(yard);
+  // muro de vedação contínuo (betão, 2,4 m) com capeamento — só abre no portão da entrada
+  const mWall = M(0xb9b6b0, 0.05, 0.8), mCap = M(0x8e9298, 0.1, 0.7);
+  const wallSeg = (x0, z0, x1, z1) => { const len = Math.hypot(x1 - x0, z1 - z0), w = box(len, 2400, 300, mWall, (x0 + x1) / 2, GY + 1200, (z0 + z1) / 2); w.rotation.y = -Math.atan2(z1 - z0, x1 - x0); const c = box(len, 120, 420, mCap, (x0 + x1) / 2, GY + 2460, (z0 + z1) / 2, scene, false); c.rotation.y = w.rotation.y; };
+  const GATE = { x: X + 20000, w: 9000 };                                                         // único acesso: portão de correr para viaturas + portaria
+  wallSeg(XWw, ZN, XE, ZN); wallSeg(XWw, ZN, XWw, ZS); wallSeg(XE, ZN, XE, ZS);
+  wallSeg(XWw, ZS, GATE.x - GATE.w / 2, ZS); wallSeg(GATE.x + GATE.w / 2, ZS, XE, ZS);
+  for (let x = XWw + 5000; x < XE; x += 5000) box(500, 2600, 500, mCap, x, GY + 1300, ZS, scene, false), box(500, 2600, 500, mCap, x, GY + 1300, ZN, scene, false);
+  // avenida interna (E-O) em frente ao escritório e via de acesso do portão até à avenida e ao cais
+  const AVZ = Z + 22500;
+  box(XE - XWw - 6000, 14, 7000, M(0x34383c, 0.05, 0.9), (XE + XWw) / 2, GY + 3, AVZ, scene, false); for (let x = XWw + 4000; x < XE - 4000; x += 3000) box(1500, 16, 140, mat.label, x, GY + 12, AVZ, scene, false);
+  box(7000, 14, ZS - DZ_, M(0x34383c, 0.05, 0.9), GATE.x, GY + 3, (ZS + DZ_) / 2, scene, false); for (let z = DZ_ + 2000; z < ZS - 1000; z += 3000) box(140, 16, 1500, mat.label, GATE.x, GY + 12, z, scene, false);
+  for (const z of [AVZ - 3600, AVZ + 3600]) box(XE - XWw - 6000, 150, 300, mKerb, (XE + XWw) / 2, GY + 55, z, scene, false);
 
   // ---------- revestimento exterior da nave: painéis sandwich horizontais, soco de betão, cobertura a duas águas com beirais
   const extTex = canvasTex(256, 256, (g, w, h) => { g.fillStyle = "#d6dbe1"; g.fillRect(0, 0, w, h); for (let y = 0; y < h; y += 32) { g.fillStyle = "#b8c0c8"; g.fillRect(0, y, w, 5); g.fillStyle = "#e9edf1"; g.fillRect(0, y + 5, w, 3); } }, [1, 1]);
@@ -79,66 +94,215 @@
     const stepW = 8000; for (let i = 0; i < 3; i++) box(stepW - i * 400, 150, 1200 - i * 300, mKerb, OX, GY + 75 + i * 150, OZ + D / 2 + 4600 + i * 250, scene, false);   // degraus de acesso
     // pisos: 0 recepção + sala de visitas de clientes · 1 administração (direcção, contabilidade, compras) · 2 sala de reunião executiva
     const FLOORS = [["PISO 0", "Recepção · Sala de visitas de clientes"], ["PISO 1", "Administração · HSA + RH · contabilidade · compras"], ["PISO 2", "Sala de reunião executiva · direcção"]];
+    // ---- pessoas (≈9 malhas cada): pernas, tronco, braços, cabeça; sentadas ou de pé; com animação ligeira
+    const people = [];
+    const SKIN = [0xf1c9a5, 0xd9a47c, 0x8d5a3b, 0x5b3a26], SHIRT = [0x2563eb, 0xf3f4f6, 0x111827, 0x16a34a, 0xdc2626, 0x7c3aed, 0xf59e0b, 0x0ea5e9], PANTS = [0x1f2937, 0x374151, 0x1e3a8a, 0x6b7280];
+    person = (x, y, z, rot, seated = false, k = 0) => {
+      const g = new THREE.Group(); g.position.set(x, y, z); g.rotation.y = rot; scene.add(g);
+      const skin = M(SKIN[k % 4], 0, 0.7), shirt = M(SHIRT[k % 8], 0, 0.7), pants = M(PANTS[k % 4], 0, 0.8);
+      if (seated) { for (const sx of [-1, 1]) { box(140, 130, 420, pants, sx * 95, 450, 180, g); box(140, 420, 130, pants, sx * 95, 220, 360, g); } box(360, 560, 230, shirt, 0, 800, 0, g); }
+      else { for (const sx of [-1, 1]) box(150, 820, 160, pants, sx * 95, 410, 0, g); box(360, 600, 230, shirt, 0, 1120, 0, g); }
+      const ty = seated ? 800 : 1120;
+      for (const sx of [-1, 1]) { const arm = box(110, 520, 120, shirt, sx * 240, ty + 10, seated ? 120 : 0, g); arm.rotation.x = seated ? -0.9 : 0.15 * sx; }
+      const head = new THREE.Mesh(new THREE.SphereGeometry(125, 14, 12), skin); head.position.set(0, ty + 480, 0); g.add(head);
+      const hair = new THREE.Mesh(new THREE.SphereGeometry(130, 14, 10, 0, Math.PI * 2, 0, Math.PI / 2.2), M([0x2b1b12, 0x111111, 0x6b4a2b, 0xd1b48c][k % 4], 0, 0.9)); hair.position.set(0, ty + 500, 0); g.add(hair);
+      people.push({ g, seated, ph: Math.random() * 6, y0: y });
+      return g;
+    };
+    const mDesk = M(0xe7e5e4, 0.1, 0.6), mDeskLeg = M(0x4b5563, 0.5, 0.5), mChair = M(0x1f2937, 0.2, 0.6), mScreen = M(0x0b1220, 0.4, 0.3, { emissive: 0x9ec5ff, emissiveIntensity: 0.6 }), mLed = M(0xffffff, 0, 0.3, { emissive: 0xfff6e0, emissiveIntensity: 1.8 }), mPlant = M(0x3f7a33, 0, 0.9), mPot = M(0x9ca3af, 0.2, 0.6), mSofa = M(0x2f4f7a, 0, 0.9), mWoodD = M(0x8b5e3c, 0.1, 0.6);
+    const desk = (x, y, z, rot, withPerson, k) => {
+      const g = new THREE.Group(); g.position.set(x, y, z); g.rotation.y = rot; scene.add(g);
+      box(1600, 30, 800, mDesk, 0, 740, 0, g); for (const sx of [-1, 1]) for (const sz of [-1, 1]) box(50, 730, 50, mDeskLeg, sx * 750, 365, sz * 350, g);
+      box(560, 340, 30, mScreen, 0, 1000, -250, g); box(60, 180, 60, mDeskLeg, 0, 830, -250, g); box(300, 30, 100, mDeskLeg, 0, 760, -250, g);   // monitor
+      box(440, 14, 150, M(0x374151, 0.3, 0.6), 0, 762, 120, g);                                                                                 // teclado
+      const chair = new THREE.Group(); chair.position.set(0, 0, 650); g.add(chair);
+      box(520, 60, 520, mChair, 0, 480, 0, chair); box(520, 560, 70, mChair, 0, 800, 260, chair); cyl(35, 400, mDeskLeg, chair, 10).position.y = 250; for (let i = 0; i < 5; i++) { const r = box(300, 30, 40, mDeskLeg, 0, 40, 0, chair); r.position.set(Math.cos(i * 1.2566) * 150, 40, Math.sin(i * 1.2566) * 150); r.rotation.y = -i * 1.2566; }
+      if (withPerson) { const pp = person(0, 0, 0, 0, true, k); pp.position.set(0, 0, 500); g.add(pp); scene.remove(pp); g.add(pp); }
+      return g;
+    };
+    const plant = (x, y, z, h = 1400) => { cyl(180, 320, mPot, scene, 12).position.set(x, y + 160, z); const c = new THREE.Mesh(new THREE.SphereGeometry(h * 0.36, 10, 8), mPlant); c.position.set(x, y + 320 + h * 0.4, z); c.scale.y = 1.4; scene.add(c); };
+    function furnish(f) {
+      const y = FLOOR + f * FH + 400, x0 = OX - W / 2, z0 = OZ - D / 2;
+      for (let i = 0; i < 6; i++) box(1800, 30, 220, mLed, x0 + 2500 + i * 2300, y + FH - 560, OZ + (i % 2 ? -1800 : 1800), scene, false);   // iluminação LED
+      if (f === 0) {   // recepção + sala de visitas de clientes
+        box(3200, 1100, 700, mWoodD, OX + 1500, y + 550, z0 + D - 2600); box(3300, 60, 800, mDesk, OX + 1500, y + 1130, z0 + D - 2600); person(OX + 1500, y, z0 + D - 3300, Math.PI, true, 1);
+        const logoR = new THREE.Mesh(new THREE.PlaneGeometry(1800, 420), new THREE.MeshBasicMaterial({ map: signTex(1024, 256), transparent: true })); logoR.position.set(OX + 1500, y + 2300, z0 + 150); scene.add(logoR);
+        box(2600, 420, 900, mSofa, OX - 3800, y + 210, z0 + D - 2200); box(2600, 500, 250, mSofa, OX - 3800, y + 670, z0 + D - 1650); box(1200, 40, 700, M(0x111827, 0.5, 0.2), OX - 3800, y + 420, z0 + D - 3600); for (const sx of [-1, 1]) box(60, 400, 60, mDeskLeg, OX - 3800 + sx * 500, y + 200, z0 + D - 3600);   // sofá e mesa
+        person(OX - 4400, y, z0 + D - 2200, 0, true, 2); person(OX - 3200, y, z0 + D - 2200, 0, true, 5);
+        box(4200, 1200, 60, M(0x0b1220, 0.4, 0.3, { emissive: 0x9ec5ff, emissiveIntensity: 0.5 }), OX - 3800, y + 1900, z0 + 80);   // ecrã de demonstrações
+        for (let i = 0; i < 2; i++) person(OX - 5200 + i * 1200, y, z0 + 2400, Math.PI, true, 3 + i);
+        people.walker = person(OX + 4500, y, z0 + 4500, 0, false, 6); people.walker.x0 = OX + 4500;
+        person(OX + 6000, y, z0 + D - 2400, -2.4, false, 4);
+        plant(x0 + 1200, y, z0 + 1000); plant(x0 + W - 1200, y, z0 + D - 1000); plant(OX - 1500, y, z0 + D - 1200, 1800);
+      } else if (f === 1) {   // administração, HSA + RH, contabilidade, compras: open-space
+        for (let r = 0; r < 2; r++) for (let i = 0; i < 5; i++) desk(x0 + 2600 + i * 2500, y, z0 + 2200 + r * 4200, r ? Math.PI : 0, (i + r) % 3 !== 2, i + r * 3);
+        box(5000, 2400, 60, M(0xdbe3ec, 0.3, 0.2, { transparent: true, opacity: 0.45 }), x0 + W - 2700, y + 1200, OZ, scene, false); box(2000, 30, 1000, mDesk, x0 + W - 2700, y + 740, OZ - 2000); person(x0 + W - 2700, y, OZ - 1200, Math.PI, true, 7);   // gabinete da direcção (vidro)
+        plant(x0 + 900, y, z0 + 900); plant(x0 + W - 900, y, z0 + D - 900); plant(OX, y, z0 + 500, 1700);
+        for (let i = 0; i < 4; i++) box(900, 1800, 420, M(0x9ca3af, 0.4, 0.5), x0 + 1200 + i * 1000, y + 900, z0 + 300);   // arquivos
+      } else {   // sala de reunião executiva
+        box(6400, 60, 2000, M(0x3b2a1e, 0.1, 0.5), OX + 800, y + 740, OZ); for (const sx of [-1, 1]) box(400, 720, 1200, M(0x2b1f16, 0.1, 0.6), OX + 800 + sx * 2600, y + 360, OZ);
+        for (let i = 0; i < 5; i++) for (const sz of [-1, 1]) { const px = OX - 1800 + i * 1300, pz = OZ + sz * 1600; box(560, 60, 560, mChair, px, y + 480, pz); box(560, 600, 70, mChair, px, y + 800, pz + sz * 260); if ((i + (sz > 0)) % 3 !== 1) person(px, y, pz - sz * 120, sz > 0 ? Math.PI : 0, true, i + (sz > 0 ? 4 : 0)); }
+        box(4200, 1300, 60, M(0x0b1220, 0.4, 0.3, { emissive: 0x9ec5ff, emissiveIntensity: 0.5 }), OX + 800, y + 2000, z0 + 80);   // ecrã de parede
+        box(2000, 1200, 60, M(0xffffff, 0, 0.6), OX - 4800, y + 1900, z0 + 80);                                                      // quadro branco
+        person(OX - 4800, y, z0 + 900, Math.PI, false, 2);
+        plant(x0 + 900, y, z0 + 900); plant(x0 + W - 900, y, z0 + 900);
+      }
+    }
+    let pt = 0;
+    addSystem({ draw(dt) {
+      pt += dt;
+      for (const p of people) { p.g.position.y = p.y0 + (p.seated ? 6 : 12) * Math.sin(pt * 1.6 + p.ph); if (!p.seated) p.g.rotation.y += 0.004 * Math.sin(pt * 0.7 + p.ph); }
+      const w = people.walker; if (w) { const u = (Math.sin(pt * 0.25) + 1) / 2; w.position.x = w.x0 - 4500 * u; w.rotation.y = Math.cos(pt * 0.25) > 0 ? Math.PI / 2 : -Math.PI / 2; w.position.y = w.position.y + 0; }
+    } });
     FLOORS.forEach(([t1, t2], f) => {
       const tex = canvasTex(1024, 192, (g, w, h) => { g.fillStyle = "rgba(20,28,40,0.85)"; g.fillRect(0, 0, w, h); g.fillStyle = "#ffffff"; g.font = "800 60px Arial"; g.fillText(tr(t1), 30, 80); g.fillStyle = "#cfe3f7"; g.font = "600 40px Arial"; g.fillText(tr(t2), 30, 150); });
       const pl = new THREE.Mesh(new THREE.PlaneGeometry(6400, 1200), new THREE.MeshBasicMaterial({ map: tex, transparent: true })); pl.position.set(OX + 3000, FLOOR + f * FH + 2000, OZ + D / 2 + 90); scene.add(pl);
-      // interior: pavimento, mesas e cadeiras simplificadas (vê-se através do vidro)
-      for (let k = 0; k < 4; k++) { box(1800, 40, 900, mat.wood, OX - W / 2 + 3000 + k * 3000, FLOOR + f * FH + 1150, OZ + (f === 2 ? 0 : -1500), scene, false); for (const sx of [-1, 1]) box(60, 720, 60, mPost, OX - W / 2 + 3000 + k * 3000 + sx * 800, FLOOR + f * FH + 780, OZ + (f === 2 ? 0 : -1500), scene, false); }
-      if (f === 2) box(6000, 60, 1800, M(0x3b2a1e, 0.1, 0.6), OX + 2000, FLOOR + f * FH + 1150, OZ, scene, false);   // mesa de reunião executiva
+      furnish(f);
       addTag({ text: `${t1} · ${t2}`, at: () => V(OX + 3000, FLOOR + f * FH + 2900, OZ + D / 2 + 300), max: 30000 });
     });
     addTag({ text: "Escritório central SACFILE · vidro e betão · 3 pisos", at: () => V(OX, FLOOR + N * FH + 2200, OZ), min: 2000, max: 90000, big: true });
   }
 
-  // ---------- estacionamento: lugares marcados em frente ao escritório, carros, passadeira e postes de iluminação
+  // ---------- estacionamento: lugares marcados ao longo da avenida, em frente ao escritório, carros, passadeira e postes de iluminação
+  const OX_ = -2500;
   {
-    const PX0 = 8000, PZ = Z + 6000, N = 10, BW = 2600, BL = 5000;
+    const PX0 = -6000, PZ = Z + 22500 + 3600 + 2700, N = 12, BW = 2600, BL = 5000;
     box(N * BW + 400, 10, BL + 400, M(0x2f3337, 0.05, 0.9), PX0 + (N * BW) / 2, GY + 2, PZ, scene, false);
     for (let i = 0; i <= N; i++) box(120, 12, BL, mat.label, PX0 + i * BW, GY + 10, PZ, scene, false);
+    // carro: carroçaria em perfil lateral extrudido com bisel, tinta com verniz (clearcoat), vidros, jantes com raios, faróis, espelhos, matrícula
+    const bodyShape = (() => { const sh = new THREE.Shape(); [[-2200, 300], [-2200, 640], [-2050, 720], [-1350, 760], [-980, 1230], [-250, 1320], [620, 1300], [1250, 820], [2120, 740], [2250, 600], [2250, 300]].forEach(([x, y], k) => k ? sh.lineTo(x, y) : sh.moveTo(x, y)); sh.closePath(); return sh; })();
+    const glassShape = (() => { const sh = new THREE.Shape(); [[-1330, 790], [-980, 1200], [-250, 1280], [600, 1265], [1180, 830]].forEach(([x, y], k) => k ? sh.lineTo(x, y) : sh.moveTo(x, y)); sh.closePath(); return sh; })();
+    const bodyGeo = new THREE.ExtrudeGeometry(bodyShape, { depth: 1760, bevelEnabled: true, bevelThickness: 90, bevelSize: 70, bevelSegments: 4 }); bodyGeo.translate(0, 0, -880);
+    const glassGeo = new THREE.ExtrudeGeometry(glassShape, { depth: 1790, bevelEnabled: false }); glassGeo.translate(0, 0, -895);
     const car = (x, z, c, rot) => {
       const g = new THREE.Group(); g.position.set(x, GY, z); g.rotation.y = rot; scene.add(g);
-      box(4300, 520, 1800, M(c, 0.6, 0.35), 0, 560, 0, g); box(2400, 560, 1650, M(0x1a2430, 0.5, 0.15), -150, 1100, 0, g);
-      for (const sx of [-1, 1]) for (const sz of [-1, 1]) { const w = cyl(330, 220, mat.black, g, 18); w.rotation.x = Math.PI / 2; w.position.set(sx * 1400, 330, sz * 900); }
-      box(300, 150, 80, mat.ledR, -2160, 700, 650, g, false); box(300, 150, 80, mat.ledR, -2160, 700, -650, g, false);
+      const paint = new THREE.MeshPhysicalMaterial({ color: c, metalness: 0.55, roughness: 0.28, clearcoat: 1, clearcoatRoughness: 0.06 });
+      const body = new THREE.Mesh(bodyGeo, paint); body.castShadow = true; g.add(body);
+      g.add(new THREE.Mesh(glassGeo, carGlass));
+      box(4300, 90, 1700, mTrim, 0, 300, 0, g, false);                                                          // saia inferior
+      for (const sx of [-1, 1]) for (const sz of [-1, 1]) {
+        const w = new THREE.Group(); w.position.set(sx * 1400, 340, sz * 820); g.add(w);
+        const t = cyl(340, 230, mTyre, w, 24); t.rotation.x = Math.PI / 2;
+        const r = cyl(215, 240, mRim, w, 20); r.rotation.x = Math.PI / 2;
+        for (let i = 0; i < 5; i++) { const sp = box(60, 330, 250, mTrim, 0, 0, sz * 6, w, false); sp.rotation.z = i * 1.2566; }
+        box(1000, 760, 60, mTrim, 0, 420, sz * 870 - sz * 30, w, false);                                           // cava da roda
+      }
+      for (const sz of [-1, 1]) { box(70, 190, 420, mLamp, 2230, 720, sz * 600, g, false); box(60, 170, 380, mat.ledR, -2210, 740, sz * 620, g, false); }   // faróis e farolins
+      box(60, 240, 1100, mTrim, 2240, 480, 0, g, false); box(900, 130, 40, mat.label, 2255, 430, 0, g, false);  // grelha e matrícula
+      for (const sz of [-1, 1]) { box(160, 90, 220, paint, -700, 1020, sz * 980, g, false); }                     // espelhos
+      for (const xx of [-1300, 0]) box(16, 520, 1800, mTrim, xx, 640, 0, g, false);                                // linhas das portas
+      box(1300, 20, 60, mTrim, -1950, 1330, 0, g, false);                                                          // barras de tejadilho (curtas)
+      return g;
     };
     [[0, 0x2b5fb3], [1, 0xe5e7eb], [3, 0x1f2937], [4, 0xb91c1c], [6, 0x9ca3af], [7, 0x2f6fdc], [9, 0xf59e0b]].forEach(([i, c]) => car(PX0 + (i + 0.5) * BW, PZ, c, Math.PI / 2));
-    for (let i = 0; i < 6; i++) box(600, 40, 2200, mat.label, PX0 - 1800, GY + 8, PZ - 4200 + i * 900, scene, false);   // passadeira
-    for (const x of [PX0 - 600, PX0 + N * BW + 600, -14000]) { cyl(70, 7000, mat.alu, scene, 12).position.set(x, GY + 3500, PZ + BL / 2 + 800); box(900, 160, 320, mat.dark, x + 350, GY + 7000, PZ + BL / 2 + 800); box(700, 20, 240, mat.lamp, x + 350, GY + 6910, PZ + BL / 2 + 800, scene, false); }
+    for (let i = 0; i < 8; i++) box(600, 40, 7000, mat.label, OX_ - 4200 + i * 1200, GY + 8, Z + 22500, scene, false);   // passadeira para a entrada do escritório
+    for (const x of [PX0 - 600, PX0 + N * BW + 600, 20000, 30000]) { cyl(70, 7000, mat.alu, scene, 12).position.set(x, GY + 3500, Z + 22500 + 3900); box(900, 160, 320, mat.dark, x + 350, GY + 7000, PZ + BL / 2 + 800); box(700, 20, 240, mat.lamp, x + 350, GY + 6910, PZ + BL / 2 + 800, scene, false); }
     addTag({ text: "Estacionamento · colaboradores e visitantes", at: () => V(PX0 + (N * BW) / 2, GY + 2500, PZ), max: 40000 });
   }
 
-  // ---------- camião de encomendas no cais (+x): tractor + semi-reboque encostado à porta do cais (a traseira está dentro da nave)
+  // ---------- camião de encomendas: tractor + semi-reboque articulado. Estados: "loading" (recuado no cais, portas abertas, a receber
+  //            paletes do KMF — uma por cada palete expedida), "closing" (fecha as portas), "leave" (segue pelo pátio, barreira sobe, sai pelo
+  //            portão), "arrive" (um camião vazio recua em linha recta até ao cais) — e recomeça. Ciclo ligado ao contador `shipped`.
+  const TRUCK = { state: "loading", t: 0, loaded: 2, CAP: 4, shippedAt: shipped, pallets: [], path: [], i: 0, hd: 0, x: 0, z: 0, trailer: { x: 0, z: 0, hd: 0 }, door: 1, barrier: 0, gone: 0 };
+  const DZ = 2200, DOCK_X = X - 40;                                                                // porta do cais
+  const trailerG = new THREE.Group(), tractorG = new THREE.Group(); scene.add(trailerG, tractorG);
+  const TL = 13500, HITCH = TL / 2 - 1100;                                                        // comprimento do reboque; o pino de engate fica 1,1 m atrás da frente
   {
-    const DZ = 2200, RX = X + 600;                                                                // o reboque começa dentro (DX+600) e sai pela porta
-    const g = new THREE.Group(); g.position.set(RX + 1000, FLOOR + 150, DZ); scene.add(g);      // continuação do reboque, encostado ao primeiro troço
-    box(11500, 2600, 2550, M(0xf1f1ee, 0.2, 0.5), 5750, 1300, 0, g);                           // caixa
-    box(11500, 120, 2550, mat.dark, 5750, 2680, 0, g, false);
-    const logo = new THREE.Mesh(new THREE.PlaneGeometry(5000, 1100), new THREE.MeshBasicMaterial({ map: signTex(1024, 256), transparent: true, toneMapped: false })); logo.position.set(5750, 1500, 1290); g.add(logo);
-    box(11000, 300, 2300, mat.dark, 5750, 150, 0, g);                                            // chassis
-    for (const x of [8200, 9600]) for (const s of [-1, 1]) { const w = cyl(520, 380, mat.black, g, 24); w.rotation.x = Math.PI / 2; w.position.set(x, -150 + 520 - 150, s * 1050); }
-    for (const s of [-1, 1]) { const leg = box(140, 900, 140, mat.alu, 2800, -300, s * 800, g); }   // apoios (recolhidos)
+    const mBox = M(0xf1f1ee, 0.2, 0.5), mInner = M(0x1f2937, 0.1, 0.8);
+    box(TL, 2600, 2550, mBox, 0, 1450, 0, trailerG); box(TL - 20, 2560, 2500, mInner, -10, 1450, 0, trailerG);
+    box(TL, 120, 2550, mat.dark, 0, 2830, 0, trailerG, false); box(TL - 200, 120, 2500, M(0x4b5563, 0.3, 0.6), 0, 210, 0, trailerG);   // tecto e piso
+    for (const sz of [-1, 1]) { const logo = new THREE.Mesh(new THREE.PlaneGeometry(5000, 1100), new THREE.MeshBasicMaterial({ map: signTex(1024, 256), transparent: true, toneMapped: false })); logo.position.set(1500, 1650, sz * 1290); logo.rotation.y = sz > 0 ? 0 : Math.PI; trailerG.add(logo); }
+    box(TL - 600, 300, 2300, mat.dark, 0, 300, 0, trailerG);                                      // chassis
+    for (const x of [-TL / 2 + 2200, -TL / 2 + 3600]) for (const sx of [-1, 1]) { const w = cyl(520, 380, mTyre, trailerG, 24); w.rotation.x = Math.PI / 2; w.position.set(x, 520, sx * 1050); const r = cyl(300, 390, mRim, trailerG, 16); r.rotation.x = Math.PI / 2; r.position.set(x, 520, sx * 1050); }
+    for (const sx of [-1, 1]) box(140, 900, 140, mat.alu, TL / 2 - 2600, 600, sx * 800, trailerG);   // apoios
+    box(1600, 80, 2500, mat.dark, -TL / 2 + 20, 450, 0, trailerG); for (const sz of [-1, 1]) box(40, 120, 160, mat.ledR, -TL / 2 - 10, 2570, sz * 1180, trailerG, false);
+    TRUCK.doors = [-1, 1].map((sz) => { const pivot = new THREE.Group(); pivot.position.set(-TL / 2, 1450, sz * 1250); trailerG.add(pivot); box(60, 2500, 1240, M(0xe5e7eb, 0.2, 0.5), 0, 0, -sz * 620, pivot); pivot.userData.sz = sz; return pivot; });
     // tractor
-    const t = new THREE.Group(); t.position.set(RX + 1000 + 11500 + 300, FLOOR + 150, DZ); scene.add(t);
-    box(2300, 2400, 2500, M(0xb91c1c, 0.3, 0.4), 1150, 1700, 0, t);                               // cabina vermelha
-    box(1500, 1200, 2450, M(0x1a2430, 0.5, 0.15), 1550, 2200, 0, t, false);                       // vidros
-    box(2000, 500, 2400, M(0x8b1a1a, 0.3, 0.5), 2250, 500, 0, t);                                 // pára-choques/grelha
-    box(3600, 300, 2300, mat.dark, 1000, 150, 0, t);
-    for (const x of [-700, 1600]) for (const s of [-1, 1]) { const w = cyl(520, 380, mat.black, t, 24); w.rotation.x = Math.PI / 2; w.position.set(x, 220, s * 1050); }
-    cyl(120, 1200, mat.alu, t, 12).position.set(-200, 3000, -900);                                // escape
-    for (const s of [-1, 1]) box(300, 200, 120, mat.lamp, 2360, 900, s * 900, t, false);
-    addTag({ text: "Camião de encomendas · a carregar paletes de limas no cais", at: () => V(RX + 7000, FLOOR + 4200, DZ), max: 40000 });
+    box(2300, 2400, 2500, M(0xb91c1c, 0.3, 0.4), 1150, 1850, 0, tractorG); box(1500, 1200, 2450, carGlass, 1550, 2350, 0, tractorG, false);
+    box(2000, 500, 2400, M(0x8b1a1a, 0.3, 0.5), 2250, 650, 0, tractorG); box(3600, 300, 2300, mat.dark, 1000, 300, 0, tractorG);
+    box(1200, 400, 2200, mat.dark, -300, 1100, 0, tractorG);                                      // prato de engate
+    for (const x of [-700, 1600]) for (const s of [-1, 1]) { const w = cyl(520, 380, mTyre, tractorG, 24); w.rotation.x = Math.PI / 2; w.position.set(x, 520, s * 1050); const r = cyl(300, 390, mRim, tractorG, 16); r.rotation.x = Math.PI / 2; r.position.set(x, 520, s * 1050); }
+    cyl(120, 1200, mat.alu, tractorG, 12).position.set(-200, 3150, -900); for (const s of [-1, 1]) box(300, 200, 120, mLamp, 2360, 1050, s * 900, tractorG, false);
+    const logoT = new THREE.Mesh(new THREE.PlaneGeometry(1600, 360), new THREE.MeshBasicMaterial({ map: signTex(1024, 256), transparent: true, toneMapped: false })); logoT.position.set(1150, 2900, 1260); tractorG.add(logoT);
   }
+  const palletSlot = (k) => V(-TL / 2 + 900 + k * 1250, 270, 0);
+  function addTruckPallet() {
+    const p = makePallet(0, 0); scene.remove(p.g); trailerG.add(p.g); p.g.position.copy(palletSlot(TRUCK.pallets.length)); p.g.rotation.y = Math.PI / 2; p.g.scale.set(0.8, 1, 0.8); stackLoad(p.g, 0, 140, 0, 700, mat.carton); TRUCK.pallets.push(p);
+  }
+  const DOCK_POSE = { x: DOCK_X - 400 + TL / 2, z: DZ, hd: 0 };                                  // reboque com a traseira 40 cm dentro da porta
+  function placeRig(tx, tz, hd, trHd = hd) {                                                      // posiciona pelo reboque (centro) e deduz o tractor pelo pino de engate
+    TRUCK.trailer.x = tx; TRUCK.trailer.z = tz; TRUCK.trailer.hd = trHd;
+    const hx = tx + Math.cos(trHd) * HITCH, hz = tz + Math.sin(trHd) * HITCH;                    // pino de engate
+    TRUCK.x = hx + Math.cos(hd) * 300; TRUCK.z = hz + Math.sin(hd) * 300; TRUCK.hd = hd;          // o prato do tractor está 30 cm à frente do pino (local x = −300)
+  }
+  function drawRig() {
+    trailerG.position.set(TRUCK.trailer.x, GY + 150, TRUCK.trailer.z); trailerG.rotation.y = -TRUCK.trailer.hd;
+    tractorG.position.set(TRUCK.x, GY + 150, TRUCK.z); tractorG.rotation.y = -TRUCK.hd;
+    for (const d of TRUCK.doors) d.rotation.y = d.userData.sz * (Math.PI * 0.95) * TRUCK.door;
+  }
+  for (let k = 0; k < 2; k++) addTruckPallet();
+  placeRig(DOCK_POSE.x, DOCK_POSE.z, 0); drawRig();
+  // percurso de saída (pelo tractor): sai do cais para +x, curva para +z ao longo do pátio, passa a barreira e sai do recinto
+  const EXIT = [[X + 17500, DZ + 300], [X + 19600, DZ + 3200], [X + 20000, DZ + 8000], [X + 20000, Z + 30000], [X + 20000, Z + 42000]];
+  function stepRig(dt) {
+    const T = TRUCK; T.t += dt;
+    if (T.state === "loading") {
+      T.door = Math.min(1, T.door + dt);
+      if (shipped > T.shippedAt && T.pallets.length < T.CAP) { T.shippedAt = shipped; addTruckPallet(); }
+      if (T.pallets.length >= T.CAP && T.t > 6) { T.state = "closing"; T.t = 0; }
+    } else if (T.state === "closing") {
+      T.door = Math.max(0, T.door - dt * 0.5);
+      if (T.door <= 0 && T.t > 3) { T.state = "leave"; T.t = 0; T.i = 0; }
+    } else if (T.state === "leave") {
+      const wp = EXIT[T.i]; if (!wp) { T.state = "gone"; T.t = 0; return; }
+      const dx = wp[0] - T.x, dz = wp[1] - T.z, dist = Math.hypot(dx, dz), want = Math.atan2(dz, dx);
+      let dh = ((want - T.hd) % (2 * Math.PI) + 3 * Math.PI) % (2 * Math.PI) - Math.PI; T.hd += Math.sign(dh) * Math.min(Math.abs(dh), 0.9 * dt);
+      const v = Math.min(dist, 1800 * dt); T.x += Math.cos(T.hd) * v; T.z += Math.sin(T.hd) * v;
+      if (dist < 2500 || T.i === EXIT.length - 1 && dist < 600) T.i++;
+      // reboque: o pino segue o tractor; o eixo do reboque fica a HITCH atrás do pino, na direcção do reboque (articulação)
+      const hx = T.x - Math.cos(T.hd) * 300, hz = T.z - Math.sin(T.hd) * 300;
+      const ax = T.trailer.x - Math.cos(T.trailer.hd) * (TL / 2 - 2900), az = T.trailer.z - Math.sin(T.trailer.hd) * (TL / 2 - 2900);   // eixo traseiro do reboque
+      const th = Math.atan2(hz - az, hx - ax); T.trailer.hd = th;
+      const L = HITCH + (TL / 2 - 2900); const nax = hx - Math.cos(th) * L, naz = hz - Math.sin(th) * L;
+      T.trailer.x = nax + Math.cos(th) * (TL / 2 - 2900); T.trailer.z = naz + Math.sin(th) * (TL / 2 - 2900);
+      T.barrier = Math.abs(T.z - (Z + 30000)) < 16000 ? Math.min(1, T.barrier + dt * 0.8) : Math.max(0, T.barrier - dt * 0.5);
+    } else if (T.state === "gone") {
+      T.barrier = Math.max(0, T.barrier - dt * 0.5);
+      if (T.t > 6) {   // novo camião vazio: aparece no pátio, alinhado com o cais, e recua em linha recta
+        for (const p of T.pallets) if (p) trailerG.remove(p.g); T.pallets.length = 0; T.loaded = 0; T.door = 0;
+        placeRig(DOCK_POSE.x + 9000, DZ, 0); T.state = "arrive"; T.t = 0;
+      }
+    } else if (T.state === "arrive") {
+      const left = TRUCK.trailer.x - DOCK_POSE.x; const v = Math.min(left, 1200 * dt); placeRig(TRUCK.trailer.x - v, DZ, 0);
+      if (left <= 1) { T.state = "loading"; T.t = 0; T.shippedAt = shipped; }
+    }
+    drawRig();
+  }
+  addSystem({ update(dt) { stepRig(dt); } });
+  addTag({ text: () => TRUCK.state === "loading" ? `Camião de encomendas · a carregar · ${TRUCK.pallets.length}/${TRUCK.CAP} paletes` : TRUCK.state === "closing" ? "Camião · a fechar as portas" : TRUCK.state === "leave" ? "Camião · a sair para entrega" : TRUCK.state === "arrive" ? "Camião vazio · a recuar para o cais" : "Cais livre", at: () => V(TRUCK.trailer.x, GY + 4200, TRUCK.trailer.z), max: 60000 });
+  TRUCK.add = addTruckPallet; window.__truck = TRUCK;
 
-  // ---------- portaria e vedação do recinto, árvores
+  // ---------- entrada única do recinto (muro sul): portão de correr para viaturas, barreira, portaria/recepção, árvores
   {
-    box(3000, 2800, 2600, mConc, X + 9000, GY + 1400, Z + 13000); box(2200, 1200, 60, M(0x254e7a, 0.6, 0.2, { transparent: true, opacity: 0.7 }), X + 9000, GY + 1700, Z + 14320, scene, false);
-    box(3400, 300, 3000, M(0x9aa0a6, 0.3, 0.6), X + 9000, GY + 2950, Z + 13000, scene, false);
-    const arm = box(6000, 120, 120, M(0xfbbf24, 0.2, 0.5), X + 4000, GY + 1100, Z + 13000); for (let i = 0; i < 5; i++) box(600, 124, 124, M(0xdc2626, 0.2, 0.5), X + 1500 + i * 1200, GY + 1100, Z + 13000, scene, false);
-    cyl(140, 1100, mat.dark, scene, 12).position.set(X + 7100, GY + 550, Z + 13000);
-    for (let x = -X - 14000; x <= X + 14000; x += 2500) { cyl(40, 2000, mat.dark, scene, 8).position.set(x, GY + 1000, Z + 15200); cyl(40, 2000, mat.dark, scene, 8).position.set(x, GY + 1000, -Z - 15200); }
-    for (const z of [-Z - 15200, Z + 15200]) box(2 * X + 28000, 1800, 20, M(0x4b5563, 0.2, 0.6, { transparent: true, opacity: 0.35, side: THREE.DoubleSide }), 0, GY + 1100, z, scene, false);
+    const gx = GATE.x, gz = ZS;
+    box(3400, 3000, 3000, mConc, gx - GATE.w / 2 - 2200, GY + 1500, gz - 1800);                                             // portaria / recepção
+    box(2600, 1300, 60, M(0x254e7a, 0.6, 0.2, { transparent: true, opacity: 0.7 }), gx - GATE.w / 2 - 2200, GY + 1800, gz - 280, scene, false);
+    box(1300, 1200, 60, M(0x254e7a, 0.6, 0.2, { transparent: true, opacity: 0.7 }), gx - GATE.w / 2 - 480, GY + 1800, gz - 1800, scene, false);   // janela para a via
+    box(3800, 300, 3400, M(0x9aa0a6, 0.3, 0.6), gx - GATE.w / 2 - 2200, GY + 3150, gz - 1800, scene, false);
+    const rs = new THREE.Mesh(new THREE.PlaneGeometry(3000, 700), new THREE.MeshBasicMaterial({ map: signTex(1024, 256), transparent: true, toneMapped: false })); rs.position.set(gx - GATE.w / 2 - 2200, GY + 3700, gz - 1800); scene.add(rs);
+    person(gx - GATE.w / 2 - 2200, GY, gz - 1800, 0, true, 0);                                                              // porteiro
+    for (const sx of [-1, 1]) box(500, 2800, 500, mCap, gx + sx * (GATE.w / 2 + 250), GY + 1400, gz, scene, false);          // pilares
+    const leaf = new THREE.Group(); leaf.position.set(gx + GATE.w / 2, GY, gz + 350); scene.add(leaf);                      // portão de correr (abre para +x, por trás do muro)
+    box(GATE.w, 2000, 80, M(0x374151, 0.6, 0.4), -GATE.w / 2, 1300, 0, leaf); for (let x = -GATE.w + 300; x < 0; x += 300) box(50, 1700, 50, M(0x1f2937, 0.6, 0.4), x, 1300, 50, leaf, false);
+    box(GATE.w, 120, 160, mCap, -GATE.w / 2, 2380, 0, leaf, false); for (const x of [-GATE.w + 400, -400]) { const w = cyl(120, 80, mat.black, leaf, 12); w.rotation.x = Math.PI / 2; w.position.set(x, 120, 0); }
+    box(GATE.w + 2000, 60, 200, mCap, gx + 1000, GY + 20, gz + 350, scene, false);                                           // carril
+    const armP = new THREE.Group(); armP.position.set(gx - GATE.w / 2 + 300, GY + 1100, gz - 5000); scene.add(armP);           // barreira a 5 m do portão, do lado de dentro
+    box(GATE.w - 1200, 120, 120, M(0xfbbf24, 0.2, 0.5), (GATE.w - 1200) / 2, 0, 0, armP); for (let i = 0; i < 5; i++) box(600, 124, 124, M(0xdc2626, 0.2, 0.5), 800 + i * 1400, 0, 0, armP, false);
+    cyl(140, 1100, mat.dark, scene, 12).position.set(gx - GATE.w / 2 + 300, GY + 550, gz - 5000);
+    addSystem({ draw() { armP.rotation.z = TRUCK.barrier * 1.45; leaf.position.x = gx + GATE.w / 2 + GATE.w * TRUCK.barrier; } });
+    addTag({ text: "Entrada única do recinto · portão de correr + barreira · portaria/recepção", at: () => V(gx, GY + 4800, gz - 1000), max: 80000 });
     const tree = (x, z, s = 1) => { cyl(90 * s, 1800 * s, M(0x5b3a1e, 0, 0.9), scene, 8).position.set(x, GY + 900 * s, z); const c = new THREE.Mesh(new THREE.SphereGeometry(1500 * s, 12, 10), M(0x3f7a33, 0, 0.9)); c.position.set(x, GY + 2900 * s, z); c.castShadow = true; scene.add(c); };
-    [[-18500, -11000, 1.1], [-9000, 12500, 1], [-13000, 12500, 1.2], [-20500, 13500, 1], [20000, -9000, 1], [16000, -12000, 1.1], [-4000, -12500, 1], [4000, -12500, 1.1]].forEach(([x, z, s]) => tree(x, z, s));
+    [[-18500, -11000, 1.1], [-16000, 20000, 1.2], [-20500, 27000, 1], [8000, 20500, 1.1], [14000, 27500, 1], [20000, -9000, 1], [16000, -12000, 1.1], [-4000, -12500, 1], [4000, -12500, 1.1]].forEach(([x, z, s]) => tree(x, z, s));
   }
 
   // ---------- cobertura: painéis solares fotovoltaicos na nave (duas águas) e no escritório; unidades exteriores dos AC inverter
@@ -202,8 +366,9 @@
 
   addTag({ text: "10 · Exterior · SACFILE", at: () => V(0, FLOOR + H + 3200, Z + 2500), min: 4000, max: 80000, big: true });
   addTag({ text: "Portaria · controlo de acessos", at: () => V(X + 9000, GY + 4200, Z + 13000), max: 40000 });
-  addView("ext", "Exterior", [38000, 12000, 30000], [0, 1500, 3000]);
+  addView("ext", "Exterior", [44000, 16000, 42000], [2000, 1500, 8000]);
   addView("office", "Escritório", [12000, 5000, 32000], [-2500, 3500, 16500]);
   addView("dock", "Cais · camião", [30000, 6000, 14000], [16000, 1200, 2200]);
+  addView("gate", "Portão · entrada", [X + 14000, 5000, Z + 42000], [X + 19000, 1000, Z + 30000]);
   window.__ext = true;
 }

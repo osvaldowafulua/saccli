@@ -118,16 +118,7 @@
     box(2600, 10, 3200, M(0x374151, 0.6, 0.6), DX - 1300, FLOOR + 145, DZ, scene, false);
     for (const s of [-1, 1]) box(300, 400, 400, mat.black, DX - 150, FLOOR + 350, DZ + s * 1300);   // batentes de borracha
     stripe(DX - 3200, DZ - 1700, DX - 3200, DZ + 1700, 100); stripe(DX - 3200, DZ - 1700, DX - 100, DZ - 1700, 100); stripe(DX - 3200, DZ + 1700, DX - 100, DZ + 1700, 100);
-    // traseira do semi-reboque (entra 1,4 m pela porta): caixa, portas abertas, pára-choques, luzes
-    const tr_ = new THREE.Group(); tr_.position.set(DX + 600, FLOOR + 150, DZ); scene.add(tr_);
-    box(2000, 2600, 2550, M(0xf1f1ee, 0.2, 0.5), 0, 1300, 0, tr_);                               // caixa do reboque (parte que se vê)
-    box(1990, 2560, 2500, M(0x1f2937, 0.1, 0.8), -10, 1300, 0, tr_);                              // interior escuro
-    box(1800, 120, 2500, M(0x4b5563, 0.3, 0.6), 0, 60, 0, tr_);                                    // piso do reboque
-    for (const s of [-1, 1]) { const d = box(60, 2500, 1250, M(0xe5e7eb, 0.2, 0.5), -1030, 1300, s * 1900, tr_); d.rotation.y = s * 0.15; }   // portas abertas
-    for (const s of [-1, 1]) box(40, 120, 160, mat.ledR, -1010, 2420, s * 1180, tr_, false);       // luzes traseiras
-    box(1600, 80, 2500, mat.dark, -1010, 300, 0, tr_);                                             // pára-choques
     // carga já dentro do reboque + paletes à espera no cais
-    for (const z of [-700, 700]) { const p = makePallet(0, 0); p.g.position.set(DX + 900, FLOOR + 270, DZ + z); p.g.rotation.y = Math.PI / 2; p.g.scale.set(0.8, 1, 0.8); stackLoad(p.g, 0, 140, 0, 700, mat.carton); }
     for (const [x, z] of [[DX - 2400, DZ - 1000], [DX - 2400, DZ + 1000], [DX - 3800, DZ - 1000]]) { const p = makePallet(0, 0); p.g.position.set(x, FLOOR, z); stackLoad(p.g, 0, 140, 0, 600, mat.carton); }
     const sg = new THREE.Mesh(new THREE.PlaneGeometry(2600, 500), new THREE.MeshBasicMaterial({ map: signTex("CAIS DE CARGA · 1", "Expedição de paletes · camião", "#b45309") }));
     sg.rotation.y = -Math.PI / 2; sg.position.set(DX - 20, FLOOR + 5300, DZ); scene.add(sg);

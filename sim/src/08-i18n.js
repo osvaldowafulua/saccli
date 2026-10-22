@@ -80,6 +80,10 @@ const I18N_EXACT = {
   "Sobe elástico, cede, alivia em linha recta: o que fica é a correção": "Rises elastically, yields, unloads in a straight line: what remains is the correction",
   "Perfil da lima (A → C)": "File profile (A → C)",
   // ---- 68-exterior.js
+  "Ocultar tudo": "Hide everything", "Mostrar painéis": "Show panels", "Portão · entrada": "Gate · entrance", "8 · Portão · entrada": "8 · Gate · entrance", "Entrada única do recinto · portão de correr + barreira · portaria/recepção": "Single site entrance · sliding gate + barrier · gatehouse/reception",
+  "Produção da lima": "File production", "Correcção SACCLI": "SACCLI correction", "Embalagem e expedição": "Packing and shipping", "Instalações e exterior": "Facilities and exterior",
+  "8 · Cais e portão": "8 · Dock and gate", "8 · Camião": "8 · Truck", "8 · Portão · saída": "8 · Gate · exit", "Portão · saída": "Gate · exit",
+  "Camião · a fechar as portas": "Truck · closing the doors", "Camião · a sair para entrega": "Truck · leaving for delivery", "Camião vazio · a recuar para o cais": "Empty truck · reversing to the dock", "Cais livre": "Dock free",
   "Painéis solares fotovoltaicos · nave e escritório": "Photovoltaic solar panels · hall and office", "Unidades exteriores · AC inverter calor/frio (6 × 50 kW)": "Outdoor units · inverter AC heating/cooling (6 × 50 kW)",
   "AZOTO LÍQUIDO": "LIQUID NITROGEN", "Tanque de azoto líquido · N₂ −196 °C · vaporizador": "Liquid nitrogen tank · N₂ −196 °C · vaporiser", "Poço de água subterrânea · bomba submersível · depósito 10 m³": "Groundwater well · submersible pump · 10 m³ tank",
   "Central de ar comprimido · compressor de parafuso 37 kW · secador · depósito 2000 L": "Compressed-air plant · 37 kW screw compressor · dryer · 2000 L receiver", "Utilidades exteriores": "Outdoor utilities", "10 · Utilidades": "10 · Utilities",
@@ -417,6 +421,7 @@ const I18N_EXACT = {
 
 // fragmentos para frases dinâmicas com números (substituição de sub-frases inteiras, da mais longa para a mais curta)
 const I18N_PHRASES = [
+  ["Camião de encomendas · a carregar · ", "Delivery truck · loading · "], [" paletes", " pallets"],
   ["Recepção · Sala de visitas de clientes", "Reception · Client visiting room"], ["Administração · HSA + RH · contabilidade · compras", "Administration · HSE + HR · accounting · purchasing"], ["Sala de reunião executiva · direcção", "Executive meeting room · management"],
   ["PISO 0 · ", "FLOOR 0 · "], ["PISO 1 · ", "FLOOR 1 · "], ["PISO 2 · ", "FLOOR 2 · "],
   ["Bigorna em apoio · ", "Anvil raised · "], ["A rodar a lima 180° · ", "Rotating the file 180° · "], ["A rodar a lima 90° · ", "Rotating the file 90° · "], ["Cinzel a descer · ", "Chisel lowering · "], ["A picar · ", "Cutting · "],

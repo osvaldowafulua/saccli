@@ -9,8 +9,7 @@ de aço, centrada na célula SACCLI de correcção automática de limas tortas.
 ## Documentação 3D (visita guiada)
 
 Na página, o botão **📖 Documentação 3D** abre uma visita guiada em 14 passos: a câmara voa até cada área e um painel
-explica o que acontece (em português ou inglês, conforme o botão **PT | EN**). Pode avançar passo a passo ou deixar em
-**Automático**. Os botões **Ver cada área** levam directamente a qualquer estação, e a velocidade da linha ajusta-se
+explica o que acontece (em português ou inglês, conforme o botão **PT | EN**). Pode avançar passo a passo, deixar em **Automático** ou **Ocultar tudo** (tecla H) para uma apresentação limpa só com a narração. Os botões **Ver cada área** levam directamente a qualquer estação, e a velocidade da linha ajusta-se
 no painel de parâmetros (0,5× a 6×).
 
 ## O que a simulação mostra
@@ -27,7 +26,7 @@ no painel de parâmetros (0,5× a 6×).
 | 7 | Embalagem | KUKA KR DELTA → caixa verde (OK) / vermelha (NOK); robô delta passa as limas para caixas de cartão que fecham; cobot KUKA LBR iisy paletiza **3 × 4 × 2 = 24 caixas** por palete |
 | 8 | Expedição | AMR leva a palete; **KUKA KMF 1500P** (empilhador autónomo) arruma-a no armário de paletes; cais de carga com camião encostado à porta lateral |
 | 9 | Instalações | bloco compacto de contentores à esquerda da nave, só com as instalações de intervenção rápida: sala de almoço e manutenção (rés-do-chão), sala dos engenheiros e armazém de EPI (1.º andar com passadiço partilhado e uma única escada virada para o cais), WC, recepção logística e sala de limpeza na parede; zona de emergência (ponto de encontro, primeiros socorros, lava-olhos, extintores); portão sandwich na entrada; climatização por AC inverter calor/frio (cassetes de tecto, consolas nos contentores, unidades exteriores); relógio de turno com sirene e luzes de alarme ao almoço (12:00) e no fim do turno (17:00) |
-| 10 | Exterior | nave em painel sandwich com cobertura e letreiro luminoso **SACFILE** (letras vermelhas); escritório central em vidro e betão com 3 pisos (recepção + sala de visitas de clientes; administração, HSA + RH, contabilidade e compras; sala de reunião executiva); estacionamento, portaria com barreira, vedação; camião de encomendas (tractor + semi-reboque SACFILE) a carregar paletes no cais; painéis solares fotovoltaicos na nave e no escritório; utilidades: tanque de azoto líquido com vaporizador, poço de água subterrânea com depósito, central de ar comprimido |
+| 10 | Exterior | nave em painel sandwich com cobertura e letreiro luminoso **SACFILE** (letras vermelhas); escritório central em vidro e betão com 3 pisos (recepção + sala de visitas de clientes; administração, HSA + RH, contabilidade e compras; sala de reunião executiva); estacionamento, portaria com barreira, vedação; camião de encomendas articulado (tractor + semi-reboque SACFILE) que carrega 4 paletes no cais, fecha as portas, sai pela entrada única do recinto (portão de correr + barreira + portaria) e é substituído por um camião vazio; recinto totalmente murado; escritório com recepção, open-space, sala de reunião e pessoas; carros com carroçaria curva e verniz; estacionamento ao longo da avenida interna; painéis solares fotovoltaicos na nave e no escritório; utilidades: tanque de azoto líquido com vaporizador, poço de água subterrânea com depósito, central de ar comprimido |
 
 As caixas de entrada (azuis), OK (verdes) e NOK (vermelhas) circulam em ciclo fechado: enchem, avançam,
 esvaziam e voltam vazias pelos corredores de retorno.
