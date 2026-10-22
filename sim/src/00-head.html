@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="pt">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SACCLI · Linha de correção 3D</title>
+<style>
+  :root {
+    --bg: #0b1324; --panel: rgba(14, 24, 44, 0.88); --line: rgba(120, 160, 220, 0.18);
+    --ink: #e6edf7; --dim: #8fa3c0; --blue: #6aa8ff; --green: #4ade80; --orange: #f59e42; --red: #ef5350;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; background: var(--bg); color: var(--ink); font: 13px/1.4 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; overflow: hidden; }
+  #view { position: fixed; inset: 0; }
+  .panel { position: fixed; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; backdrop-filter: blur(8px); padding: 12px 14px; }
+  .hidden { display: none !important; }
+  h1 { font-size: 15px; margin: 0 0 2px; letter-spacing: .02em; }
+  h2 { font-size: 11px; margin: 12px 0 6px; color: var(--dim); text-transform: uppercase; letter-spacing: .08em; font-weight: 600; }
+  .sub { color: var(--dim); font-size: 12px; }
+  #hud { top: 14px; left: 14px; width: 330px; max-height: calc(100vh - 300px); overflow: auto; }
+  #ctrl { top: 14px; right: 14px; width: 320px; max-height: calc(100vh - 480px); min-height: 160px; overflow: auto; }
+  #charts { bottom: 14px; right: 14px; width: 320px; }
+  #motors { bottom: 14px; left: 14px; width: 330px; }
+  .phase { display: flex; align-items: center; gap: 8px; margin-top: 10px; font-weight: 600; }
+  .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--blue); flex: none; }
+  .order { margin-top: 8px; padding: 7px 9px; border-radius: 8px; background: rgba(106, 168, 255, .1); border: 1px solid rgba(106, 168, 255, .3); font-size: 12px; }
+  .order b { color: var(--blue); }
+  .grid { display: grid; grid-template-columns: 1fr auto; gap: 3px 10px; margin-top: 8px; font-variant-numeric: tabular-nums; }
+  .grid span:nth-child(odd) { color: var(--dim); }
+  .grid span:nth-child(even) { text-align: right; }
+  .big { font-size: 20px; font-weight: 700; }
+  .meter { height: 8px; border-radius: 4px; background: rgba(255,255,255,.08); position: relative; margin: 6px 0 2px; overflow: hidden; }
+  .meter i { position: absolute; left: 0; top: 0; bottom: 0; background: var(--orange); border-radius: 4px; }
+  .meter u { position: absolute; top: -2px; bottom: -2px; width: 2px; background: var(--green); }
+  .meter-l { display: flex; justify-content: space-between; font-size: 10px; color: var(--dim); }
+  label.s { display: grid; grid-template-columns: 1fr auto; gap: 2px 8px; margin: 7px 0; font-size: 12px; }
+  label.s input, label.s select { grid-column: 1 / -1; width: 100%; accent-color: var(--blue); }
+  label.s select { background: #18284a; color: var(--ink); border: 1px solid var(--line); border-radius: 6px; padding: 4px; font: inherit; }
+  label.s b { font-weight: 600; font-variant-numeric: tabular-nums; color: var(--blue); }
+  .res { display: grid; grid-template-columns: 1fr auto; gap: 3px 10px; font-variant-numeric: tabular-nums; font-size: 12px; }
+  .res span:nth-child(odd) { color: var(--dim); }
+  .res span:nth-child(even) { text-align: right; }
+  .res .hl { color: var(--orange); font-weight: 700; }
+  .res .sec { grid-column: 1 / -1; color: var(--ink); font-weight: 600; margin-top: 6px; }
+  .btns { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; }
+  button { background: #18284a; color: var(--ink); border: 1px solid var(--line); border-radius: 8px; padding: 6px 10px; font: inherit; cursor: pointer; }
+  button:hover { background: #22365f; }
+  button.primary { background: #2f6fdc; border-color: #2f6fdc; }
+  .note { font-size: 11px; color: var(--dim); margin-top: 8px; }
+  .bad { color: var(--red); }
+  .good { color: var(--green); }
+  canvas.chart { width: 100%; height: 140px; display: block; background: rgba(0,0,0,.18); border-radius: 8px; }
+  .mgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 8px; }
+  .m { border: 1px solid rgba(143,163,192,.3); border-radius: 8px; padding: 5px 8px; font-variant-numeric: tabular-nums; font-size: 12px; }
+  .m b { display: block; font-size: 11px; color: var(--dim); font-weight: 600; }
+  .m.push { border-color: var(--orange); box-shadow: 0 0 12px rgba(245, 158, 66, .35); }
+  .m.hold { border-color: var(--blue); }
+  .m.over { border-color: var(--red); box-shadow: 0 0 12px rgba(239, 83, 80, .4); }
+  .tag { position: fixed; pointer-events: none; font-size: 11px; color: var(--ink); background: rgba(10, 18, 34, .8); border: 1px solid var(--line); padding: 2px 7px; border-radius: 6px; white-space: nowrap; transform: translate(-50%, -100%); }
+  .tag.big { font-size: 12px; font-weight: 600; background: rgba(31, 95, 214, .85); }
+  .legend { height: 8px; border-radius: 4px; margin-top: 8px; background: linear-gradient(90deg, #2f6fdc 0%, #3b82f6 33%, #facc15 45%, #f97316 66%, #ef4444 100%); }
+  .legend-l { display: flex; justify-content: space-between; font-size: 10px; color: var(--dim); }
+  @media (max-width: 900px) { #ctrl, #charts, #motors { display: none; } #hud { width: calc(100% - 28px); } }
+</style>
+</head>
+<body>
+<div id="view"></div>
+
+<div id="hud" class="panel">
+  <h1>SACCLI · Linha de correção de limas</h1>
+  <div class="sub">0 barras → 1 laminagem → 2 picagem → 3 têmpera → 4 dureza → 5 jateamento → 6 SACCLI (scanner 1 manda · 2 pares seguram, 1 corrige · scanner 2 controla) → 7 embalagem + palete → 8 expedição AMR</div>
+  <div class="phase"><span class="dot" id="phaseDot"></span><span id="phase">—</span></div>
+  <div class="order" id="order">À espera da primeira lima…</div>
+  <div class="grid">
+    <span>Lima</span><span id="limaId">—</span>
+    <span>Erro medido (scanner 1)</span><span id="eMeas">—</span>
+    <span>Força no actuador</span><span id="force" class="big">0 N</span>
+    <span>Flecha medida (scanner 2)</span><span id="defl">—</span>
+    <span>Tensão na secção crítica</span><span id="stress">—</span>
+  </div>
+  <div class="meter"><i id="mFill"></i><u id="mTarget"></u></div>
+  <div class="meter-l"><span>retorno previsto δ − F/K: <b id="pred">—</b></span><span>alvo <b id="target">—</b></span></div>
+  <div class="grid">
+    <span>Passagem</span><span id="pass">—</span>
+    <span>Erro final medido (scanner 2)</span><span id="eFinal">—</span>
+    <span>Erro real (simulação)</span><span id="eTrue">—</span>
+    <span>Só com força fixa (malha aberta)</span><span id="eOpen">—</span>
+    <span>OK / NOK / paletes expedidas</span><span id="counts">0 / 0 / 0</span>
+  </div>
+  <div class="legend"></div>
+  <div class="legend-l"><span>azul = dentro da tolerância</span><span>vermelho = fora / tensão alta</span></div>
+  <div class="btns">
+    <button class="primary" id="play">❚❚ Pausa</button>
+    <button id="viewFab">Fábrica</button>
+    <button id="viewCell">Célula</button>
+    <button id="viewMod">Módulo</button>
+    <button id="viewExp">Expedição</button>
+    <button id="viewTop">Topo</button>
+    <button id="panels">Painéis</button>
+  </div>
+  <div class="btns" id="stationViews"></div>
+  <div class="note">Arraste para rodar · roda para zoom · botão direito para mover · espaço pausa.</div>
+</div>
+
+<div id="ctrl" class="panel">
+  <h1>Parâmetros</h1>
+  <div class="sub">Tudo é recalculado ao mexer.</div>
+  <div class="btns" style="margin-top:6px">
+    <button id="preSaccli">Tolerância SACCLI 0,05 mm</button>
+    <button id="preMicro">0,5 µm</button>
+  </div>
+  <h2>Lima</h2>
+  <label class="s">Espessura h (direção da correção) <b id="vH"></b><input id="h" type="range" min="2" max="16" step="0.5" value="10"></label>
+  <label class="s">Largura b <b id="vB"></b><input id="b" type="range" min="4" max="40" step="1" value="25"></label>
+  <label class="s">Distância A–B = B–C <b id="vA"></b><input id="a" type="range" min="40" max="160" step="5" value="100"></label>
+  <h2>Aço temperado</h2>
+  <label class="s">Cedência nominal σy (≈55 HRC) <b id="vSy"></b><input id="sy" type="range" min="1200" max="2200" step="25" value="1800"></label>
+  <label class="s">Variação de σy entre limas <b id="vVar"></b><input id="var" type="range" min="0" max="15" step="1" value="8"></label>
+  <label class="s">Módulo de elasticidade E <b id="vE"></b><input id="E" type="range" min="190" max="215" step="1" value="210"></label>
+  <h2>Máquina</h2>
+  <label class="s">Força máx. do actuador de correção <b id="vCap"></b><input id="cap" type="range" min="50" max="40000" step="50" value="20000"></label>
+  <div class="btns" style="margin-top:0"><button id="capNeed">Força necessária</button><button id="cap250">250 N em tudo</button></div>
+  <label class="s">Aperto dos pares que seguram (guia linear) <b id="vClamp"></b><input id="clamp" type="range" min="50" max="2000" step="50" value="250"></label>
+  <label class="s">Sensor dos scanners
+    <select id="sensor"><option value="ljs">Keyence LJ-S640 · repetibilidade Z 10 µm</option><option value="hp">Sensor de alta precisão · 0,1 µm</option></select></label>
+  <h2>Produção</h2>
+  <label class="s">Têmpera por indução: temperatura <b id="vIndT"></b><input id="indT" type="range" min="800" max="1250" step="10" value="1200"></label>
+  <label class="s">Choque térmico em água: duração <b id="vQuenchT"></b><input id="quenchT" type="range" min="0.1" max="1.5" step="0.05" value="0.3"></label>
+  <label class="s">Acabamento do jateamento
+    <select id="finish"><option value="shot">Granalha seca · cinza mate especial</option><option value="wet">Jato húmido (líquido) · cinza metálico</option></select></label>
+  <label class="s">Limas que já chegam direitas <b id="vStraight"></b><input id="straight" type="range" min="0" max="100" step="5" value="40"></label>
+  <label class="s">Erro máx. das limas tortas <b id="vE0"></b><input id="e0" type="range" min="1" max="1000" step="1" value="500"></label>
+  <label class="s">Tolerância <b id="vTol"></b><input id="tol" type="range" min="0.5" max="200" step="0.5" value="50"></label>
+  <label class="s">Ampliação visual do erro <b id="vExag"></b><input id="exag" type="range" min="1" max="3000" step="1" value="15"></label>
+  <label class="s">Velocidade <b id="vSpeed"></b><input id="speed" type="range" min="0.25" max="4" step="0.25" value="1"></label>
+  <h2>Resultado do modelo (lima nominal)</h2>
+  <div class="res" id="res"></div>
+  <div class="note" id="explain"></div>
+</div>
+
+<div id="motors" class="panel">
+  <h1>Módulos A1–C2 (dos dois lados da esteira)</h1>
+  <div class="sub"><span style="color:var(--blue)">azul segura (bloqueado)</span> · <span style="color:var(--orange)">laranja corrige</span> · <span style="color:var(--red)">vermelho acima do actuador</span></div>
+  <div class="mgrid" id="mgrid"></div>
+</div>
+
+<div id="charts" class="panel">
+  <h1>Força × flecha (scanner 2)</h1>
+  <div class="sub">Sobe elástico, cede, alivia em linha recta: o que fica é a correção</div>
+  <canvas class="chart" id="fd" width="560" height="280"></canvas>
+  <h2>Perfil da lima (A → C)</h2>
+  <canvas class="chart" id="prof" width="560" height="280"></canvas>
+</div>
+
