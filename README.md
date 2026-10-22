@@ -25,7 +25,8 @@ no painel de parâmetros (0,5× a 6×).
 | 5 | Jateamento | granalha (cinza mate) ou jato húmido (cinza metálico) |
 | 6 | **SACCLI** | scanner 1 Keyence LJ-S (fixo, lê a lima toda) decide onde está torta → 2 pares de módulos seguram (guias lineares 250 N, depois bloqueadas), 1 par corrige (kN) → scanner 2 controla em tempo real pela tensão (δ − F/K) → lima sai direita (azul = dentro da tolerância, vermelho = fora); limas direitas passam OK sem correcção |
 | 7 | Embalagem | KUKA KR DELTA → caixa verde (OK) / vermelha (NOK); robô delta passa as limas para caixas de cartão que fecham; cobot KUKA LBR iisy paletiza **3 × 4 × 2 = 24 caixas** por palete |
-| 8 | Expedição | AMR leva a palete; **KUKA KMF 1500P** (empilhador autónomo) arruma-a no armário de paletes |
+| 8 | Expedição | AMR leva a palete; **KUKA KMF 1500P** (empilhador autónomo) arruma-a no armário de paletes; cais de carga com camião encostado à porta lateral |
+| 9 | Instalações | em contentores modulares dentro da nave: administração, sala de almoço, HSA + RH, sala dos engenheiros, WC/balneários, armazém de EPI, sala de limpeza, recepção logística, manutenção; no 1.º andar (com passadiço e escada) a sala de reunião executiva e a sala de visitas de clientes; zona de emergência (ponto de encontro, primeiros socorros, lava-olhos, extintores); portão sandwich na entrada; ventilação (extractores de cobertura, HVLS, ventiladores de parede); relógio de turno com sirene e luzes de alarme ao almoço (12:00) e no fim do turno (17:00) |
 
 As caixas de entrada (azuis), OK (verdes) e NOK (vermelhas) circulam em ciclo fechado: enchem, avançam,
 esvaziam e voltam vazias pelos corredores de retorno.

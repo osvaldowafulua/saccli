@@ -79,7 +79,22 @@ const I18N_EXACT = {
   "Força × flecha (scanner 2)": "Force × deflection (scanner 2)",
   "Sobe elástico, cede, alivia em linha recta: o que fica é a correção": "Rises elastically, yields, unloads in a straight line: what remains is the correction",
   "Perfil da lima (A → C)": "File profile (A → C)",
-  // ---- 90-ui.js
+  // ---- 65-instalacoes.js
+  "9 · Instalações": "9 · Facilities", "9 · Cais e portão": "9 · Dock and gate", "9 · Instalações de apoio em contentores": "9 · Support facilities in containers", "9 · Cais de carga e portão sandwich": "9 · Loading dock and sandwich gate",
+  "SALA DE REUNIÃO EXECUTIVA": "EXECUTIVE MEETING ROOM", "1.º andar · direcção e gestão": "1st floor · management", "SALA DE VISITAS · CLIENTES": "CLIENT VISITING ROOM", "1.º andar · recepção de clientes e demonstrações": "1st floor · client reception and demonstrations",
+  "1.º andar · Sala de reunião executiva": "1st floor · Executive meeting room", "1.º andar · Sala de visitas de clientes": "1st floor · Client visiting room", "Ventilação · extractores de cobertura, HVLS e ventiladores de parede": "Ventilation · roof extractors, HVLS and wall fans",
+  "Corredor do KMF 1500P · 2,5 m livres (linha de segurança)": "KMF 1500P corridor · 2.5 m clear (safety line)", "Faixa do AMR · circulação livre": "AMR lane · keep clear", "Materiais e peças de reserva": "Materials and spare parts",
+  "ADMINISTRAÇÃO": "ADMINISTRATION", "Direcção · contabilidade · compras": "Management · accounting · purchasing", "SALA DE ALMOÇO": "CANTEEN", "Refeitório dos funcionários": "Staff dining room",
+  "HSA + RH": "HSE + HR", "Segurança, saúde, ambiente · recursos humanos": "Health, safety, environment · human resources", "SALA DOS ENGENHEIROS": "ENGINEERS' ROOM", "Engenharia · métodos · manutenção": "Engineering · methods · maintenance",
+  "WC": "WC", "Balneários · vestiários": "Showers · changing rooms", "ARMAZÉM DE EPI": "PPE STORE", "Capacetes · luvas · óculos · botas": "Helmets · gloves · goggles · boots",
+  "SALA DE LIMPEZA": "CLEANING ROOM", "Material e produtos de limpeza": "Cleaning equipment and products", "RECEPÇÃO LOGÍSTICA": "LOGISTICS RECEPTION", "Armazém de entrada · bobinas · consumíveis": "Inbound store · coils · consumables",
+  "MANUTENÇÃO": "MAINTENANCE", "Materiais e peças de reserva · oficina": "Materials and spare parts · workshop", "PONTO DE ENCONTRO": "ASSEMBLY POINT", "Zona de emergência · primeiros socorros": "Emergency zone · first aid", "Lava-olhos · extintores · maca": "Eyewash · extinguishers · stretcher",
+  "CAIS DE CARGA · 1": "LOADING DOCK · 1", "Expedição de paletes · camião": "Pallet shipping · truck", "ENTRADA · PORTÃO 1": "ENTRANCE · GATE 1", "Portão seccional de painel sandwich · 3,8 × 4,2 m": "Sectional sandwich-panel gate · 3.8 × 4.2 m",
+  "Turno 1 · 08:00–17:00 · almoço 12:00": "Shift 1 · 08:00–17:00 · lunch 12:00", "Produção": "Production", "ALMOÇO · PAUSA 60 MIN": "LUNCH · 60 MIN BREAK", "FIM DE TURNO": "END OF SHIFT", "EM PRODUÇÃO": "IN PRODUCTION",
+  "Administração · direcção, contabilidade, compras": "Administration · management, accounting, purchasing", "Sala de almoço dos funcionários": "Staff canteen", "HSA + Recursos Humanos": "HSE + Human Resources", "Sala dos engenheiros": "Engineers' room",
+  "WC · balneários": "WC · changing rooms", "Armazém de EPI": "PPE store", "Sala de limpeza · material de limpeza": "Cleaning room · cleaning equipment", "Recepção logística · armazém de entrada": "Logistics reception · inbound store",
+  "Manutenção · materiais e peças de reserva": "Maintenance · materials and spare parts", "Zona de emergência · ponto de encontro": "Emergency zone · assembly point", "Cais de carga · camião a carregar paletes de caixas": "Loading dock · truck loading pallets of cartons", "Entrada · portão sandwich": "Entrance · sandwich-panel gate",
+  "Sirene · ALMOÇO": "Siren · LUNCH", "Sirene · FIM DE TURNO": "Siren · END OF SHIFT",
   "Documentação 3D": "3D documentation", "Documentação 3D · passo": "3D documentation · step", "Anterior": "Previous", "Seguinte": "Next", "Recomeçar": "Restart",
   "Automático": "Auto-play", "Parar automático": "Stop auto-play", "Fechar": "Close", "Pausa": "Pause", "Continuar": "Resume", "1 · Molde de corte": "1 · Blanking die",
   "0 · Bobina de banda de aço": "0 · Steel strip coil", "1 · Laminagem — rolo de aço giratório": "1 · Rolling — rotating steel roll", "1 · Molde de corte — a forma da lima": "1 · Blanking die — the file shape",
@@ -238,6 +253,8 @@ const I18N_EXACT = {
   "Em espera · sem lima": "Idle · no file",
   "Bigorna em apoio · cinzel a descer": "Anvil raised · chisel lowering",
   "A picar · 1.º corte (65°)": "Cutting · 1st cut (65°)",
+  "face de cima": "top face", "face de baixo": "bottom face", "canto esquerdo": "left edge", "canto direito": "right edge", "Face": "Face", "(4 faces)": "(4 faces)",
+  "Passagem concluída · próxima face": "Pass complete · next face", "Picagem concluída · 4 faces": "Cutting complete · 4 faces", "picado bastardo · 10 dentes/cm · cinzel 12° · 4 faces, uma de cada vez": "bastard cut · 10 teeth/cm · chisel 12° · 4 faces, one at a time",
   "Cinzel a recuar": "Chisel retracting",
   "Linha em espera (caixa cheia)": "Line waiting (crate full)",
   "Picagem concluída": "Cutting complete",
@@ -388,6 +405,8 @@ const I18N_EXACT = {
 
 // fragmentos para frases dinâmicas com números (substituição de sub-frases inteiras, da mais longa para a mais curta)
 const I18N_PHRASES = [
+  ["Bigorna em apoio · ", "Anvil raised · "], ["A rodar a lima 180° · ", "Rotating the file 180° · "], ["A rodar a lima 90° · ", "Rotating the file 90° · "], ["Cinzel a descer · ", "Chisel lowering · "], ["A picar · ", "Cutting · "],
+  ["9 · Instalações de apoio (contentores) · ", "9 · Support facilities (containers) · "], ["Relógio de turno · ", "Shift clock · "],
   ["Aparas do corte · ", "Cutting scrap · "],
   // notas do painel de resultados (frases com números)
   ["O actuador de correção precisa de ~", "The correction actuator needs ~"], [" a lima só flete de forma elástica e volta torta.", " the file only bends elastically and springs back bent."], [". Com ", ". With "],

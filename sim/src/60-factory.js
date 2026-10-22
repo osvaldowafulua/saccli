@@ -43,7 +43,7 @@ function stackLoad(parent, x, y0, z, h, m) {
   for (let i = 0; i < nx; i++) for (let k = 0; k < nz; k++) for (let j = 0; j < ny; j++)
     box(cw - 14, ch - 8, cd - 14, m, x + (i - (nx - 1) / 2) * cw, y0 + j * ch + ch / 2, z + (k - (nz - 1) / 2) * cd, parent, false);
 }
-for (const [x, z] of [[-4600, 1600], [-3200, 1600]]) { const g = new THREE.Group(); g.position.set(x, FLOOR, z); scene.add(g); box(1200, 140, 1000, mat.wood, 0, 70, 0, g); stackLoad(g, 0, 140, 0, 700, mat.crate); }
+for (const [x, z] of [[-5800, -4600], [-4400, -4600]]) { const g = new THREE.Group(); g.position.set(x, FLOOR, z); scene.add(g); box(1200, 140, 1000, mat.wood, 0, 70, 0, g); stackLoad(g, 0, 140, 0, 700, mat.crate); }
 for (let i = 0; i < 6; i++) {
   const x = -7000 + i * 2800;
   for (const z of [-6600, -5600]) box(90, 4400, 90, mat.rackBlue, x, FLOOR + 2200, z);

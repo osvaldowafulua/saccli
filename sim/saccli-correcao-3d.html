@@ -369,7 +369,22 @@ const I18N_EXACT = {
   "Força × flecha (scanner 2)": "Force × deflection (scanner 2)",
   "Sobe elástico, cede, alivia em linha recta: o que fica é a correção": "Rises elastically, yields, unloads in a straight line: what remains is the correction",
   "Perfil da lima (A → C)": "File profile (A → C)",
-  // ---- 90-ui.js
+  // ---- 65-instalacoes.js
+  "9 · Instalações": "9 · Facilities", "9 · Cais e portão": "9 · Dock and gate", "9 · Instalações de apoio em contentores": "9 · Support facilities in containers", "9 · Cais de carga e portão sandwich": "9 · Loading dock and sandwich gate",
+  "SALA DE REUNIÃO EXECUTIVA": "EXECUTIVE MEETING ROOM", "1.º andar · direcção e gestão": "1st floor · management", "SALA DE VISITAS · CLIENTES": "CLIENT VISITING ROOM", "1.º andar · recepção de clientes e demonstrações": "1st floor · client reception and demonstrations",
+  "1.º andar · Sala de reunião executiva": "1st floor · Executive meeting room", "1.º andar · Sala de visitas de clientes": "1st floor · Client visiting room", "Ventilação · extractores de cobertura, HVLS e ventiladores de parede": "Ventilation · roof extractors, HVLS and wall fans",
+  "Corredor do KMF 1500P · 2,5 m livres (linha de segurança)": "KMF 1500P corridor · 2.5 m clear (safety line)", "Faixa do AMR · circulação livre": "AMR lane · keep clear", "Materiais e peças de reserva": "Materials and spare parts",
+  "ADMINISTRAÇÃO": "ADMINISTRATION", "Direcção · contabilidade · compras": "Management · accounting · purchasing", "SALA DE ALMOÇO": "CANTEEN", "Refeitório dos funcionários": "Staff dining room",
+  "HSA + RH": "HSE + HR", "Segurança, saúde, ambiente · recursos humanos": "Health, safety, environment · human resources", "SALA DOS ENGENHEIROS": "ENGINEERS' ROOM", "Engenharia · métodos · manutenção": "Engineering · methods · maintenance",
+  "WC": "WC", "Balneários · vestiários": "Showers · changing rooms", "ARMAZÉM DE EPI": "PPE STORE", "Capacetes · luvas · óculos · botas": "Helmets · gloves · goggles · boots",
+  "SALA DE LIMPEZA": "CLEANING ROOM", "Material e produtos de limpeza": "Cleaning equipment and products", "RECEPÇÃO LOGÍSTICA": "LOGISTICS RECEPTION", "Armazém de entrada · bobinas · consumíveis": "Inbound store · coils · consumables",
+  "MANUTENÇÃO": "MAINTENANCE", "Materiais e peças de reserva · oficina": "Materials and spare parts · workshop", "PONTO DE ENCONTRO": "ASSEMBLY POINT", "Zona de emergência · primeiros socorros": "Emergency zone · first aid", "Lava-olhos · extintores · maca": "Eyewash · extinguishers · stretcher",
+  "CAIS DE CARGA · 1": "LOADING DOCK · 1", "Expedição de paletes · camião": "Pallet shipping · truck", "ENTRADA · PORTÃO 1": "ENTRANCE · GATE 1", "Portão seccional de painel sandwich · 3,8 × 4,2 m": "Sectional sandwich-panel gate · 3.8 × 4.2 m",
+  "Turno 1 · 08:00–17:00 · almoço 12:00": "Shift 1 · 08:00–17:00 · lunch 12:00", "Produção": "Production", "ALMOÇO · PAUSA 60 MIN": "LUNCH · 60 MIN BREAK", "FIM DE TURNO": "END OF SHIFT", "EM PRODUÇÃO": "IN PRODUCTION",
+  "Administração · direcção, contabilidade, compras": "Administration · management, accounting, purchasing", "Sala de almoço dos funcionários": "Staff canteen", "HSA + Recursos Humanos": "HSE + Human Resources", "Sala dos engenheiros": "Engineers' room",
+  "WC · balneários": "WC · changing rooms", "Armazém de EPI": "PPE store", "Sala de limpeza · material de limpeza": "Cleaning room · cleaning equipment", "Recepção logística · armazém de entrada": "Logistics reception · inbound store",
+  "Manutenção · materiais e peças de reserva": "Maintenance · materials and spare parts", "Zona de emergência · ponto de encontro": "Emergency zone · assembly point", "Cais de carga · camião a carregar paletes de caixas": "Loading dock · truck loading pallets of cartons", "Entrada · portão sandwich": "Entrance · sandwich-panel gate",
+  "Sirene · ALMOÇO": "Siren · LUNCH", "Sirene · FIM DE TURNO": "Siren · END OF SHIFT",
   "Documentação 3D": "3D documentation", "Documentação 3D · passo": "3D documentation · step", "Anterior": "Previous", "Seguinte": "Next", "Recomeçar": "Restart",
   "Automático": "Auto-play", "Parar automático": "Stop auto-play", "Fechar": "Close", "Pausa": "Pause", "Continuar": "Resume", "1 · Molde de corte": "1 · Blanking die",
   "0 · Bobina de banda de aço": "0 · Steel strip coil", "1 · Laminagem — rolo de aço giratório": "1 · Rolling — rotating steel roll", "1 · Molde de corte — a forma da lima": "1 · Blanking die — the file shape",
@@ -528,6 +543,8 @@ const I18N_EXACT = {
   "Em espera · sem lima": "Idle · no file",
   "Bigorna em apoio · cinzel a descer": "Anvil raised · chisel lowering",
   "A picar · 1.º corte (65°)": "Cutting · 1st cut (65°)",
+  "face de cima": "top face", "face de baixo": "bottom face", "canto esquerdo": "left edge", "canto direito": "right edge", "Face": "Face", "(4 faces)": "(4 faces)",
+  "Passagem concluída · próxima face": "Pass complete · next face", "Picagem concluída · 4 faces": "Cutting complete · 4 faces", "picado bastardo · 10 dentes/cm · cinzel 12° · 4 faces, uma de cada vez": "bastard cut · 10 teeth/cm · chisel 12° · 4 faces, one at a time",
   "Cinzel a recuar": "Chisel retracting",
   "Linha em espera (caixa cheia)": "Line waiting (crate full)",
   "Picagem concluída": "Cutting complete",
@@ -678,6 +695,8 @@ const I18N_EXACT = {
 
 // fragmentos para frases dinâmicas com números (substituição de sub-frases inteiras, da mais longa para a mais curta)
 const I18N_PHRASES = [
+  ["Bigorna em apoio · ", "Anvil raised · "], ["A rodar a lima 180° · ", "Rotating the file 180° · "], ["A rodar a lima 90° · ", "Rotating the file 90° · "], ["Cinzel a descer · ", "Chisel lowering · "], ["A picar · ", "Cutting · "],
+  ["9 · Instalações de apoio (contentores) · ", "9 · Support facilities (containers) · "], ["Relógio de turno · ", "Shift clock · "],
   ["Aparas do corte · ", "Cutting scrap · "],
   // notas do painel de resultados (frases com números)
   ["O actuador de correção precisa de ~", "The correction actuator needs ~"], [" a lima só flete de forma elástica e volta torta.", " the file only bends elastically and springs back bent."], [". Com ", ". With "],
@@ -1853,14 +1872,14 @@ UP.blendFinish = (l, name, k) => {
 UP.guarantee = (l) => {
   if (l.slot >= 2) l.form = 1;                     // depois da laminagem: tira chata direita, calibrada
   if (l.slot >= 3) l.cut = true;                   // depois do molde de corte: silhueta de lima (afunilada, com espigão)
-  if (l.slot >= 6) l.teeth = 1;                    // depois da picagem: dentes em todo o comprimento
+  if (l.slot >= 6) { l.teeth = 1; l.teethF = [1, 1, 1, 1]; }   // depois da picagem: dentes em todo o comprimento, nas 4 faces
   if (l.slot >= 13 && l.finishName === "raw") { l.heat = 0; UP.blendFinish(l, "scale", 1); l.finishName = "scale"; }   // depois da têmpera
   if (l.slot >= 14) l.heat = 0;
   if (l.slot >= 17 && !l.tested) { l.tested = true; l.hrc = 58 + Math.random() * 4.5; }                              // depois da dureza
   if (l.slot >= 20 && l.finishName !== P.finish) { UP.blendFinish(l, P.finish, 1); l.finishName = P.finish; }          // depois do jateamento
 };
 UP.reset = (l) => {
-  l.form = 0; l.cut = false; l.teeth = 0; l.heat = 0; l.tested = false; l.hrc = 0; l.finishName = "raw";
+  l.form = 0; l.cut = false; l.teeth = 0; l.teethF = [0, 0, 0, 0]; l.heat = 0; l.tested = false; l.hrc = 0; l.finishName = "raw";
   l.color.set(UP.FINISH.raw.color); l.metal = UP.FINISH.raw.metal; l.rough = UP.FINISH.raw.rough;
 };
 
@@ -1911,10 +1930,12 @@ function makeUpLima(slot) {
   const tm = new THREE.MeshStandardMaterial({ map: upTeethTex, metalness: 0.85, roughness: 0.4, transparent: true, opacity: 0.9 });
   const bar = new THREE.Mesh(upGeo.bar, m), strip = new THREE.Mesh(upGeo.strip, m), blank = new THREE.Mesh(upGeo.blank, m), tang = new THREE.Mesh(upGeo.tang, m);
   const teethPlane = new THREE.Mesh(upGeo.teeth, tm); teethPlane.rotation.x = -Math.PI / 2;
+  const teethB = new THREE.Mesh(upGeo.teeth, tm); teethB.rotation.x = Math.PI / 2;                       // face de baixo
+  const teethL = new THREE.Mesh(upGeo.teeth, tm), teethR = new THREE.Mesh(upGeo.teeth, tm); teethR.rotation.y = Math.PI;   // cantos (faces laterais)
   const mark = new THREE.Mesh(new THREE.SphereGeometry(5, 10, 8), mat.ledG);
   for (const o of [bar, strip, blank, tang]) { o.castShadow = true; o.receiveShadow = true; }
-  g.add(bar, strip, blank, tang, teethPlane, mark);
-  const l = { g, m, tm, bar, strip, blank, tang, teethPlane, mark, slot, color: new THREE.Color(), metal: 0, rough: 0 };
+  g.add(bar, strip, blank, tang, teethPlane, teethB, teethL, teethR, mark);
+  const l = { g, m, tm, bar, strip, blank, tang, teethPlane, teethB, teethL, teethR, mark, slot, color: new THREE.Color(), metal: 0, rough: 0 };
   UP.reset(l);
   UP.limas.push(l);
   return l;
@@ -1933,9 +1954,13 @@ function drawUpLima(l) {
   l.strip.scale.set(1, 1 + (1 - l.form) * 1.4, 1); l.strip.position.set(30, 2 + (P.h * l.strip.scale.y) / 2, 0);
   l.blank.scale.set(1, 1 + (1 - l.form) * 1.4, 1); l.blank.position.set(0, 2 + (P.h * l.blank.scale.y) / 2, 0);
   l.tang.position.set(len / 2 + 30, 2 + P.h * 0.3, 0);
-  l.teethPlane.visible = !!l.cut && l.teeth > 0.01;
-  l.teethPlane.scale.set(Math.max(1, len * 0.85 * l.teeth), P.b * 0.8, 1);
-  l.teethPlane.position.set(-len / 2 + 10 + (len * 0.85 * l.teeth) / 2, 2 + P.h + 0.4, 0);
+  const tf = l.teethF || [l.teeth, 0, 0, 0];
+  l.teethPlane.visible = !!l.cut && tf[0] > 0.01;
+  l.teethPlane.scale.set(Math.max(1, len * 0.85 * tf[0]), P.b * 0.8, 1);
+  l.teethPlane.position.set(-len / 2 + 10 + (len * 0.85 * tf[0]) / 2, 2 + P.h + 0.4, 0);
+  l.teethB.visible = !!l.cut && tf[1] > 0.01; l.teethB.scale.set(Math.max(1, len * 0.85 * tf[1]), P.b * 0.8, 1); l.teethB.position.set(-len / 2 + 10 + (len * 0.85 * tf[1]) / 2, 2 - 0.4, 0);
+  l.teethL.visible = !!l.cut && tf[2] > 0.01; l.teethL.scale.set(Math.max(1, len * 0.85 * tf[2]), P.h * 0.8, 1); l.teethL.position.set(-len / 2 + 10 + (len * 0.85 * tf[2]) / 2, 2 + P.h / 2, P.b / 2 + 0.4);
+  l.teethR.visible = !!l.cut && tf[3] > 0.01; l.teethR.scale.set(Math.max(1, len * 0.85 * tf[3]), P.h * 0.8, 1); l.teethR.position.set(-len / 2 + 10 + (len * 0.85 * tf[3]) / 2, 2 + P.h / 2, -P.b / 2 - 0.4);
   upTeethTex.repeat.set(8, 1);
   l.mark.visible = l.tested; l.mark.position.set(len / 2 + 30, 2 + P.h * 0.6 + 5, 0);
   l.m.color.copy(l.color); l.m.metalness = l.metal; l.m.roughness = l.rough;
@@ -3193,29 +3218,49 @@ window.__UP = UP;
   // =================================================================
   // Ciclo de picagem
   // =================================================================
-  const st = { lima: null, s: -1, done: false, n: 0, strikes: 0 };
-  const cutAt = (s) => Math.max(0, Math.min(1, (s - 0.06) / 0.86));       // avanço do corte (= fracção de dentes)
-  const lowerAt = (s) => seg(s, 0, 0.06) * (1 - seg(s, 0.93, 0.99));     // cilindro de aproximação: 1 = cinzel solto sobre a lima
+  // A picagem faz-se nas 4 faces da lima — cima, baixo, canto esquerdo, canto direito — UMA DE CADA VEZ: a paragem
+  // divide-se em 4 passagens; entre passagens a lima roda (180° para a face de baixo, 90° para cada canto) e o cinzel
+  // volta a picar da ponta ao espigão. Dentro de cada passagem: q 0→0,12 rodar · 0,12→0,18 cinzel desce · 0,18→0,88 picar · 0,88→0,94 recua · 0,94→1 roda de volta (só na última)
+  const FACES = 4, ROT = [0, Math.PI, Math.PI / 2, -Math.PI / 2], FACE_NAME = ["face de cima", "face de baixo", "canto esquerdo", "canto direito"];
+  const st = { lima: null, s: -1, done: false, n: 0, strikes: 0, pass: 0, q: -1, ang: 0 };
+  const passOf = (s) => Math.min(FACES - 1, Math.floor(s * FACES));
+  const subOf = (s) => s * FACES - Math.floor(s * FACES);
+  const cutAt = (q) => Math.max(0, Math.min(1, (q - 0.18) / 0.70));      // avanço do corte na passagem (= fracção de dentes dessa face)
+  const lowerAt = (q) => seg(q, 0.12, 0.18) * (1 - seg(q, 0.88, 0.94)); // cilindro de aproximação: 1 = cinzel solto sobre a lima
+  const angleAt = (pass, q) => {
+    const from = pass === 0 ? 0 : ROT[pass - 1], to = ROT[pass];
+    let a = from + (to - from) * seg(q, 0, 0.12);
+    if (pass === FACES - 1) a = to + (0 - to) * seg(q, 0.94, 1);         // na última passagem a lima volta à posição normal
+    return a;
+  };
+  const halfY = (a, hh, bb) => Math.abs(Math.cos(a)) * hh / 2 + Math.abs(Math.sin(a)) * bb / 2;   // meia-altura da lima rodada
   const limaTopAt = (l, x) => {
     if (l.form < 0.5) return 2 + 1.6 * P.h;
-    const len = limaLen(), h = P.h * (1 + (1 - l.form) * 1.4), u = Math.max(0, Math.min(1, -(x - l.g.position.x) / (len / 2)));
-    return Math.max(2 + h - 0.15 * h * u * u + 0.3, 2 + P.h + 0.45);       // aresta do cinzel na frente da camada de dentes
+    const len = limaLen(), u = Math.max(0, Math.min(1, -(x - l.g.position.x) / (len / 2)));
+    const h = P.h * (1 - 0.15 * u * u), b = P.b * (1 - 0.42 * u * u);
+    return 2 + 2 * halfY(st.ang, h, b) + 0.45;                              // aresta do cinzel na frente da camada de dentes
   };
   const phaseText = (s, here) => {
     if (s < 0) return UP.phase === "move" ? "Carro a regressar · lima a avançar" : here ? "Em espera" : "Em espera · sem lima";
-    if (s < 0.06) return "Bigorna em apoio · cinzel a descer";
-    if (s < 0.92) return "A picar · 1.º corte (65°)";
-    if (s < 0.99) return "Cinzel a recuar";
-    return UP.waiting ? "Linha em espera (caixa cheia)" : "Picagem concluída";
+    const pass = passOf(s), q = subOf(s), face = FACE_NAME[pass];
+    if (q < 0.12) return (pass === 0 ? "Bigorna em apoio · " : `A rodar a lima ${pass === 1 ? "180°" : "90°"} · `) + face;
+    if (q < 0.18) return "Cinzel a descer · " + face;
+    if (q < 0.88) return `A picar · ${face} (${pass + 1}/4)`;
+    if (q < 0.94) return "Cinzel a recuar";
+    if (pass < FACES - 1) return "Passagem concluída · próxima face";
+    return UP.waiting ? "Linha em espera (caixa cheia)" : "Picagem concluída · 4 faces";
   };
   UP.addStation({
     slot: SLOT, name: "Picagem dos dentes",
     onDwell(l, s) {
       if (st.lima !== l) { st.lima = l; st.done = false; }
-      st.s = s;
-      l.teeth = cutAt(s);                                                // a camada de dentes cresce desde a ponta, atrás do cinzel
-      if (l.teeth >= 1 && !st.done) { st.done = true; st.n++; }
+      st.s = s; st.pass = passOf(s); st.q = subOf(s);
+      if (!l.teethF) l.teethF = [0, 0, 0, 0];
+      for (let k = 0; k < FACES; k++) l.teethF[k] = k < st.pass ? 1 : k === st.pass ? cutAt(st.q) : l.teethF[k];
+      l.teeth = l.teethF[0];
+      if (st.pass === FACES - 1 && l.teethF[3] >= 1 && !st.done) { st.done = true; st.n++; }
     },
+    onMove(l) { if (l) { l.g.rotation.x = 0; } st.ang = 0; },
   });
 
   // ---------- camada de dentes picados, por lima (como a marca de dureza da estação 4): a textura do núcleo tem
@@ -3227,29 +3272,37 @@ window.__UP = UP;
     const sk = 172, par = (x, wx, c) => { g.fillStyle = c; g.beginPath(); g.moveTo(x, 0); g.lineTo(x + wx, 0); g.lineTo(x + wx + sk, h); g.lineTo(x + sk, h); g.closePath(); g.fill(); };
     for (let k = -1; k <= 0; k++) for (let i = 0; i < 4; i++) { const x = i * 64 + k * 256; par(x, 22, "#32383f"); par(x + 22, 12, "#f1f5f9"); par(x + 34, 10, "#cfd5dc"); }
   });
-  const buildOv = () => {
+  // uma camada por face: 0 cima (y+), 1 baixo (y−), 2 canto esquerdo (z+), 3 canto direito (z−)
+  const buildOv = (face) => {
     const len = limaLen(), x0 = -len / 2 + 10, L = len * 0.85;
     const g = new THREE.PlaneGeometry(1, 1, NSEG, 1), p = g.attributes.position, uv = g.attributes.uv, n = g.attributes.normal;
     for (let i = 0; i < p.count; i++) {
-      const xs = x0 + (p.getX(i) + 0.5) * L, u = Math.max(0, -xs / (len / 2)), f = 1 - 0.42 * u * u;
-      p.setXYZ(i, xs, 2 + P.h + 0.75, -p.getY(i) * P.b * 0.8 * f); uv.setX(i, (xs - x0) / PITCH_T); n.setXYZ(i, 0, 1, 0);
+      const xs = x0 + (p.getX(i) + 0.5) * L, u = Math.max(0, -xs / (len / 2)), f = 1 - 0.42 * u * u, hg = 1 - 0.15 * u * u, t = p.getY(i);
+      if (face === 0) { p.setXYZ(i, xs, 2 + P.h * hg + 0.75, -t * P.b * 0.8 * f); n.setXYZ(i, 0, 1, 0); }
+      else if (face === 1) { p.setXYZ(i, xs, 2 - 0.75, t * P.b * 0.8 * f); n.setXYZ(i, 0, -1, 0); }
+      else if (face === 2) { p.setXYZ(i, xs, 2 + P.h * hg / 2 + t * P.h * 0.8 * hg, (P.b / 2) * f + 0.75); n.setXYZ(i, 0, 0, 1); }
+      else { p.setXYZ(i, xs, 2 + P.h * hg / 2 - t * P.h * 0.8 * hg, -(P.b / 2) * f - 0.75); n.setXYZ(i, 0, 0, -1); }
+      uv.setX(i, (xs - x0) / PITCH_T);
     }
     g.computeBoundingSphere(); return g;
   };
-  let ovKey = "", ovFull = null, ovPart = null;
-  const ovs = UP.limas.map((l) => {
+  let ovKey = "", ovFull = [], ovPart = [];
+  const ovs = UP.limas.map((l) => [l, [0, 1, 2, 3].map(() => {
     const o = new THREE.Mesh(undefined, M(0xffffff, 0.85, 0.5, { map: cutTex, polygonOffset: true, polygonOffsetFactor: -1, polygonOffsetUnits: -1 }));
-    o.visible = false; o.receiveShadow = true; l.g.add(o); return [l, o];
-  });
+    o.visible = false; o.receiveShadow = true; l.g.add(o); return o;
+  })]);
   function drawTeeth() {
     const key = `${limaLen()}|${P.h}|${P.b}`;
-    if (key !== ovKey) { ovKey = key; if (ovFull) { ovFull.dispose(); ovPart.dispose(); } ovFull = buildOv(); ovPart = buildOv(); }
-    for (const [l, o] of ovs) {
-      const on = l.form >= 0.5 && l.teeth > 0.004; o.visible = on; if (!on) continue;
-      if (l.teeth >= 0.999) o.geometry = ovFull;
-      else { o.geometry = ovPart; ovPart.setDrawRange(0, 6 * Math.max(1, Math.floor(l.teeth * NSEG + 1e-4))); }
-      const m = o.material; m.color.copy(l.color); m.metalness = l.metal; m.roughness = Math.min(1, l.rough + 0.18);
-      m.emissive.copy(l.m.emissive); m.emissiveIntensity = l.m.emissiveIntensity;
+    if (key !== ovKey) { ovKey = key; for (const g of ovFull.concat(ovPart)) g.dispose(); ovFull = [0, 1, 2, 3].map(buildOv); ovPart = [0, 1, 2, 3].map(buildOv); }
+    for (const [l, os] of ovs) {
+      const tf = l.teethF || [l.teeth, 0, 0, 0];
+      for (let k = 0; k < 4; k++) {
+        const o = os[k], t = tf[k], on = l.form >= 0.5 && t > 0.004; o.visible = on; if (!on) continue;
+        if (t >= 0.999) o.geometry = ovFull[k];
+        else { o.geometry = ovPart[k]; ovPart[k].setDrawRange(0, 6 * Math.max(1, Math.floor(t * NSEG + 1e-4))); }
+        const m = o.material; m.color.copy(l.color); m.metalness = l.metal; m.roughness = Math.min(1, l.rough + 0.18);
+        m.emissive.copy(l.m.emissive); m.emissiveIntensity = l.m.emissiveIntensity;
+      }
     }
   }
 
@@ -3262,16 +3315,16 @@ window.__UP = UP;
     g.textAlign = "right"; g.fillStyle = "#a7c9b6"; g.font = "17px Arial, sans-serif"; g.fillText(tr("Limas picadas: ") + st.n, HW - 14, 22);
     g.textAlign = "left"; g.fillStyle = "#7f9a8c"; g.font = "600 14px Arial, sans-serif"; g.fillText(tr("GOLPES / MIN"), 16, 62);
     g.fillStyle = engaged ? "#ffffff" : "#56695f"; g.font = "700 56px Menlo, Consolas, monospace"; g.fillText(engaged ? String(gpm) : "0", 16, 104);
-    g.fillStyle = s >= 0 && s < 0.99 ? "#fbbf24" : "#8fa79a"; g.font = "600 16px Arial, sans-serif"; g.fillText(tr(phaseText(s, !!UP.limaAt(SLOT))), 16, 146);
+    g.fillStyle = s >= 0 && s < 0.99 ? "#fbbf24" : "#8fa79a"; g.font = "600 16px Arial, sans-serif"; g.fillText(tr(phaseText(s, !!UP.limaAt(SLOT))).replace(/face de cima|face de baixo|canto esquerdo|canto direito/, (w) => tr(w)), 16, 146);
     // tabela à direita
-    const rows = [[tr("Carro X"), `${(c * limaLen() * 0.85).toFixed(1)} mm`], [tr("Cinzel"), engaged && s > 0.06 && s < 0.92 ? tr("a bater") : tr("recolhido")],
+    const rows = [[tr("Carro X"), `${(c * limaLen() * 0.85).toFixed(1)} mm`], [tr("Cinzel"), engaged && st.q > 0.18 && st.q < 0.88 ? tr("a bater") : tr("recolhido")], [tr("Face"), s >= 0 ? `${st.pass + 1}/4 · ` + tr(FACE_NAME[st.pass]) : "—"],
       [tr("Bigorna"), anvUp ? tr("em apoio") : tr("em baixo")], [tr("Óleo de corte"), engaged ? tr("névoa ON") : tr("OFF")], [tr("Golpes"), String(st.strikes)]];
     rows.forEach(([k, v], i) => {
       const y = 64 + i * 22; g.fillStyle = "#7f9a8c"; g.font = "15px Arial, sans-serif"; g.textAlign = "left"; g.fillText(k, 300, y);
       g.fillStyle = "#dfe9e3"; g.font = "600 15px Arial, sans-serif"; g.textAlign = "right"; g.fillText(v, HW - 14, y);
     });
     // lima esquemática (vista de cima) com os dentes picados até à frente do cinzel
-    g.textAlign = "left"; g.fillStyle = "#7f9a8c"; g.font = "600 14px Arial, sans-serif"; g.fillText(tr("DENTES PICADOS · ") + Math.round(c * 100) + " %", 16, 182);
+    g.textAlign = "left"; g.fillStyle = "#7f9a8c"; g.font = "600 14px Arial, sans-serif"; g.fillText(tr("DENTES PICADOS · ") + Math.round(c * 100) + " % " + tr("(4 faces)"), 16, 182);
     const x0 = 22, x1 = 430, ym = 238, hw = 26, xt = x1 + 62;
     const yAt = (x) => { const u = Math.max(0, (x0 + 210 - x) / 210); return hw * (1 - 0.42 * u * u); };
     g.beginPath(); g.moveTo(x0, ym - yAt(x0)); for (let x = x0; x <= x1; x += 6) g.lineTo(x, ym - yAt(x)); g.lineTo(x1, ym + yAt(x1));
@@ -3284,7 +3337,7 @@ window.__UP = UP;
     g.restore();
     if (s >= 0 && s < 0.99) { g.strokeStyle = "#fbbf24"; g.lineWidth = 3; g.beginPath(); g.moveTo(xc, ym - hw - 10); g.lineTo(xc + 10, ym + hw + 10); g.stroke(); }
     g.fillStyle = "#6b7f74"; g.font = "13px Arial, sans-serif"; g.fillText(tr("ponta"), x0, 290); g.textAlign = "right"; g.fillText(tr("espigão"), xt, 290);
-    g.textAlign = "left"; g.fillStyle = "#8fa79a"; g.fillText(tr("picado bastardo · 10 dentes/cm · cinzel 12°"), 110, 306);
+    g.textAlign = "left"; g.fillStyle = "#8fa79a"; g.fillText(tr("picado bastardo · 10 dentes/cm · cinzel 12° · 4 faces, uma de cada vez"), 110, 306);
     hmiTex.needsUpdate = true;
   }
 
@@ -3311,14 +3364,19 @@ window.__UP = UP;
       if (UP.phase === "move" && prevPhase !== "move") carXm = carX;
       prevPhase = UP.phase;
       const s = active ? st.s : -1;
-      let c = 0, lower = 0;
-      if (active) { c = cutAt(s); lower = lowerAt(s); carX = xs + (xe - xs) * c; }
-      else if (UP.phase === "move") carX = carXm + (xs - carXm) * UP.shift;   // regresso do carro durante o avanço
+      let c = 0, lower = 0, cf = 0;
+      if (active) {
+        cf = cutAt(st.q); lower = lowerAt(st.q); carX = xs + (xe - xs) * cf; c = (st.pass + cf) / FACES;
+        // a lima roda para a face a picar ficar em cima; fica sempre apoiada na bigorna (centro recalculado)
+        st.ang = angleAt(st.pass, st.q);
+        const cy = 2 + P.h / 2, hy = halfY(st.ang, P.h, P.b);
+        here.g.rotation.x = st.ang; here.g.position.y = UP.TOP + 2 + hy - cy * Math.cos(st.ang); here.g.position.z = Z0 - cy * Math.sin(st.ang);
+      } else { st.ang = 0; if (UP.phase === "move") carX = carXm + (xs - carXm) * UP.shift; }   // regresso do carro durante o avanço
       carG.position.x = carX;
       updateChain(carX + 60);
       drawTeeth();
       // volante sempre a rodar; a came só com a embraiagem engatada (há lima e o cinzel está em baixo)
-      const engaged = active && s > 0.015 && s < 0.985; engagedNow = engaged;
+      const engaged = active && st.q > 0.10 && st.q < 0.95; engagedNow = engaged;
       fly += TAU * REV * dtv; if (engaged) theta += TAU * REV * dtv;
       flyG.rotation.x = fly; camG.rotation.x = theta; pulley.rotation.x = fly * (250 / 54);
       const touch = active ? limaTopAt(here, carX) : 2 + P.h + 0.45;
@@ -3328,7 +3386,7 @@ window.__UP = UP;
       spring.position.y = tipY + 518; spring.scale.y = (706 - (tipY + 518)) / SPH;
       // golpe: o rolete cai do ressalto → o cinzel bate na lima
       const k = Math.floor((theta - Math.PI / 2) / (TAU / NLOB));
-      const cutting = engaged && lower > 0.98 && c > 0 && c < 1;
+      const cutting = engaged && lower > 0.98 && cf > 0 && cf < 1;
       if (k !== lastK) { if (cutting && dt > 0) { strike(carX, touch); st.strikes++; hitT = 0.06; } lastK = k; }
       hitT -= dt; setLamp(mHit, hitT > 0);
       // bigorna: sobe no início da paragem, desce antes do avanço
@@ -5453,7 +5511,7 @@ function stackLoad(parent, x, y0, z, h, m) {
   for (let i = 0; i < nx; i++) for (let k = 0; k < nz; k++) for (let j = 0; j < ny; j++)
     box(cw - 14, ch - 8, cd - 14, m, x + (i - (nx - 1) / 2) * cw, y0 + j * ch + ch / 2, z + (k - (nz - 1) / 2) * cd, parent, false);
 }
-for (const [x, z] of [[-4600, 1600], [-3200, 1600]]) { const g = new THREE.Group(); g.position.set(x, FLOOR, z); scene.add(g); box(1200, 140, 1000, mat.wood, 0, 70, 0, g); stackLoad(g, 0, 140, 0, 700, mat.crate); }
+for (const [x, z] of [[-5800, -4600], [-4400, -4600]]) { const g = new THREE.Group(); g.position.set(x, FLOOR, z); scene.add(g); box(1200, 140, 1000, mat.wood, 0, 70, 0, g); stackLoad(g, 0, 140, 0, 700, mat.crate); }
 for (let i = 0; i < 6; i++) {
   const x = -7000 + i * 2800;
   for (const z of [-6600, -5600]) box(90, 4400, 90, mat.rackBlue, x, FLOOR + 2200, z);
@@ -5469,6 +5527,260 @@ for (let i = 0; i < 6; i++) {
   }
 }
 
+
+// ----- 65-instalacoes.js -----
+// =====================================================================
+// Instalações de apoio dentro da nave, em contentores modulares (10' = 2991 mm, 20' = 6058 mm; 2438 × 2591):
+//   fila da frente (parede +z): Administração · Sala de almoço · HSA + RH · Sala dos engenheiros · portão sandwich
+//   parede −x: WC · Armazém de EPI · Sala de limpeza        atrás da linha: Recepção logística · Zona de emergência · Manutenção
+//   cais de carga (porta da parede +x): camião encostado ao cais, paletes de caixas prontas
+//   relógio de turno com sirene e luzes de alarme (almoço e fim de turno)
+// =====================================================================
+{
+  const CD = 2438, CH = 2591, L10 = 2991, L20 = 6058, TAU_ = Math.PI * 2;
+  const corr = canvasTex(256, 128, (g, w, h) => {                       // chapa canelada
+    g.fillStyle = "#e9ebee"; g.fillRect(0, 0, w, h);
+    for (let x = 0; x < w; x += 32) { g.fillStyle = "#d6d9de"; g.fillRect(x, 0, 10, h); g.fillStyle = "#f4f5f7"; g.fillRect(x + 10, 0, 6, h); }
+  }, [1, 1]);
+  const wallMat = (c) => { const t = corr.clone(); t.needsUpdate = true; return M(c, 0.15, 0.6, { map: t }); };
+  const mPost = M(0x3b4148, 0.4, 0.5), mDoor = M(0x2f3b4a, 0.3, 0.5), mFrame = M(0xe8eaed, 0.4, 0.4), mAC = M(0xd9dcdf, 0.3, 0.5);
+  const signTex = (label, sub, band) => canvasTex(512, 128, (g, w, h) => {
+    g.fillStyle = "#f6f7f9"; g.fillRect(0, 0, w, h); g.fillStyle = band; g.fillRect(0, 0, 14, h);
+    g.fillStyle = "#15202e"; g.font = "700 40px Arial"; g.fillText(tr(label), 32, 58);
+    g.fillStyle = "#5b6b7d"; g.font = "24px Arial"; g.fillText(tr(sub), 32, 98);
+  });
+  // contentor: cx, cz = centro; len ao longo do eixo local x; rot = rotação em y; a frente (porta/janelas) é a face local +z
+  function container(cx, cz, len, rot, label, sub, color, band, opts = {}) {
+    const level = opts.level || 0;                                                     // 1 = contentor em cima de outro (1.º andar)
+    const g = new THREE.Group(); g.position.set(cx, FLOOR + level * (CH + 70), cz); g.rotation.y = rot; scene.add(g);
+    const wm = wallMat(color); wm.map.repeat.set(len / 400, 1);
+    box(len, CH, CD, wm, 0, CH / 2, 0, g);
+    for (const sx of [-1, 1]) for (const sz of [-1, 1]) box(140, CH + 20, 140, mPost, sx * (len / 2 - 70), CH / 2 + 10, sz * (CD / 2 - 70), g);
+    box(len + 30, 70, CD + 30, mPost, 0, CH + 35, 0, g);
+    box(len + 30, 70, CD + 30, mPost, 0, 35, 0, g);
+    const F = CD / 2 + 2;
+    const dx = opts.door ?? -len / 2 + 700;
+    box(900, 2050, 50, mDoor, dx, 1025, F + 20, g);                                   // porta
+    box(60, 2100, 70, mFrame, dx - 470, 1050, F + 20, g); box(60, 2100, 70, mFrame, dx + 470, 1050, F + 20, g); box(1000, 60, 70, mFrame, dx, 2120, F + 20, g);
+    box(140, 30, 30, mat.chrome, dx + 320, 1050, F + 55, g);                           // puxador
+    box(1100, 120, 500, M(0x6b7280, 0.3, 0.6), dx, 60, F + 300, g);                    // degrau
+    for (let i = 0; i < (opts.windows ?? Math.max(1, Math.floor((len - 1800) / 1500))); i++) {
+      const wx = dx + 1200 + i * 1500;
+      if (wx + 600 > len / 2 - 150) break;
+      box(1240, 940, 60, mFrame, wx, 1600, F + 10, g); box(1160, 860, 30, mat.glass, wx, 1600, F + 40, g);
+    }
+    const sign = new THREE.Mesh(new THREE.PlaneGeometry(2000, 500), new THREE.MeshBasicMaterial({ map: signTex(label, sub, band) }));
+    sign.position.set(Math.min(len / 2 - 1100, dx + 1500), CH - 330, F + 60); g.add(sign);
+    if (!opts.noAC) box(640, 520, 320, mAC, len / 2 - 600, CH + 330, -CD / 2 + 400, g);   // unidade de ar condicionado no tecto
+    const lamp = cyl(50, 90, mat.lamp, g, 12); lamp.rotation.x = Math.PI / 2; lamp.position.set(dx, 2350, F + 50);
+    if (level === 1) {                                                                 // passadiço à frente com guarda-corpos e escada metálica
+      box(len + 300, 60, 1100, M(0x4b5563, 0.5, 0.5), 0, -35, F + 560, g);
+      for (let x = -len / 2 - 100; x <= len / 2 + 100; x += 1000) box(40, 1050, 40, mPost, x, 500, F + 1090, g);
+      box(len + 300, 40, 40, mat.yellow, 0, 1030, F + 1090, g); box(len + 300, 30, 30, mPost, 0, 520, F + 1090, g);
+      // escada metálica: desce do passadiço para a nave (local +z), encostada a um dos topos do contentor
+      const sx = opts.stairSide || 1, xs = sx * (len / 2 - 520), z0 = F + 1100, RUN = 3000, DROP = CH + 70 - 160;
+      for (let i = 0; i < 14; i++) { const t = i / 14; box(1000, 40, 260, M(0x4b5563, 0.5, 0.5), xs, -70 - t * DROP, z0 + 150 + t * RUN, g); }
+      for (const x of [xs - 470, xs + 470]) beam(V(x, -20, z0 + 50), V(x, -DROP + 120, z0 + 150 + RUN + 100), 60, mPost, g);
+      for (let i = 0; i <= 3; i++) { const t = i / 3; for (const x of [xs - 500, xs + 500]) box(40, 1000, 40, mPost, x, 430 - t * DROP, z0 + 150 + t * RUN, g); }
+      for (const x of [xs - 500, xs + 500]) beam(V(x, 1000, z0 + 150), V(x, 1000 - DROP, z0 + 150 + RUN), 40, mat.yellow, g);
+    }
+    return g;
+  }
+
+  // ---------- fila da frente (parede +z), frentes viradas para −z (interior da nave)
+  const ZF = 5750, R180 = Math.PI;
+  container(-8271, ZF, L20, R180, "ADMINISTRAÇÃO", "Direcção · contabilidade · compras", 0xf1f3f5, "#1f5fd6");
+  container(-1871, ZF, L20, R180, "SALA DE ALMOÇO", "Refeitório dos funcionários", 0xfbf3e4, "#d97706");
+  container(-8271, ZF, L20, R180, "SALA DE REUNIÃO EXECUTIVA", "1.º andar · direcção e gestão", 0xeef2f7, "#1e3a8a", { level: 1, stairSide: -1, noAC: false });
+  container(-1871, ZF, L20, R180, "SALA DE VISITAS · CLIENTES", "1.º andar · recepção de clientes e demonstrações", 0xfdf6ec, "#9a3412", { level: 1, stairSide: 1 });
+  container(2870, ZF, L10, R180, "HSA + RH", "Segurança, saúde, ambiente · recursos humanos", 0xe8f5ec, "#15803d");
+  container(6200, ZF, L10, R180, "SALA DOS ENGENHEIROS", "Engenharia · métodos · manutenção", 0xe7eef8, "#2f6fdc");
+  // ---------- parede −x, frentes viradas para +x
+  const XW = -10300, R90 = Math.PI / 2;
+  container(XW, 3000, L10, R90, "WC", "Balneários · vestiários", 0xeef2f6, "#64748b", { door: -L10 / 2 + 700, windows: 0 });
+  container(XW, -2500, L10, R90, "ARMAZÉM DE EPI", "Capacetes · luvas · óculos · botas", 0xfff4e5, "#ea580c", { windows: 0 });
+  container(XW, -5300, L10, R90, "SALA DE LIMPEZA", "Material e produtos de limpeza", 0xeaf6fb, "#0e7490", { windows: 0 });
+  // ---------- atrás da linha (corredor do operador), frentes viradas para +z
+  // atrás da linha, fora do corredor dos robôs: o KMF 1500P circula em z −5500…−3000 (x ≥ 2000) e ao longo de x ≈ 9150;
+  // nada é colocado a menos de 1 m desses corredores, nem a menos de 0,5 m do corredor do operador da linha
+  container(-8450, -2950, L20, 0, "RECEPÇÃO LOGÍSTICA", "Armazém de entrada · bobinas · consumíveis", 0xf1f3f5, "#334155");
+  container(-3800, -2950, L10, 0, "MANUTENÇÃO", "Materiais e peças de reserva", 0xf1f3f5, "#b45309", { windows: 0 });
+
+  // mesas e bancos à porta do refeitório; carrinho de limpeza; estante de EPI à porta
+  for (const x of [-2700, -1300]) { box(1400, 40, 700, mat.wood, x, FLOOR + 740, 3900); for (const s of [-1, 1]) box(1400, 30, 250, mat.wood, x, FLOOR + 460, 3900 + s * 500); for (const sx of [-1, 1]) box(60, 740, 60, mPost, x + sx * 600, FLOOR + 370, 3900); }
+  { const g = new THREE.Group(); g.position.set(-8600, FLOOR, -5300); scene.add(g); box(900, 60, 500, M(0x2563eb, 0.2, 0.5), 0, 900, 0, g); for (const [x, z] of [[-400, -200], [400, -200], [-400, 200], [400, 200]]) box(40, 880, 40, mPost, x, 440, z, g); box(700, 500, 400, mat.yellow, 0, 300, 0, g); cyl(25, 1200, mat.alu, g, 10).position.set(430, 600, 0); }   // carrinho de limpeza
+  { for (let i = 0; i < 3; i++) box(1200, 30, 400, mAC, -8600, FLOOR + 400 + i * 500, -2500); for (const s of [-1, 1]) box(40, 1500, 400, mPost, -8600 + s * 600, FLOOR + 750, -2500); for (const [i, c] of [[0, 0xf2c200], [1, 0x2563eb], [2, 0xef4444]]) box(300, 260, 240, M(c, 0.2, 0.5), -8900 + i * 300, FLOOR + 560, -2500); }   // estante de EPI
+
+  // ---------- zona de emergência (área livre, marcada no chão)
+  {
+    const EX = 3300, EZ = -2100;
+    box(3600, 6, 1800, M(0x16a34a, 0.1, 0.7), EX, FLOOR + 3, EZ, scene, false);
+    box(3600, 7, 120, mat.label, EX, FLOOR + 4, EZ - 840, scene, false); box(3600, 7, 120, mat.label, EX, FLOOR + 4, EZ + 840, scene, false);
+    const crossTex = canvasTex(256, 256, (g) => { g.fillStyle = "#16a34a"; g.fillRect(0, 0, 256, 256); g.fillStyle = "#fff"; g.fillRect(104, 40, 48, 176); g.fillRect(40, 104, 176, 48); });
+    const cross = new THREE.Mesh(new THREE.PlaneGeometry(1200, 1200), new THREE.MeshBasicMaterial({ map: crossTex })); cross.rotation.x = -Math.PI / 2; cross.position.set(EX, FLOOR + 8, EZ); scene.add(cross);
+    box(60, 2600, 60, mPost, EX - 1500, FLOOR + 1300, EZ - 700);                               // poste com sinal de ponto de encontro
+    const pe = new THREE.Mesh(new THREE.PlaneGeometry(900, 600), new THREE.MeshBasicMaterial({ map: canvasTex(384, 256, (g) => { g.fillStyle = "#16a34a"; g.fillRect(0, 0, 384, 256); g.fillStyle = "#fff"; g.font = "700 34px Arial"; g.fillText(tr("PONTO DE ENCONTRO"), 20, 70); g.font = "26px Arial"; g.fillText(tr("Zona de emergência · primeiros socorros"), 20, 120); g.fillText(tr("Lava-olhos · extintores · maca"), 20, 160); g.beginPath(); g.arc(320, 200, 30, 0, 7); g.fill(); }) }));
+    pe.position.set(EX - 1500, FLOOR + 2300, EZ - 660); scene.add(pe);
+    for (const x of [EX + 900, EX + 1200]) { const e = cyl(90, 520, M(0xdc2626, 0.3, 0.4), scene, 16); e.position.set(x, FLOOR + 330, EZ - 700); cyl(30, 80, mat.black, scene, 10).position.set(x, FLOOR + 630, EZ - 700); }   // extintores
+    box(700, 600, 200, mat.label, EX + 1500, FLOOR + 1500, EZ - 760); box(80, 400, 10, M(0xdc2626, 0.1, 0.5), EX + 1500, FLOOR + 1500, EZ - 655, scene, false); box(400, 80, 10, M(0xdc2626, 0.1, 0.5), EX + 1500, FLOOR + 1500, EZ - 655, scene, false);   // armário de primeiros socorros
+    cyl(40, 1100, mat.steel, scene, 12).position.set(EX - 1000, FLOOR + 550, EZ + 600); box(500, 120, 350, M(0x22c55e, 0.3, 0.4), EX - 1000, FLOOR + 1150, EZ + 600); for (const s of [-1, 1]) cyl(25, 60, mat.chrome, scene, 10).position.set(EX - 1000 + s * 120, FLOOR + 1240, EZ + 600);   // lava-olhos
+    box(1900, 60, 600, M(0xf97316, 0.2, 0.5), EX + 600, FLOOR + 650, EZ + 600); for (const sx of [-1, 1]) for (const sz of [-1, 1]) box(50, 620, 50, mPost, EX + 600 + sx * 850, FLOOR + 310, EZ + 600 + sz * 250);
+    // linhas de segurança: corredor do KMF 1500P (2,5 m livres) e faixa do AMR — circulação dos robôs sempre desimpedida
+    stripe(2000, -3000, 9800, -3000, 100); stripe(2000, -5500, 7200, -5500, 100); stripe(8300, -5500, 8300, 3600, 100); stripe(10000, -5500, 10000, 1200, 100);
+    stripe(4300, -1200, 4300, 2400, 80); stripe(6100, -1200, 6100, 700, 80); stripe(4300, 2400, 7600, 2400, 80); stripe(7600, 2400, 7600, 700, 80);   // maca
+  }
+
+  // ---------- cais de carga: a porta da parede +x (z = 2200) é o cais; o camião está encostado por fora, com a traseira aberta no cais
+  {
+    const DZ = 2200, DX = HALL.x - 40;
+    box(2600, 140, 3200, M(0x6b7280, 0.6, 0.5), DX - 1300, FLOOR + 70, DZ);                      // plataforma / rampa niveladora
+    box(2600, 10, 3200, M(0x374151, 0.6, 0.6), DX - 1300, FLOOR + 145, DZ, scene, false);
+    for (const s of [-1, 1]) box(300, 400, 400, mat.black, DX - 150, FLOOR + 350, DZ + s * 1300);   // batentes de borracha
+    stripe(DX - 3200, DZ - 1700, DX - 3200, DZ + 1700, 100); stripe(DX - 3200, DZ - 1700, DX - 100, DZ - 1700, 100); stripe(DX - 3200, DZ + 1700, DX - 100, DZ + 1700, 100);
+    // traseira do semi-reboque (entra 1,4 m pela porta): caixa, portas abertas, pára-choques, luzes
+    const tr_ = new THREE.Group(); tr_.position.set(DX + 600, FLOOR + 150, DZ); scene.add(tr_);
+    box(2000, 2600, 2550, M(0xf1f1ee, 0.2, 0.5), 0, 1300, 0, tr_);                               // caixa do reboque (parte que se vê)
+    box(1990, 2560, 2500, M(0x1f2937, 0.1, 0.8), -10, 1300, 0, tr_);                              // interior escuro
+    box(1800, 120, 2500, M(0x4b5563, 0.3, 0.6), 0, 60, 0, tr_);                                    // piso do reboque
+    for (const s of [-1, 1]) { const d = box(60, 2500, 1250, M(0xe5e7eb, 0.2, 0.5), -1030, 1300, s * 1900, tr_); d.rotation.y = s * 0.15; }   // portas abertas
+    for (const s of [-1, 1]) box(40, 120, 160, mat.ledR, -1010, 2420, s * 1180, tr_, false);       // luzes traseiras
+    box(1600, 80, 2500, mat.dark, -1010, 300, 0, tr_);                                             // pára-choques
+    // carga já dentro do reboque + paletes à espera no cais
+    for (const z of [-700, 700]) { const p = makePallet(0, 0); p.g.position.set(DX + 900, FLOOR + 270, DZ + z); p.g.rotation.y = Math.PI / 2; p.g.scale.set(0.8, 1, 0.8); stackLoad(p.g, 0, 140, 0, 700, mat.carton); }
+    for (const [x, z] of [[DX - 2400, DZ - 1000], [DX - 2400, DZ + 1000], [DX - 3800, DZ - 1000]]) { const p = makePallet(0, 0); p.g.position.set(x, FLOOR, z); stackLoad(p.g, 0, 140, 0, 600, mat.carton); }
+    const sg = new THREE.Mesh(new THREE.PlaneGeometry(2600, 500), new THREE.MeshBasicMaterial({ map: signTex("CAIS DE CARGA · 1", "Expedição de paletes · camião", "#b45309") }));
+    sg.rotation.y = -Math.PI / 2; sg.position.set(DX - 20, FLOOR + 5300, DZ); scene.add(sg);
+  }
+
+  // ---------- portão sandwich (parede +z, x ≈ 9700): porta seccional de painéis sandwich, porta de peões, sinalética
+  {
+    const GX = 9850, GZ = HALL.z - 40, GW = 3400, GH = 4200;
+    const panelTex = canvasTex(512, 512, (g, w, h) => {
+      g.fillStyle = "#cfd6dd"; g.fillRect(0, 0, w, h);
+      for (let y = 0; y < h; y += 86) { g.fillStyle = "#b9c2ca"; g.fillRect(0, y, w, 6); g.fillStyle = "#e3e8ed"; g.fillRect(0, y + 6, w, 4); }
+      g.fillStyle = "#1f2937"; for (let x = 24; x < w; x += 120) g.fillRect(x, 300, 90, 48);        // janelas da secção
+    });
+    const door = new THREE.Mesh(new THREE.BoxGeometry(GW, GH, 60), M(0xffffff, 0.3, 0.5, { map: panelTex })); door.position.set(GX, FLOOR + GH / 2, GZ); scene.add(door);
+    for (const s of [-1, 1]) box(200, GH + 300, 200, M(0x2f6a9e, 0.3, 0.5), GX + s * (GW / 2 + 120), FLOOR + (GH + 300) / 2, GZ - 60);
+    box(GW + 640, 250, 260, M(0x2f6a9e, 0.3, 0.5), GX, FLOOR + GH + 300, GZ - 60);
+    box(GW + 640, 90, 260, mat.yellow, GX, FLOOR + GH + 470, GZ - 60);
+    box(900, 2100, 40, mDoor, GX - GW / 2 + 700, FLOOR + 1050, GZ - 50);                             // porta de peões (postigo no portão)
+    box(1000, 60, 50, mFrame, GX - GW / 2 + 700, FLOOR + 2150, GZ - 50); box(120, 30, 30, mat.chrome, GX - GW / 2 + 1050, FLOOR + 1050, GZ - 80);
+    stripe(GX - GW / 2, GZ - 400, GX + GW / 2, GZ - 400, 120); stripe(GX - GW / 2, GZ - 1200, GX + GW / 2, GZ - 1200, 120);
+    const gs = new THREE.Mesh(new THREE.PlaneGeometry(2600, 500), new THREE.MeshBasicMaterial({ map: signTex("ENTRADA · PORTÃO 1", "Portão seccional de painel sandwich · 3,8 × 4,2 m", "#2f6fdc") }));
+    gs.rotation.y = Math.PI; gs.position.set(GX, FLOOR + GH + 950, GZ - 200); scene.add(gs);
+    const bc = cyl(60, 120, mat.ledO, scene, 16); bc.position.set(GX + GW / 2 + 120, FLOOR + GH + 560, GZ - 60);   // pirilampo do portão
+  }
+
+  // ---------- ventilação da nave: extractores de cobertura, ventiladores HVLS de tecto e ventiladores axiais de parede com persianas
+  const fans = [];
+  {
+    const RY = FLOOR + HALL.h - 160, mFan = M(0x9aa3ad, 0.6, 0.45), mBlade = M(0x374151, 0.3, 0.6);
+    for (const x of [-8000, -3000, 2000, 7000]) for (const z of [-4200, 3600]) {          // 8 extractores de cobertura (turbina)
+      cyl(420, 260, mFan, scene, 24).position.set(x, RY, z);
+      const cap = cyl(470, 60, mFan, scene, 24); cap.position.set(x, RY + 160, z);
+      const rot = new THREE.Group(); rot.position.set(x, RY - 140, z); scene.add(rot);
+      for (let i = 0; i < 6; i++) { const b = box(360, 14, 120, mBlade, 0, 0, 0, rot, false); b.position.set(Math.cos(i * Math.PI / 3) * 200, 0, Math.sin(i * Math.PI / 3) * 200); b.rotation.y = -i * Math.PI / 3; b.rotation.x = 0.5; }
+      fans.push({ g: rot, w: 9 });
+    }
+    for (const [x, z] of [[-5500, 1800], [3500, -3200]]) {                                 // 2 ventiladores HVLS (Ø 5 m, lentos), acima dos contentores de 1.º andar
+      const hub = new THREE.Group(); hub.position.set(x, FLOOR + 6100, z); scene.add(hub);
+      cyl(40, 1300, mPost, scene, 10).position.set(x, FLOOR + 6800, z);
+      cyl(220, 220, M(0xe5e7eb, 0.4, 0.4), hub, 24);
+      for (let i = 0; i < 6; i++) { const b = box(2400, 20, 220, M(0xcbd5e1, 0.5, 0.4), 0, 0, 0, hub, false); b.position.set(Math.cos(i * Math.PI / 3) * 1350, 0, Math.sin(i * Math.PI / 3) * 1350); b.rotation.y = -i * Math.PI / 3; b.rotation.x = 0.18; }
+      fans.push({ g: hub, w: 1.2 });
+    }
+    const louv = canvasTex(128, 256, (g, w, h) => { g.fillStyle = "#b9bfc5"; g.fillRect(0, 0, w, h); g.fillStyle = "#3b4148"; for (let y = 8; y < h - 6; y += 18) g.fillRect(8, y, w - 16, 9); });
+    for (const [x, z, rot] of [[-6000, -HALL.z + 70, 0], [6000, -HALL.z + 70, 0], [HALL.x - 70, -3500, -Math.PI / 2], [-HALL.x + 70, 5000, Math.PI / 2]]) {   // ventiladores axiais de parede
+      const g = new THREE.Group(); g.position.set(x, FLOOR + 4200, z); g.rotation.y = rot; scene.add(g);
+      box(1300, 1300, 160, mFan, 0, 0, 0, g);
+      const pl = new THREE.Mesh(new THREE.PlaneGeometry(1200, 1200), M(0xffffff, 0.5, 0.5, { map: louv })); pl.position.z = 85; g.add(pl);
+      const rot2 = new THREE.Group(); rot2.position.z = -40; g.add(rot2);
+      for (let i = 0; i < 5; i++) { const b = box(520, 150, 10, mBlade, 0, 0, 0, rot2, false); b.position.set(Math.cos(i * TAU_ / 5) * 300, Math.sin(i * TAU_ / 5) * 300, 0); b.rotation.z = i * TAU_ / 5; }
+      fans.push({ g: rot2, w: 6, axis: "z" });
+    }
+  }
+  addSystem({ draw(dt) { for (const f of fans) { if (f.axis === "z") f.g.rotation.z += f.w * dt; else f.g.rotation.y += f.w * dt; } } });
+
+  // ---------- relógio de turno, sirene e luzes de alarme (almoço e fim de turno)
+  // tempo da fábrica: 1 minuto de turno por 2 s de simulação (à velocidade 1) — turno 08:00–17:00, almoço às 12:00
+  const SHIFT = { start: 8 * 60, end: 17 * 60, lunch: 12 * 60, lunchLen: 60, min: 8 * 60, alarm: null, alarmT: 0 };
+  const beacons = [];
+  function beacon(x, y, z, rot) {
+    const g = new THREE.Group(); g.position.set(x, y, z); g.rotation.y = rot; scene.add(g);
+    box(360, 520, 160, M(0x374151, 0.3, 0.5), 0, 0, 0, g);                                      // caixa da sirene
+    for (let i = 0; i < 5; i++) box(300, 24, 40, mat.black, 0, -180 + i * 80, 90, g);          // grelha
+    const a = cyl(60, 120, M(0xffa040, 0, 0.5, { emissive: 0xffa040, emissiveIntensity: 0 }), g, 16); a.position.set(-90, 340, 0);
+    const r = cyl(60, 120, M(0xff4040, 0, 0.5, { emissive: 0xff4040, emissiveIntensity: 0 }), g, 16); r.position.set(90, 340, 0);
+    beacons.push({ a: a.material, r: r.material });
+    return g;
+  }
+  beacon(-4000, 3200, HALL.z - 150, Math.PI); beacon(5000, 3200, HALL.z - 150, Math.PI);             // fila da frente
+  beacon(-HALL.x + 150, 3200, -1500, Math.PI / 2); beacon(0, 3400, -HALL.z + 150, 0); beacon(HALL.x - 150, 3200, 2200 + 2500, -Math.PI / 2);
+  // painel LED do turno, ao lado do portão
+  const ledW = 800, ledH = 250;
+  const ledTex = canvasTex(ledW, ledH, () => {}); ledTex.wrapS = ledTex.wrapT = THREE.ClampToEdgeWrapping;
+  const led = new THREE.Mesh(new THREE.PlaneGeometry(3200, 1000), new THREE.MeshBasicMaterial({ map: ledTex })); led.rotation.y = Math.PI; led.position.set(5000, FLOOR + 4100, HALL.z - 90); scene.add(led);
+  box(3300, 1100, 60, mat.black, 5000, FLOOR + 4100, HALL.z - 55);
+  let ledKey = "";
+  const hhmm = (m) => `${String(Math.floor(m / 60)).padStart(2, "0")}:${String(Math.floor(m % 60)).padStart(2, "0")}`;
+  function drawLed() {
+    const g = ledTex.image.getContext("2d");
+    g.fillStyle = "#06090f"; g.fillRect(0, 0, ledW, ledH);
+    g.fillStyle = "#f59e0b"; g.font = "700 96px Menlo, Consolas, monospace"; g.fillText(hhmm(SHIFT.min), 24, 110);
+    g.fillStyle = "#9fb3c8"; g.font = "600 28px Arial"; g.fillText(tr("Turno 1 · 08:00–17:00 · almoço 12:00"), 330, 60);
+    g.fillText(tr("Produção") + ` · OK ${okCount} · NOK ${nokCount}`, 330, 104);
+    g.fillStyle = SHIFT.alarm === "lunch" ? "#fbbf24" : SHIFT.alarm === "end" ? "#ef4444" : "#22c55e"; g.font = "700 54px Arial";
+    g.fillText(SHIFT.alarm === "lunch" ? tr("ALMOÇO · PAUSA 60 MIN") : SHIFT.alarm === "end" ? tr("FIM DE TURNO") : tr("EM PRODUÇÃO"), 24, 205);
+    ledTex.needsUpdate = true;
+  }
+  // sirene: dois tons (almoço) ou tom contínuo (fim de turno), só se o browser já permitir áudio
+  let audio = null;
+  function siren(kind) {
+    try {
+      audio = audio || new (window.AudioContext || window.webkitAudioContext)();
+      if (audio.state !== "running") return;
+      const o = audio.createOscillator(), gn = audio.createGain(); o.connect(gn); gn.connect(audio.destination);
+      o.type = "square"; gn.gain.value = 0.03; const t0 = audio.currentTime;
+      if (kind === "lunch") { o.frequency.setValueAtTime(660, t0); o.frequency.setValueAtTime(880, t0 + 0.4); o.frequency.setValueAtTime(660, t0 + 0.8); o.frequency.setValueAtTime(880, t0 + 1.2); o.start(t0); o.stop(t0 + 1.6); }
+      else { o.frequency.setValueAtTime(440, t0); o.frequency.linearRampToValueAtTime(900, t0 + 1.5); o.start(t0); o.stop(t0 + 2.5); }
+    } catch (e) { /* sem áudio */ }
+  }
+  let sirenT = 0;
+  addSystem({
+    update(dt) {
+      SHIFT.min += dt / 2;                                                              // 1 min de turno por 2 s
+      if (SHIFT.min >= SHIFT.end + 30) SHIFT.min = SHIFT.start;                         // novo turno
+      const a = SHIFT.min >= SHIFT.lunch && SHIFT.min < SHIFT.lunch + 0.5 * 2 ? "lunch" : SHIFT.min >= SHIFT.end && SHIFT.min < SHIFT.end + 1 ? "end" : null;
+      if (a && SHIFT.alarm !== a) { SHIFT.alarm = a; SHIFT.alarmT = 0; sirenT = 0; }
+      if (SHIFT.alarm) { SHIFT.alarmT += dt; sirenT -= dt; if (sirenT <= 0) { siren(SHIFT.alarm); sirenT = 3; } if (SHIFT.alarmT > 12) SHIFT.alarm = null; }
+    },
+    draw(dt) {
+      const on = SHIFT.alarm ? (Math.floor(performance.now() / 250) % 2 === 0) : false;
+      for (const b of beacons) { b.a.emissiveIntensity = SHIFT.alarm === "lunch" && on ? 2.6 : 0; b.r.emissiveIntensity = SHIFT.alarm === "end" && on ? 2.6 : 0; }
+      const key = `${Math.floor(SHIFT.min)}|${SHIFT.alarm}|${okCount}|${nokCount}|${LANG.rev}`;
+      if (key !== ledKey) { ledKey = key; drawLed(); }
+    },
+  });
+  window.__shift = SHIFT;
+
+  // ---------- etiquetas e vistas
+  const T = [
+    ["Administração · direcção, contabilidade, compras", -8271, ZF - 200], ["Sala de almoço dos funcionários", -1871, ZF - 200],
+    ["1.º andar · Sala de reunião executiva", -8271, ZF + 2900], ["1.º andar · Sala de visitas de clientes", -1871, ZF + 2900], ["HSA + Recursos Humanos", 2870, ZF - 200], ["Sala dos engenheiros", 6200, ZF - 200],
+    ["WC · balneários", XW + 200, 3000], ["Armazém de EPI", XW + 200, -2500], ["Sala de limpeza · material de limpeza", XW + 200, -5300],
+    ["Recepção logística · armazém de entrada", -8450, -2950], ["Manutenção · materiais e peças de reserva", -3800, -2950], ["Zona de emergência · ponto de encontro", 3300, -2100],
+    ["Cais de carga · camião a carregar paletes de caixas", HALL.x - 1800, 2200], ["Entrada · portão sandwich", 9850, HALL.z - 600],
+  ];
+  for (const [text, x, z] of T) addTag({ text, at: () => V(x, FLOOR + CH + 650 + (z > ZF + 2000 ? CH + 70 : 0), z > ZF + 2000 ? ZF - 200 : z), max: 9000 });
+  addTag({ text: "Corredor do KMF 1500P · 2,5 m livres (linha de segurança)", at: () => V(5500, FLOOR + 400, -4250), max: 7000 });
+  addTag({ text: "Faixa do AMR · circulação livre", at: () => V(5200, FLOOR + 400, 600), max: 6000 });
+  addTag({ text: "Ventilação · extractores de cobertura, HVLS e ventiladores de parede", at: () => V(-5500, FLOOR + 5800, 1800), min: 1500, max: 12000 });
+  addTag({ text: () => `9 · Instalações de apoio (contentores) · ${hhmm(SHIFT.min)}`, at: () => V(-1000, FLOOR + 4300, 5200), min: 3500, big: true });
+  addTag({ text: () => (SHIFT.alarm === "lunch" ? "Sirene · ALMOÇO" : SHIFT.alarm === "end" ? "Sirene · FIM DE TURNO" : `Relógio de turno · ${hhmm(SHIFT.min)}`), at: () => V(5000, FLOOR + 4900, HALL.z - 300), max: 9000 });
+  addView("inst", "Instalações", [-2000, 4200, -400], [-2000, 200, 5200]);
+  addView("cais", "Cais e portão", [7600, 2800, -1200], [10800, 500, 2600]);
+}
 
 // ----- 70-tags.js -----
 // =====================================================================
@@ -5905,7 +6217,7 @@ VIEWS.crates = [[-2400, 1900, 2300], [-900, -200, 200]];
 const AREAS = [
   ["feed", "0 · Bobina de banda"], ["lam", "1 · Laminagem"], ["pic", "2 · Picagem"], ["ind", "3 · Têmpera"], ["indHmi", "3 · Painel da têmpera"],
   ["dur", "4 · Dureza"], ["jato", "5 · Jateamento"], ["cell", "6 · SACCLI"], ["mod", "6 · Módulos A–C"], ["crates", "6 · Caixas e robôs"],
-  ["pack", "7 · Embalagem e palete"], ["exp", "8 · Expedição (AMR)"], ["kmf", "8 · Armário (KMF 1500P)"],
+  ["pack", "7 · Embalagem e palete"], ["exp", "8 · Expedição (AMR)"], ["kmf", "8 · Armário (KMF 1500P)"], ["inst", "9 · Instalações"], ["cais", "9 · Cais e portão"],
 ];
 VIEWS.molde = [[-8300, 650, 500], [-8950, 100, -380]];
 AREAS.splice(2, 0, ["molde", "1 · Molde de corte"]);
@@ -5990,8 +6302,8 @@ const TOUR = [
     "A two-high rolling mill with two Ø330 mm steel rolls, driven by a motor, gearbox and cardan shafts, squeezes the strip to its final thickness: a flat, straight, sized strip comes out. The rolls turn in sync with the die — they feed the strip exactly one pitch at a time and stop while the die cuts."],
   ["molde", "1 · Molde de corte — a forma da lima", "Logo a seguir, uma prensa hidráulica fecha o molde de corte: a matriz inferior está embutida na esteira e o punção superior tem a silhueta da lima em negativo. O punção desce, corta na tira a lâmina afunilada com o espigão, e as aparas caem pela calha para o contentor. A partir daqui a peça já tem a forma de lima.",
     "Right after, a hydraulic press closes the blanking die: the lower die is embedded in the conveyor and the upper punch carries the file outline in negative. The punch comes down, cuts the tapered blade with its tang out of the strip, and the scrap slides down the chute into the bin. From here on the part has the shape of a file."],
-  ["pic", "2 · Picagem dos dentes", "A máquina de picar prende a lima e um cinzel, accionado a alta cadência, pica os dentes ao longo de todo o comprimento, do espigão até à ponta. A HMI mostra os golpes por minuto, os dentes por centímetro e o avanço da picagem.",
-    "The cutting machine clamps the file and a high-cadence chisel cuts the teeth along the whole length, from the tang to the tip. The HMI shows strokes per minute, teeth per centimetre and the cutting progress."],
+  ["pic", "2 · Picagem dos dentes", "A máquina de picar prende a lima e um cinzel, accionado a alta cadência, pica os dentes ao longo de todo o comprimento. A picagem faz-se nas 4 faces — cima, baixo, canto esquerdo e canto direito — uma de cada vez: entre passagens a lima roda 180° ou 90° e o cinzel volta a picar da ponta ao espigão. A HMI mostra a face em curso, os golpes por minuto e o avanço.",
+    "The cutting machine clamps the file and a high-cadence chisel cuts the teeth along the whole length. Cutting is done on all 4 faces — top, bottom, left edge and right edge — one at a time: between passes the file rotates 180° or 90° and the chisel cuts again from tip to tang. The HMI shows the current face, strokes per minute and progress."],
   ["ind", "3 · Têmpera por indução → choque em água", "Uma pinça eleva a lima até ao eixo da bobina de cobre (arrefecida a água). O gerador de média frequência faz passar corrente na bobina e a lima aquece por indução até 1200 °C em segundos. De seguida cai no tanque de água: o choque térmico em fracções de segundo endurece o aço (martensite). Um revenido por indução a ~200 °C alivia tensões.",
     "A gripper lifts the file to the axis of the water-cooled copper coil. The medium-frequency generator drives current through the coil and the file heats by induction to 1200 °C in seconds. It then drops into the water tank: the thermal shock within fractions of a second hardens the steel (martensite). An induction temper at ~200 °C relieves stresses."],
   ["indHmi", "3 · Painel do gerador de indução", "O armário do gerador (fonte AC, 120 kW, 10–30 kHz) tem a HMI, a paragem de emergência, o interruptor geral e a coluna luminosa virados para o corredor do operador; do lado da máquina só entram os cabos e as mangueiras de água. O refrigerador de circuito fechado mantém a água da bobina a ~21 °C.",
@@ -6010,6 +6322,10 @@ const TOUR = [
     "A delta robot moves the files from the green crate into cartons of 6; the flaps close and the carton travels to the end of the conveyor. The KUKA LBR iisy cobot picks each carton and palletises 3 × 4 per layer, 2 layers: 24 cartons per pallet."],
   ["exp", "8 · Expedição — AMR", "Quando a palete está completa, o AMR entra por baixo, levanta-a e leva-a até ao posto de expedição, seguindo as faixas no chão. Uma palete vazia é reposta no posto de paletização.",
     "When the pallet is complete, the AMR drives underneath, lifts it and carries it to the shipping stand, following the floor markings. An empty pallet is put back at the palletising stand."],
+  ["inst", "9 · Instalações de apoio em contentores", "Dentro da nave, em contentores modulares de 10' e 20': administração, sala de almoço, HSA + recursos humanos e sala dos engenheiros na frente; WC/balneários, armazém de EPI e sala de limpeza junto à parede; recepção logística, zona de emergência (ponto de encontro, primeiros socorros, lava-olhos, extintores) e manutenção atrás da linha. Por cima da administração e do refeitório, no 1.º andar, ficam a sala de reunião executiva e a sala de visitas de clientes, com passadiço e escada metálica. A ventilação faz-se com extractores de cobertura, ventiladores HVLS de tecto e ventiladores axiais de parede. O relógio de turno acciona a sirene e as luzes de alarme ao almoço (12:00) e no fim do turno (17:00).",
+    "Inside the hall, in 10' and 20' modular containers: administration, canteen, HSE + HR and the engineers' room at the front; WC/changing rooms, PPE store and cleaning room by the wall; logistics reception, emergency zone (assembly point, first aid, eyewash, extinguishers) and maintenance behind the line. Above the administration and the canteen, on the first floor, are the executive meeting room and the client visiting room, with a walkway and a steel staircase. Ventilation is provided by roof extractors, HVLS ceiling fans and wall-mounted axial fans. The shift clock triggers the siren and alarm lights at lunch (12:00) and at the end of the shift (17:00)."],
+  ["cais", "9 · Cais de carga e portão sandwich", "Na porta da parede lateral está o cais de carga: o camião encosta por fora, a rampa niveladora faz a ponte e as paletes de caixas prontas, trazidas pelo KMF 1500P, entram no reboque. Ao lado, a entrada principal é um portão seccional de painéis sandwich com porta de peões e pirilampo.",
+    "At the side-wall door is the loading dock: the truck backs in from outside, the dock leveler bridges the gap and the pallets of finished cartons, brought by the KMF 1500P, go into the trailer. Next to it, the main entrance is a sectional sandwich-panel gate with a pedestrian door and a beacon."],
   ["kmf", "8 · Armário de paletes — KUKA KMF 1500P", "O KUKA KMF 1500P, empilhador autónomo de 1500 kg com navegação laser, vai buscar a palete ao posto de expedição e arruma-a no armário de paletes, no primeiro lugar livre dos três níveis. Quando o armário está cheio, a palete mais antiga sai para o camião.",
     "The KUKA KMF 1500P, a 1500 kg autonomous forklift with laser navigation, collects the pallet from the shipping stand and stores it in the pallet rack, in the first free slot of the three levels. When the rack is full, the oldest pallet leaves for the truck."],
 ];

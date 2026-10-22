@@ -438,29 +438,49 @@
   // =================================================================
   // Ciclo de picagem
   // =================================================================
-  const st = { lima: null, s: -1, done: false, n: 0, strikes: 0 };
-  const cutAt = (s) => Math.max(0, Math.min(1, (s - 0.06) / 0.86));       // avanço do corte (= fracção de dentes)
-  const lowerAt = (s) => seg(s, 0, 0.06) * (1 - seg(s, 0.93, 0.99));     // cilindro de aproximação: 1 = cinzel solto sobre a lima
+  // A picagem faz-se nas 4 faces da lima — cima, baixo, canto esquerdo, canto direito — UMA DE CADA VEZ: a paragem
+  // divide-se em 4 passagens; entre passagens a lima roda (180° para a face de baixo, 90° para cada canto) e o cinzel
+  // volta a picar da ponta ao espigão. Dentro de cada passagem: q 0→0,12 rodar · 0,12→0,18 cinzel desce · 0,18→0,88 picar · 0,88→0,94 recua · 0,94→1 roda de volta (só na última)
+  const FACES = 4, ROT = [0, Math.PI, Math.PI / 2, -Math.PI / 2], FACE_NAME = ["face de cima", "face de baixo", "canto esquerdo", "canto direito"];
+  const st = { lima: null, s: -1, done: false, n: 0, strikes: 0, pass: 0, q: -1, ang: 0 };
+  const passOf = (s) => Math.min(FACES - 1, Math.floor(s * FACES));
+  const subOf = (s) => s * FACES - Math.floor(s * FACES);
+  const cutAt = (q) => Math.max(0, Math.min(1, (q - 0.18) / 0.70));      // avanço do corte na passagem (= fracção de dentes dessa face)
+  const lowerAt = (q) => seg(q, 0.12, 0.18) * (1 - seg(q, 0.88, 0.94)); // cilindro de aproximação: 1 = cinzel solto sobre a lima
+  const angleAt = (pass, q) => {
+    const from = pass === 0 ? 0 : ROT[pass - 1], to = ROT[pass];
+    let a = from + (to - from) * seg(q, 0, 0.12);
+    if (pass === FACES - 1) a = to + (0 - to) * seg(q, 0.94, 1);         // na última passagem a lima volta à posição normal
+    return a;
+  };
+  const halfY = (a, hh, bb) => Math.abs(Math.cos(a)) * hh / 2 + Math.abs(Math.sin(a)) * bb / 2;   // meia-altura da lima rodada
   const limaTopAt = (l, x) => {
     if (l.form < 0.5) return 2 + 1.6 * P.h;
-    const len = limaLen(), h = P.h * (1 + (1 - l.form) * 1.4), u = Math.max(0, Math.min(1, -(x - l.g.position.x) / (len / 2)));
-    return Math.max(2 + h - 0.15 * h * u * u + 0.3, 2 + P.h + 0.45);       // aresta do cinzel na frente da camada de dentes
+    const len = limaLen(), u = Math.max(0, Math.min(1, -(x - l.g.position.x) / (len / 2)));
+    const h = P.h * (1 - 0.15 * u * u), b = P.b * (1 - 0.42 * u * u);
+    return 2 + 2 * halfY(st.ang, h, b) + 0.45;                              // aresta do cinzel na frente da camada de dentes
   };
   const phaseText = (s, here) => {
     if (s < 0) return UP.phase === "move" ? "Carro a regressar · lima a avançar" : here ? "Em espera" : "Em espera · sem lima";
-    if (s < 0.06) return "Bigorna em apoio · cinzel a descer";
-    if (s < 0.92) return "A picar · 1.º corte (65°)";
-    if (s < 0.99) return "Cinzel a recuar";
-    return UP.waiting ? "Linha em espera (caixa cheia)" : "Picagem concluída";
+    const pass = passOf(s), q = subOf(s), face = FACE_NAME[pass];
+    if (q < 0.12) return (pass === 0 ? "Bigorna em apoio · " : `A rodar a lima ${pass === 1 ? "180°" : "90°"} · `) + face;
+    if (q < 0.18) return "Cinzel a descer · " + face;
+    if (q < 0.88) return `A picar · ${face} (${pass + 1}/4)`;
+    if (q < 0.94) return "Cinzel a recuar";
+    if (pass < FACES - 1) return "Passagem concluída · próxima face";
+    return UP.waiting ? "Linha em espera (caixa cheia)" : "Picagem concluída · 4 faces";
   };
   UP.addStation({
     slot: SLOT, name: "Picagem dos dentes",
     onDwell(l, s) {
       if (st.lima !== l) { st.lima = l; st.done = false; }
-      st.s = s;
-      l.teeth = cutAt(s);                                                // a camada de dentes cresce desde a ponta, atrás do cinzel
-      if (l.teeth >= 1 && !st.done) { st.done = true; st.n++; }
+      st.s = s; st.pass = passOf(s); st.q = subOf(s);
+      if (!l.teethF) l.teethF = [0, 0, 0, 0];
+      for (let k = 0; k < FACES; k++) l.teethF[k] = k < st.pass ? 1 : k === st.pass ? cutAt(st.q) : l.teethF[k];
+      l.teeth = l.teethF[0];
+      if (st.pass === FACES - 1 && l.teethF[3] >= 1 && !st.done) { st.done = true; st.n++; }
     },
+    onMove(l) { if (l) { l.g.rotation.x = 0; } st.ang = 0; },
   });
 
   // ---------- camada de dentes picados, por lima (como a marca de dureza da estação 4): a textura do núcleo tem
@@ -472,29 +492,37 @@
     const sk = 172, par = (x, wx, c) => { g.fillStyle = c; g.beginPath(); g.moveTo(x, 0); g.lineTo(x + wx, 0); g.lineTo(x + wx + sk, h); g.lineTo(x + sk, h); g.closePath(); g.fill(); };
     for (let k = -1; k <= 0; k++) for (let i = 0; i < 4; i++) { const x = i * 64 + k * 256; par(x, 22, "#32383f"); par(x + 22, 12, "#f1f5f9"); par(x + 34, 10, "#cfd5dc"); }
   });
-  const buildOv = () => {
+  // uma camada por face: 0 cima (y+), 1 baixo (y−), 2 canto esquerdo (z+), 3 canto direito (z−)
+  const buildOv = (face) => {
     const len = limaLen(), x0 = -len / 2 + 10, L = len * 0.85;
     const g = new THREE.PlaneGeometry(1, 1, NSEG, 1), p = g.attributes.position, uv = g.attributes.uv, n = g.attributes.normal;
     for (let i = 0; i < p.count; i++) {
-      const xs = x0 + (p.getX(i) + 0.5) * L, u = Math.max(0, -xs / (len / 2)), f = 1 - 0.42 * u * u;
-      p.setXYZ(i, xs, 2 + P.h + 0.75, -p.getY(i) * P.b * 0.8 * f); uv.setX(i, (xs - x0) / PITCH_T); n.setXYZ(i, 0, 1, 0);
+      const xs = x0 + (p.getX(i) + 0.5) * L, u = Math.max(0, -xs / (len / 2)), f = 1 - 0.42 * u * u, hg = 1 - 0.15 * u * u, t = p.getY(i);
+      if (face === 0) { p.setXYZ(i, xs, 2 + P.h * hg + 0.75, -t * P.b * 0.8 * f); n.setXYZ(i, 0, 1, 0); }
+      else if (face === 1) { p.setXYZ(i, xs, 2 - 0.75, t * P.b * 0.8 * f); n.setXYZ(i, 0, -1, 0); }
+      else if (face === 2) { p.setXYZ(i, xs, 2 + P.h * hg / 2 + t * P.h * 0.8 * hg, (P.b / 2) * f + 0.75); n.setXYZ(i, 0, 0, 1); }
+      else { p.setXYZ(i, xs, 2 + P.h * hg / 2 - t * P.h * 0.8 * hg, -(P.b / 2) * f - 0.75); n.setXYZ(i, 0, 0, -1); }
+      uv.setX(i, (xs - x0) / PITCH_T);
     }
     g.computeBoundingSphere(); return g;
   };
-  let ovKey = "", ovFull = null, ovPart = null;
-  const ovs = UP.limas.map((l) => {
+  let ovKey = "", ovFull = [], ovPart = [];
+  const ovs = UP.limas.map((l) => [l, [0, 1, 2, 3].map(() => {
     const o = new THREE.Mesh(undefined, M(0xffffff, 0.85, 0.5, { map: cutTex, polygonOffset: true, polygonOffsetFactor: -1, polygonOffsetUnits: -1 }));
-    o.visible = false; o.receiveShadow = true; l.g.add(o); return [l, o];
-  });
+    o.visible = false; o.receiveShadow = true; l.g.add(o); return o;
+  })]);
   function drawTeeth() {
     const key = `${limaLen()}|${P.h}|${P.b}`;
-    if (key !== ovKey) { ovKey = key; if (ovFull) { ovFull.dispose(); ovPart.dispose(); } ovFull = buildOv(); ovPart = buildOv(); }
-    for (const [l, o] of ovs) {
-      const on = l.form >= 0.5 && l.teeth > 0.004; o.visible = on; if (!on) continue;
-      if (l.teeth >= 0.999) o.geometry = ovFull;
-      else { o.geometry = ovPart; ovPart.setDrawRange(0, 6 * Math.max(1, Math.floor(l.teeth * NSEG + 1e-4))); }
-      const m = o.material; m.color.copy(l.color); m.metalness = l.metal; m.roughness = Math.min(1, l.rough + 0.18);
-      m.emissive.copy(l.m.emissive); m.emissiveIntensity = l.m.emissiveIntensity;
+    if (key !== ovKey) { ovKey = key; for (const g of ovFull.concat(ovPart)) g.dispose(); ovFull = [0, 1, 2, 3].map(buildOv); ovPart = [0, 1, 2, 3].map(buildOv); }
+    for (const [l, os] of ovs) {
+      const tf = l.teethF || [l.teeth, 0, 0, 0];
+      for (let k = 0; k < 4; k++) {
+        const o = os[k], t = tf[k], on = l.form >= 0.5 && t > 0.004; o.visible = on; if (!on) continue;
+        if (t >= 0.999) o.geometry = ovFull[k];
+        else { o.geometry = ovPart[k]; ovPart[k].setDrawRange(0, 6 * Math.max(1, Math.floor(t * NSEG + 1e-4))); }
+        const m = o.material; m.color.copy(l.color); m.metalness = l.metal; m.roughness = Math.min(1, l.rough + 0.18);
+        m.emissive.copy(l.m.emissive); m.emissiveIntensity = l.m.emissiveIntensity;
+      }
     }
   }
 
@@ -507,16 +535,16 @@
     g.textAlign = "right"; g.fillStyle = "#a7c9b6"; g.font = "17px Arial, sans-serif"; g.fillText(tr("Limas picadas: ") + st.n, HW - 14, 22);
     g.textAlign = "left"; g.fillStyle = "#7f9a8c"; g.font = "600 14px Arial, sans-serif"; g.fillText(tr("GOLPES / MIN"), 16, 62);
     g.fillStyle = engaged ? "#ffffff" : "#56695f"; g.font = "700 56px Menlo, Consolas, monospace"; g.fillText(engaged ? String(gpm) : "0", 16, 104);
-    g.fillStyle = s >= 0 && s < 0.99 ? "#fbbf24" : "#8fa79a"; g.font = "600 16px Arial, sans-serif"; g.fillText(tr(phaseText(s, !!UP.limaAt(SLOT))), 16, 146);
+    g.fillStyle = s >= 0 && s < 0.99 ? "#fbbf24" : "#8fa79a"; g.font = "600 16px Arial, sans-serif"; g.fillText(tr(phaseText(s, !!UP.limaAt(SLOT))).replace(/face de cima|face de baixo|canto esquerdo|canto direito/, (w) => tr(w)), 16, 146);
     // tabela à direita
-    const rows = [[tr("Carro X"), `${(c * limaLen() * 0.85).toFixed(1)} mm`], [tr("Cinzel"), engaged && s > 0.06 && s < 0.92 ? tr("a bater") : tr("recolhido")],
+    const rows = [[tr("Carro X"), `${(c * limaLen() * 0.85).toFixed(1)} mm`], [tr("Cinzel"), engaged && st.q > 0.18 && st.q < 0.88 ? tr("a bater") : tr("recolhido")], [tr("Face"), s >= 0 ? `${st.pass + 1}/4 · ` + tr(FACE_NAME[st.pass]) : "—"],
       [tr("Bigorna"), anvUp ? tr("em apoio") : tr("em baixo")], [tr("Óleo de corte"), engaged ? tr("névoa ON") : tr("OFF")], [tr("Golpes"), String(st.strikes)]];
     rows.forEach(([k, v], i) => {
       const y = 64 + i * 22; g.fillStyle = "#7f9a8c"; g.font = "15px Arial, sans-serif"; g.textAlign = "left"; g.fillText(k, 300, y);
       g.fillStyle = "#dfe9e3"; g.font = "600 15px Arial, sans-serif"; g.textAlign = "right"; g.fillText(v, HW - 14, y);
     });
     // lima esquemática (vista de cima) com os dentes picados até à frente do cinzel
-    g.textAlign = "left"; g.fillStyle = "#7f9a8c"; g.font = "600 14px Arial, sans-serif"; g.fillText(tr("DENTES PICADOS · ") + Math.round(c * 100) + " %", 16, 182);
+    g.textAlign = "left"; g.fillStyle = "#7f9a8c"; g.font = "600 14px Arial, sans-serif"; g.fillText(tr("DENTES PICADOS · ") + Math.round(c * 100) + " % " + tr("(4 faces)"), 16, 182);
     const x0 = 22, x1 = 430, ym = 238, hw = 26, xt = x1 + 62;
     const yAt = (x) => { const u = Math.max(0, (x0 + 210 - x) / 210); return hw * (1 - 0.42 * u * u); };
     g.beginPath(); g.moveTo(x0, ym - yAt(x0)); for (let x = x0; x <= x1; x += 6) g.lineTo(x, ym - yAt(x)); g.lineTo(x1, ym + yAt(x1));
@@ -529,7 +557,7 @@
     g.restore();
     if (s >= 0 && s < 0.99) { g.strokeStyle = "#fbbf24"; g.lineWidth = 3; g.beginPath(); g.moveTo(xc, ym - hw - 10); g.lineTo(xc + 10, ym + hw + 10); g.stroke(); }
     g.fillStyle = "#6b7f74"; g.font = "13px Arial, sans-serif"; g.fillText(tr("ponta"), x0, 290); g.textAlign = "right"; g.fillText(tr("espigão"), xt, 290);
-    g.textAlign = "left"; g.fillStyle = "#8fa79a"; g.fillText(tr("picado bastardo · 10 dentes/cm · cinzel 12°"), 110, 306);
+    g.textAlign = "left"; g.fillStyle = "#8fa79a"; g.fillText(tr("picado bastardo · 10 dentes/cm · cinzel 12° · 4 faces, uma de cada vez"), 110, 306);
     hmiTex.needsUpdate = true;
   }
 
@@ -556,14 +584,19 @@
       if (UP.phase === "move" && prevPhase !== "move") carXm = carX;
       prevPhase = UP.phase;
       const s = active ? st.s : -1;
-      let c = 0, lower = 0;
-      if (active) { c = cutAt(s); lower = lowerAt(s); carX = xs + (xe - xs) * c; }
-      else if (UP.phase === "move") carX = carXm + (xs - carXm) * UP.shift;   // regresso do carro durante o avanço
+      let c = 0, lower = 0, cf = 0;
+      if (active) {
+        cf = cutAt(st.q); lower = lowerAt(st.q); carX = xs + (xe - xs) * cf; c = (st.pass + cf) / FACES;
+        // a lima roda para a face a picar ficar em cima; fica sempre apoiada na bigorna (centro recalculado)
+        st.ang = angleAt(st.pass, st.q);
+        const cy = 2 + P.h / 2, hy = halfY(st.ang, P.h, P.b);
+        here.g.rotation.x = st.ang; here.g.position.y = UP.TOP + 2 + hy - cy * Math.cos(st.ang); here.g.position.z = Z0 - cy * Math.sin(st.ang);
+      } else { st.ang = 0; if (UP.phase === "move") carX = carXm + (xs - carXm) * UP.shift; }   // regresso do carro durante o avanço
       carG.position.x = carX;
       updateChain(carX + 60);
       drawTeeth();
       // volante sempre a rodar; a came só com a embraiagem engatada (há lima e o cinzel está em baixo)
-      const engaged = active && s > 0.015 && s < 0.985; engagedNow = engaged;
+      const engaged = active && st.q > 0.10 && st.q < 0.95; engagedNow = engaged;
       fly += TAU * REV * dtv; if (engaged) theta += TAU * REV * dtv;
       flyG.rotation.x = fly; camG.rotation.x = theta; pulley.rotation.x = fly * (250 / 54);
       const touch = active ? limaTopAt(here, carX) : 2 + P.h + 0.45;
@@ -573,7 +606,7 @@
       spring.position.y = tipY + 518; spring.scale.y = (706 - (tipY + 518)) / SPH;
       // golpe: o rolete cai do ressalto → o cinzel bate na lima
       const k = Math.floor((theta - Math.PI / 2) / (TAU / NLOB));
-      const cutting = engaged && lower > 0.98 && c > 0 && c < 1;
+      const cutting = engaged && lower > 0.98 && cf > 0 && cf < 1;
       if (k !== lastK) { if (cutting && dt > 0) { strike(carX, touch); st.strikes++; hitT = 0.06; } lastK = k; }
       hitT -= dt; setLamp(mHit, hitT > 0);
       // bigorna: sobe no início da paragem, desce antes do avanço

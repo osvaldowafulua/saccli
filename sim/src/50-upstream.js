@@ -33,14 +33,14 @@ UP.blendFinish = (l, name, k) => {
 UP.guarantee = (l) => {
   if (l.slot >= 2) l.form = 1;                     // depois da laminagem: tira chata direita, calibrada
   if (l.slot >= 3) l.cut = true;                   // depois do molde de corte: silhueta de lima (afunilada, com espigão)
-  if (l.slot >= 6) l.teeth = 1;                    // depois da picagem: dentes em todo o comprimento
+  if (l.slot >= 6) { l.teeth = 1; l.teethF = [1, 1, 1, 1]; }   // depois da picagem: dentes em todo o comprimento, nas 4 faces
   if (l.slot >= 13 && l.finishName === "raw") { l.heat = 0; UP.blendFinish(l, "scale", 1); l.finishName = "scale"; }   // depois da têmpera
   if (l.slot >= 14) l.heat = 0;
   if (l.slot >= 17 && !l.tested) { l.tested = true; l.hrc = 58 + Math.random() * 4.5; }                              // depois da dureza
   if (l.slot >= 20 && l.finishName !== P.finish) { UP.blendFinish(l, P.finish, 1); l.finishName = P.finish; }          // depois do jateamento
 };
 UP.reset = (l) => {
-  l.form = 0; l.cut = false; l.teeth = 0; l.heat = 0; l.tested = false; l.hrc = 0; l.finishName = "raw";
+  l.form = 0; l.cut = false; l.teeth = 0; l.teethF = [0, 0, 0, 0]; l.heat = 0; l.tested = false; l.hrc = 0; l.finishName = "raw";
   l.color.set(UP.FINISH.raw.color); l.metal = UP.FINISH.raw.metal; l.rough = UP.FINISH.raw.rough;
 };
 
@@ -91,10 +91,12 @@ function makeUpLima(slot) {
   const tm = new THREE.MeshStandardMaterial({ map: upTeethTex, metalness: 0.85, roughness: 0.4, transparent: true, opacity: 0.9 });
   const bar = new THREE.Mesh(upGeo.bar, m), strip = new THREE.Mesh(upGeo.strip, m), blank = new THREE.Mesh(upGeo.blank, m), tang = new THREE.Mesh(upGeo.tang, m);
   const teethPlane = new THREE.Mesh(upGeo.teeth, tm); teethPlane.rotation.x = -Math.PI / 2;
+  const teethB = new THREE.Mesh(upGeo.teeth, tm); teethB.rotation.x = Math.PI / 2;                       // face de baixo
+  const teethL = new THREE.Mesh(upGeo.teeth, tm), teethR = new THREE.Mesh(upGeo.teeth, tm); teethR.rotation.y = Math.PI;   // cantos (faces laterais)
   const mark = new THREE.Mesh(new THREE.SphereGeometry(5, 10, 8), mat.ledG);
   for (const o of [bar, strip, blank, tang]) { o.castShadow = true; o.receiveShadow = true; }
-  g.add(bar, strip, blank, tang, teethPlane, mark);
-  const l = { g, m, tm, bar, strip, blank, tang, teethPlane, mark, slot, color: new THREE.Color(), metal: 0, rough: 0 };
+  g.add(bar, strip, blank, tang, teethPlane, teethB, teethL, teethR, mark);
+  const l = { g, m, tm, bar, strip, blank, tang, teethPlane, teethB, teethL, teethR, mark, slot, color: new THREE.Color(), metal: 0, rough: 0 };
   UP.reset(l);
   UP.limas.push(l);
   return l;
@@ -113,9 +115,13 @@ function drawUpLima(l) {
   l.strip.scale.set(1, 1 + (1 - l.form) * 1.4, 1); l.strip.position.set(30, 2 + (P.h * l.strip.scale.y) / 2, 0);
   l.blank.scale.set(1, 1 + (1 - l.form) * 1.4, 1); l.blank.position.set(0, 2 + (P.h * l.blank.scale.y) / 2, 0);
   l.tang.position.set(len / 2 + 30, 2 + P.h * 0.3, 0);
-  l.teethPlane.visible = !!l.cut && l.teeth > 0.01;
-  l.teethPlane.scale.set(Math.max(1, len * 0.85 * l.teeth), P.b * 0.8, 1);
-  l.teethPlane.position.set(-len / 2 + 10 + (len * 0.85 * l.teeth) / 2, 2 + P.h + 0.4, 0);
+  const tf = l.teethF || [l.teeth, 0, 0, 0];
+  l.teethPlane.visible = !!l.cut && tf[0] > 0.01;
+  l.teethPlane.scale.set(Math.max(1, len * 0.85 * tf[0]), P.b * 0.8, 1);
+  l.teethPlane.position.set(-len / 2 + 10 + (len * 0.85 * tf[0]) / 2, 2 + P.h + 0.4, 0);
+  l.teethB.visible = !!l.cut && tf[1] > 0.01; l.teethB.scale.set(Math.max(1, len * 0.85 * tf[1]), P.b * 0.8, 1); l.teethB.position.set(-len / 2 + 10 + (len * 0.85 * tf[1]) / 2, 2 - 0.4, 0);
+  l.teethL.visible = !!l.cut && tf[2] > 0.01; l.teethL.scale.set(Math.max(1, len * 0.85 * tf[2]), P.h * 0.8, 1); l.teethL.position.set(-len / 2 + 10 + (len * 0.85 * tf[2]) / 2, 2 + P.h / 2, P.b / 2 + 0.4);
+  l.teethR.visible = !!l.cut && tf[3] > 0.01; l.teethR.scale.set(Math.max(1, len * 0.85 * tf[3]), P.h * 0.8, 1); l.teethR.position.set(-len / 2 + 10 + (len * 0.85 * tf[3]) / 2, 2 + P.h / 2, -P.b / 2 - 0.4);
   upTeethTex.repeat.set(8, 1);
   l.mark.visible = l.tested; l.mark.position.set(len / 2 + 30, 2 + P.h * 0.6 + 5, 0);
   l.m.color.copy(l.color); l.m.metalness = l.metal; l.m.roughness = l.rough;
