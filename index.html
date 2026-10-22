@@ -5591,12 +5591,20 @@ for (let i = 0; i < 6; i++) {
     const lamp = cyl(50, 90, mat.lamp, g, 12); lamp.rotation.x = Math.PI / 2; lamp.position.set(dx, 2350, F + 50);
     if (level === 1) {                                                                 // passadiço à frente com guarda-corpos e escada metálica
       // passadiço de 1,1 m com guarda-corpos; o guarda-corpos tem uma ABERTURA de 1,4 m onde começa a escada
+      // passadiço PARTILHADO: o corredor do 1.º andar é contínuo entre contentores vizinhos (opts.openEnd = topo local sem
+      // guarda-corpos, onde liga ao passadiço do contentor ao lado); só um dos contentores tem escada (opts.stairs)
       const sx = opts.stairSide || 1, xs = sx * (len / 2 - 650), SW = 1100, z0 = F + 1100, RUN = 2600, DROP = CH + 70 - 160;
-      box(len + 300, 60, 1100, M(0x4b5563, 0.5, 0.5), 0, -35, F + 560, g);
+      const ext = opts.extend || 0;                                                           // prolonga o passadiço para tapar o intervalo até ao vizinho
+      box(len + 300 + Math.abs(ext), 60, 1100, M(0x4b5563, 0.5, 0.5), ext / 2, -35, F + 560, g);
       const rail = (x0, x1) => { if (x1 - x0 < 200) return; const xm = (x0 + x1) / 2, w = x1 - x0; box(w, 40, 40, mat.yellow, xm, 1030, F + 1090, g); box(w, 30, 30, mPost, xm, 520, F + 1090, g); for (let x = x0; x <= x1; x += 1000) box(40, 1050, 40, mPost, Math.min(x, x1), 500, F + 1090, g); box(40, 1050, 40, mPost, x1, 500, F + 1090, g); };
-      rail(-len / 2 - 100, xs - SW / 2 - 100); rail(xs + SW / 2 + 100, len / 2 + 100);
-      for (const sxx of [-1, 1]) box(40, 1050, 40, mPost, sxx * (len / 2 + 120), 500, F + 10, g);   // guarda-corpos nos topos do passadiço
-      for (const sxx of [-1, 1]) { box(40, 40, 1100, mat.yellow, sxx * (len / 2 + 120), 1030, F + 560, g); box(30, 30, 1100, mPost, sxx * (len / 2 + 120), 520, F + 560, g); }
+      const xl = -len / 2 - 100 + Math.min(0, ext), xr = len / 2 + 100 + Math.max(0, ext);
+      if (opts.stairs) { rail(xl, xs - SW / 2 - 100); rail(xs + SW / 2 + 100, xr); } else rail(xl, xr);
+      for (const sxx of [-1, 1]) {
+        if (sxx === opts.openEnd) continue;                                                   // topo aberto: liga ao passadiço vizinho
+        box(40, 1050, 40, mPost, sxx * (len / 2 + 120), 500, F + 10, g);
+        box(40, 40, 1100, mat.yellow, sxx * (len / 2 + 120), 1030, F + 560, g); box(30, 30, 1100, mPost, sxx * (len / 2 + 120), 520, F + 560, g);
+      }
+      if (!opts.stairs) return g;
       // escada metálica de 1,1 m AO LONGO DA FACHADA (não avança para a nave): patamar na abertura do guarda-corpos, no
       // topo DIREITO (+x) do contentor, e 14 degraus (44°) a descer paralelamente ao contentor, para o lado do centro;
       // fica a 1,1–2,2 m da fachada e termina antes da porta do piso térreo
@@ -5620,9 +5628,9 @@ for (let i = 0; i < 6; i++) {
   const ZF = 5750, R180 = Math.PI, XW = -10300, R90 = Math.PI / 2;
   // fila da frente (parede +z), frentes viradas para −z: refeitório (20') + manutenção (10'); 1.º andar: engenheiros e EPI
   container(-8400, ZF, L20, R180, "SALA DE ALMOÇO", "Refeitório dos funcionários", 0xfbf3e4, "#d97706");
-  container(-8400, ZF, L20, R180, "SALA DOS ENGENHEIROS", "1.º andar · engenharia · métodos · intervenção rápida", 0xe7eef8, "#2f6fdc", { level: 1, stairSide: -1 });
+  container(-8400, ZF, L20, R180, "SALA DOS ENGENHEIROS", "1.º andar · engenharia · métodos · intervenção rápida", 0xe7eef8, "#2f6fdc", { level: 1, stairs: false, openEnd: -1, extend: -150 });   // sem escada: usa o passadiço partilhado
   container(-3600, ZF, L10, R180, "MANUTENÇÃO", "Materiais e peças de reserva · intervenção rápida", 0xf1f3f5, "#b45309", { windows: 0 });
-  container(-3600, ZF, L10, R180, "ARMAZÉM DE EPI", "1.º andar · capacetes · luvas · óculos · botas", 0xfff4e5, "#ea580c", { level: 1, stairSide: -1, windows: 0 });
+  container(-3600, ZF, L10, R180, "ARMAZÉM DE EPI", "1.º andar · capacetes · luvas · óculos · botas", 0xfff4e5, "#ea580c", { level: 1, stairs: true, stairSide: 1, openEnd: 1, extend: 150, windows: 0 });   // a ÚNICA escada: no topo do lado do cais (+x), desce ao longo da fachada para o cais
   // coluna da parede −x, frentes viradas para +x: WC junto ao refeitório; logística junto à bobina; limpeza ao fundo
   container(XW, 2700, L10, R90, "WC", "Balneários · vestiários", 0xeef2f6, "#64748b", { door: -L10 / 2 + 700, windows: 0 });
   container(XW, -2450, L10, R90, "RECEPÇÃO LOGÍSTICA", "Armazém de entrada · bobinas · consumíveis", 0xf1f3f5, "#334155", { windows: 0 });
