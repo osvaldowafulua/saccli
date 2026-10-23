@@ -80,6 +80,7 @@ const I18N_EXACT = {
   "Sobe elástico, cede, alivia em linha recta: o que fica é a correção": "Rises elastically, yields, unloads in a straight line: what remains is the correction",
   "Perfil da lima (A → C)": "File profile (A → C)",
   // ---- 68-exterior.js
+  "Camião encostado · a abrir a porta do cais": "Truck docked · opening the dock door",
   "Ocultar tudo": "Hide everything", "Mostrar painéis": "Show panels", "Portão · entrada": "Gate · entrance", "8 · Portão · entrada": "8 · Gate · entrance", "Entrada única do recinto · portão de correr + barreira · portaria/recepção": "Single site entrance · sliding gate + barrier · gatehouse/reception",
   "Produção da lima": "File production", "Correcção SACCLI": "SACCLI correction", "Embalagem e expedição": "Packing and shipping", "Instalações e exterior": "Facilities and exterior",
   "8 · Cais e portão": "8 · Dock and gate", "8 · Camião": "8 · Truck", "8 · Portão · saída": "8 · Gate · exit", "Portão · saída": "Gate · exit",

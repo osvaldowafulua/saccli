@@ -171,6 +171,8 @@ function stripe(x0, z0, x1, z1, w = 80, m = yl) {
   s.rotation.x = -Math.PI / 2; s.rotation.z = -Math.atan2(z1 - z0, x1 - x0);
   s.position.set((x0 + x1) / 2, FLOOR + 1, (z0 + z1) / 2); s.receiveShadow = true; scene.add(s);
 }
+// porta seccional do cais (animada em 68-exterior.js): open 0 = fechada, 1 = enrolada em cima
+const DOCKDOOR = { panel: null, open: 1 };
 function buildHall() {
   const floor = new THREE.Mesh(new THREE.PlaneGeometry(2 * HALL.x, 2 * HALL.z), M(0xffffff, 0.05, 0.82, { map: concrete }));
   floor.rotation.x = -Math.PI / 2; floor.position.y = FLOOR; floor.receiveShadow = true; scene.add(floor);
@@ -196,7 +198,10 @@ function buildHall() {
   }
   // porta seccional do cais ABERTA (enrolada em cima), aro amarelo e vedantes de borracha
   const door = new THREE.Group(); door.position.set(HALL.x - 30, FLOOR, 2200); door.rotation.y = -Math.PI / 2; scene.add(door);
-  box(4300, 420, 420, M(0x9aa3ad, 0.5, 0.5), 0, 4700, -120, door, false);          // porta enrolada
+  box(4300, 420, 420, M(0x9aa3ad, 0.5, 0.5), 0, 4700, -120, door, false);          // caixa do rolo
+  const slats = canvasTex(64, 512, (g, w, h) => { g.fillStyle = "#a3abb5"; g.fillRect(0, 0, w, h); for (let y = 0; y < h; y += 48) { g.fillStyle = "#7c858f"; g.fillRect(0, y, w, 5); g.fillStyle = "#c4cbd2"; g.fillRect(0, y + 5, w, 3); } g.fillStyle = "#1f2937"; for (const y of [200, 248]) g.fillRect(6, y + 12, w - 12, 20); });
+  DOCKDOOR.panel = new THREE.Mesh(new THREE.BoxGeometry(4200, 4800, 40), M(0xffffff, 0.5, 0.45, { map: slats }));
+  DOCKDOOR.panel.position.set(0, 2500, -60); door.add(DOCKDOOR.panel); DOCKDOOR.panel.visible = false;
   for (const sx of [-1, 1]) box(160, 4900, 160, mat.yellow, sx * 2160, 2450, 0, door, false);
   box(4400, 200, 160, mat.yellow, 0, 4950, 0, door, false);
   for (const sx of [-1, 1]) box(300, 3000, 300, mat.black, sx * 1450, 1900, -200, door, false);   // vedantes laterais

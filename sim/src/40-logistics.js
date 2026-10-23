@@ -303,7 +303,7 @@ function startLoadTruck() {
   if (!full.length) return false;
   const slot = full.reduce((a, b) => (a.t <= b.t ? a : b));
   const pal = slot.pallet, k = tr.reserve();
-  const xIn = tr.slotX(k) - FL_FORK_X;                                             // posição do KMF com a palete no lugar k do reboque
+  const xIn = tr.slotX(k) - FL_FORK_X, zIn = DOCK.z + tr.slotZ(k);                // posição do KMF com a palete no lugar k do reboque (2 filas)
   FL.task = { i: 0, t: 0, load: true, wps: [
     { fork: 320 },
     { to: [FL_ROUTE_X, FL_AISLE_Z] },
@@ -316,13 +316,13 @@ function startLoadTruck() {
     { to: [slot.x, FL_AISLE_Z], rev: true },
     { fork: 320 },
     { to: [FL_ROUTE_X, FL_AISLE_Z] },
-    { to: [FL_ROUTE_X, DOCK.z] },
+    { to: [FL_ROUTE_X, zIn] },
     { face: 0 },
     { call: () => { DOCK.inside = true; } },
-    { to: [xIn, DOCK.z] },                                                          // sobe a rampa e entra no reboque
+    { to: [xIn, zIn] },                                                          // sobe a rampa e entra no reboque
     { fork: 60 },                                                                   // pousa no piso do reboque
     { call: () => { FL.pallet = null; tr.accept(pal, k); shipped++; } },
-    { to: [FL_ROUTE_X, DOCK.z], rev: true },
+    { to: [FL_ROUTE_X, zIn], rev: true },
     { call: () => { DOCK.inside = false; } },
     { fork: 150 },
     { to: [FL_ROUTE_X, FL_PARK_Z] },
@@ -332,11 +332,8 @@ function startLoadTruck() {
 function startForklift() {
   if (FL.task) return;
   if (!FL.waiting.length) { startLoadTruck(); return; }
-  let slot = rackSlots.find((s) => !s.pallet);
-  if (!slot) {   // armário cheio: a palete mais antiga sai (carregada no camião)
-    slot = rackSlots.reduce((a, b) => (a.t <= b.t ? a : b));
-    scene.remove(slot.pallet.g); slot.pallet = null;
-  }
+  const slot = rackSlots.find((s) => !s.pallet);
+  if (!slot) { startLoadTruck(); return; }   // armário cheio: espera que o camião volte e leve paletes
   const pal = FL.waiting[0];
   slot.pallet = pal;
   FL.task = { i: 0, t: 0, wps: [

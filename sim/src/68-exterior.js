@@ -208,7 +208,7 @@
   // ---------- camião de encomendas: tractor + semi-reboque articulado. Estados: "loading" (recuado no cais, portas abertas, a receber
   //            paletes do KMF — uma por cada palete expedida), "closing" (fecha as portas), "leave" (segue pelo pátio, barreira sobe, sai pelo
   //            portão), "arrive" (um camião vazio recua em linha recta até ao cais) — e recomeça. Ciclo ligado ao contador `shipped`.
-  const TRUCK = { state: "loading", t: 0, loaded: 0, CAP: 4, shippedAt: shipped, pallets: [], path: [], i: 0, hd: 0, x: 0, z: 0, trailer: { x: 0, z: 0, hd: 0 }, door: 1, barrier: 0, gone: 0 };
+  const TRUCK = { state: "loading", t: 0, loaded: 0, CAP: 22, shippedAt: shipped, pallets: [], path: [], i: 0, hd: 0, x: 0, z: 0, trailer: { x: 0, z: 0, hd: 0 }, door: 1, barrier: 0, gone: 0 };
   const DZ = 2200, DOCK_X = X - 40;                                                                // porta do cais
   const trailerG = new THREE.Group(), tractorG = new THREE.Group(); scene.add(trailerG, tractorG);
   const TL = 13500, HITCH = TL / 2 - 1100;                                                        // comprimento do reboque; o pino de engate fica 1,1 m atrás da frente
@@ -217,14 +217,14 @@
     // caixa do reboque em painéis (abre-se à traseira e vê-se o interior a ser carregado)
     for (const sz of [-1, 1]) { const w = box(TL, 2600, 40, mBox, 0, 1450, sz * 1255, trailerG); w.receiveShadow = false; }
     { const w = box(40, 2600, 2550, mBox, TL / 2 - 20, 1450, 0, trailerG); w.receiveShadow = false; }
-    for (const sz of [-1, 1]) box(2800, 1100, 440, mBox, -TL / 2 + 2900, 270 + 550, sz * 1030, trailerG);
     box(1800, 900, 2470, mBox, TL / 2 - 900, 270 + 450, 0, trailerG);                              // pescoço de cisne (frente elevada sobre o prato e as rodas do tractor)   // caixas das rodas (reboque de piso rebaixado): as rodas ficam tapadas e as paletes passam entre elas
     for (let x = -TL / 2 + 600; x < TL / 2; x += 1200) for (const sz of [-1, 1]) box(60, 2500, 30, M(0xcbd5e1, 0.5, 0.4), x, 1450, sz * 1225, trailerG, false);   // nervuras interiores
     { const l = box(TL - 400, 20, 300, M(0xfff6e0, 0, 0.3, { emissive: 0xfff3d6, emissiveIntensity: 1 }), 0, 2740, 0, trailerG, false); }   // luz interior
     box(TL, 120, 2550, mat.dark, 0, 2830, 0, trailerG, false); box(TL - 200, 120, 2500, M(0x4b5563, 0.3, 0.6), 0, 210, 0, trailerG);   // tecto e piso
     for (const sz of [-1, 1]) { const logo = new THREE.Mesh(new THREE.PlaneGeometry(5000, 1100), new THREE.MeshBasicMaterial({ map: signTex(1024, 256), transparent: true, toneMapped: false })); logo.position.set(1500, 1650, sz * 1290); logo.rotation.y = sz > 0 ? 0 : Math.PI; trailerG.add(logo); }
     box(TL - 600, 300, 2300, mat.dark, 0, 0, 0, trailerG);                                        // chassis (por baixo do piso)
-    for (const x of [-TL / 2 + 2200, -TL / 2 + 3600]) for (const sx of [-1, 1]) { const w = cyl(520, 380, mTyre, trailerG, 24); w.rotation.x = Math.PI / 2; w.position.set(x, 520, sx * 1050); const r = cyl(300, 390, mRim, trailerG, 16); r.rotation.x = Math.PI / 2; r.position.set(x, 520, sx * 1050); }
+    for (const x of [-TL / 2 + 1900, -TL / 2 + 2600, -TL / 2 + 3300]) for (const sx of [-1, 1]) { const w = cyl(300, 260, mTyre, trailerG, 24); w.rotation.x = Math.PI / 2; w.position.set(x, -40, sx * 1080); const r = cyl(170, 270, mRim, trailerG, 16); r.rotation.x = Math.PI / 2; r.position.set(x, -40, sx * 1080); }   // 3 eixos de rodas baixas (piso rebaixado)
+    for (const sz of [-1, 1]) box(TL - 4200, 330, 30, M(0x9ca3af, 0.4, 0.5), -400, 0, sz * 1280, trailerG, false);   // saias laterais
     for (const sx of [-1, 1]) box(140, 250, 140, mat.alu, TL / 2 - 2600, -20, sx * 800, trailerG);   // apoios (recolhidos, por baixo do piso)
     box(1600, 80, 2500, mat.dark, -TL / 2 + 20, 60, 0, trailerG); for (const sz of [-1, 1]) box(40, 120, 160, mat.ledR, -TL / 2 - 10, 2570, sz * 1180, trailerG, false);
     TRUCK.doors = [-1, 1].map((sz) => { const pivot = new THREE.Group(); pivot.position.set(-TL / 2, 1450, sz * 1250); trailerG.add(pivot); box(60, 2500, 1240, M(0xe5e7eb, 0.2, 0.5), 0, 0, -sz * 620, pivot); pivot.userData.sz = sz; return pivot; });
@@ -233,21 +233,35 @@
     box(2300, 2400, 2500, M(0xb91c1c, 0.3, 0.4), 2450, 1850, 0, tractorG); box(1500, 1200, 2450, carGlass, 2850, 2350, 0, tractorG, false);
     box(600, 500, 2400, M(0x8b1a1a, 0.3, 0.5), 3750, 650, 0, tractorG); box(5000, 300, 2300, mat.dark, 1300, 0, 0, tractorG);
     box(1200, 200, 2200, mat.dark, -300, 250, 0, tractorG);                                       // prato de engate (por baixo do pescoço do reboque)
-    for (const x of [-300, 3000]) for (const s of [-1, 1]) { const w = cyl(520, 380, mTyre, tractorG, 24); w.rotation.x = Math.PI / 2; w.position.set(x, 520, s * 1050); const r = cyl(300, 390, mRim, tractorG, 16); r.rotation.x = Math.PI / 2; r.position.set(x, 520, s * 1050); }
+    for (const x of [-300, 3000]) for (const s of [-1, 1]) { const w = cyl(520, 380, mTyre, tractorG, 24); w.rotation.x = Math.PI / 2; w.position.set(x, 370, s * 1050); const r = cyl(300, 390, mRim, tractorG, 16); r.rotation.x = Math.PI / 2; r.position.set(x, 520, s * 1050); }
     cyl(120, 1200, mat.alu, tractorG, 12).position.set(1150, 3150, -1100); for (const s of [-1, 1]) box(120, 200, 300, mLamp, 4060, 1050, s * 900, tractorG, false);
     const logoT = new THREE.Mesh(new THREE.PlaneGeometry(1600, 360), new THREE.MeshBasicMaterial({ map: signTex(1024, 256), transparent: true, toneMapped: false })); logoT.position.set(2450, 2900, 1260); tractorG.add(logoT);
   }
-  // lugares no reboque: a 1.ª palete vai para o fundo (junto ao tractor) e as seguintes vêm em direcção à porta
-  const palletSlot = (k) => V(-TL / 2 + 900 + (TRUCK.CAP - 1 - k) * 1250, 270, 0);
-  function addTruckPallet() {   // (só para testes) palete instantânea
-    const p = makePallet(0, 0); scene.remove(p.g); trailerG.add(p.g); p.g.position.copy(palletSlot(TRUCK.pallets.length)); p.g.rotation.y = Math.PI / 2; stackLoad(p.g, 0, 140, 0, 700, mat.carton); TRUCK.pallets.push(p);
+  // lugares no reboque: 11 filas × 2 paletes (1200 mm atravessadas) = 22; enche do fundo (junto ao pescoço) para a porta, esquerda e direita
+  const ROWS = 11, palletSlot = (k) => V(-TL / 2 + 600 + (ROWS - 1 - Math.floor(k / 2)) * 1050, 270, (k % 2 ? 1 : -1) * 615);
+  // palete leve no reboque (base + 24 caixas numa InstancedMesh) — substitui a palete do armário para não pesar a cena
+  const cartGeo = new THREE.BoxGeometry(CART.w - 6, CART.h - 4, CART.d - 6), _o = new THREE.Object3D();
+  function lightPallet() {
+    const g = new THREE.Group();
+    box(1200, 30, 1000, mat.wood, 0, 15, 0, g, false); for (const zz of [-440, 0, 440]) box(1200, 80, 120, mat.wood, 0, 70, zz, g, false); box(1200, 22, 1000, mat.wood, 0, 129, 0, g, false);
+    const im = new THREE.InstancedMesh(cartGeo, mat.carton, SLOTS.length); im.castShadow = true;
+    SLOTS.forEach(([x, z, l], i) => { _o.position.set(x, 140 + l * CART.h + CART.h / 2, z); _o.updateMatrix(); im.setMatrixAt(i, _o.matrix); }); g.add(im);
+    return { g };
+  }
+  function addTruckPallet() {   // palete já carregada (arranque e testes)
+    const p = lightPallet(); trailerG.add(p.g); p.g.position.copy(palletSlot(TRUCK.pallets.length)); p.g.rotation.y = Math.PI / 2; TRUCK.pallets.push(p);
   }
   // interface com o KMF 1500P (40-logistics.js)
   DOCK.truck = {
-    wants: () => TRUCK.state === "loading" && TRUCK.door > 0.95 && TRUCK.pallets.length + DOCK.reserved < TRUCK.CAP,
+    wants: () => TRUCK.state === "loading" && TRUCK.door > 0.95 && DOCKDOOR.open > 0.98 && TRUCK.pallets.length + DOCK.reserved < TRUCK.CAP,
     reserve: () => TRUCK.pallets.length + DOCK.reserved++,
     slotX: (k) => TRUCK.trailer.x + palletSlot(k).x,
-    accept: (pal, k) => { DOCK.reserved = Math.max(0, DOCK.reserved - 1); trailerG.attach(pal.g); pal.g.position.copy(palletSlot(k)); pal.g.rotation.set(0, Math.PI / 2, 0); TRUCK.pallets.push(pal); },
+    slotZ: (k) => palletSlot(k).z,
+    accept: (pal, k) => {
+      DOCK.reserved = Math.max(0, DOCK.reserved - 1);
+      if (pal.g.parent) pal.g.parent.remove(pal.g);                                    // a palete do armário dá lugar a uma versão leve, igual à vista
+      const lp = lightPallet(); trailerG.add(lp.g); lp.g.position.copy(palletSlot(k)); lp.g.rotation.set(0, Math.PI / 2, 0); TRUCK.pallets.push(lp);
+    },
   };
   const DOCK_POSE = { x: DOCK_X - 400 + TL / 2, z: DZ, hd: 0 };                                  // reboque com a traseira 40 cm dentro da porta
   function placeRig(tx, tz, hd, trHd = hd) {                                                      // posiciona pelo reboque (centro) e deduz o tractor pelo pino de engate
@@ -265,7 +279,10 @@
   const EXIT = [[X + 17500, DZ + 300], [X + 19600, DZ + 3200], [X + 20000, DZ + 8000], [X + 20000, Z + 30000], [X + 20000, Z + 42000]];
   function stepRig(dt) {
     const T = TRUCK; T.t += dt;
-    if (T.state === "loading") {
+    if (T.state === "dockopen") {                                                      // encostado: abre a porta do cais e depois as portas do reboque
+      DOCKDOOR.open = Math.min(1, DOCKDOOR.open + dt * 0.3);
+      if (DOCKDOOR.open >= 1) { T.door = Math.min(1, T.door + dt * 0.6); if (T.door >= 1) { T.state = "loading"; T.t = 0; } }
+    } else if (T.state === "loading") {
       T.door = Math.min(1, T.door + dt);
       if (T.pallets.length >= T.CAP && !DOCK.inside && !DOCK.reserved) { T.full = (T.full || 0) + dt; if (T.full > 2.5) { T.state = "closing"; T.t = 0; T.full = 0; } }   // cheio e o KMF já saiu do reboque
     } else if (T.state === "closing") {
@@ -284,7 +301,9 @@
       const L = HITCH + (TL / 2 - 2900); const nax = hx - Math.cos(th) * L, naz = hz - Math.sin(th) * L;
       T.trailer.x = nax + Math.cos(th) * (TL / 2 - 2900); T.trailer.z = naz + Math.sin(th) * (TL / 2 - 2900);
       T.barrier = Math.abs(T.z - (Z + 30000)) < 16000 ? Math.min(1, T.barrier + dt * 0.8) : Math.max(0, T.barrier - dt * 0.5);
+      if (T.trailer.x - Math.cos(T.trailer.hd) * TL / 2 > DOCK_X + 1500 || T.i > 1) DOCKDOOR.open = Math.max(0, DOCKDOOR.open - dt * 0.3);   // o reboque saiu do vão: a porta do cais desce
     } else if (T.state === "gone") {
+      DOCKDOOR.open = Math.max(0, DOCKDOOR.open - dt * 0.3);
       T.barrier = Math.max(0, T.barrier - dt * 0.5);
       if (T.t > 6) {   // novo camião vazio: aparece no pátio, alinhado com o cais, e recua em linha recta
         for (const p of T.pallets) if (p) trailerG.remove(p.g); T.pallets.length = 0; T.loaded = 0; T.door = 0; DOCK.reserved = 0;
@@ -292,12 +311,17 @@
       }
     } else if (T.state === "arrive") {
       const left = TRUCK.trailer.x - DOCK_POSE.x; const v = Math.min(left, 1200 * dt); placeRig(TRUCK.trailer.x - v, DZ, 0);
-      if (left <= 1) { T.state = "loading"; T.t = 0; T.shippedAt = shipped; }
+      if (left <= 1) { T.state = "dockopen"; T.t = 0; T.shippedAt = shipped; }
     }
     drawRig();
   }
   addSystem({ update(dt) { stepRig(dt); } });
-  addTag({ text: () => TRUCK.state === "loading" ? `Camião de encomendas · a carregar · ${TRUCK.pallets.length}/${TRUCK.CAP} paletes` + (DOCK.inside ? " · KMF 1500P dentro do reboque" : "") : TRUCK.state === "closing" ? "Camião · a fechar as portas" : TRUCK.state === "leave" ? "Camião · a sair para entrega" : TRUCK.state === "arrive" ? "Camião vazio · a recuar para o cais" : "Cais livre", at: () => V(TRUCK.trailer.x, GY + 4200, TRUCK.trailer.z), max: 60000 });
+  addTag({ text: () => TRUCK.state === "dockopen" ? "Camião encostado · a abrir a porta do cais" : TRUCK.state === "loading" ? `Camião de encomendas · a carregar · ${TRUCK.pallets.length}/${TRUCK.CAP} paletes` + (DOCK.inside ? " · KMF 1500P dentro do reboque" : "") : TRUCK.state === "closing" ? "Camião · a fechar as portas" : TRUCK.state === "leave" ? "Camião · a sair para entrega" : TRUCK.state === "arrive" ? "Camião vazio · a recuar para o cais" : "Cais livre", at: () => V(TRUCK.trailer.x, GY + 4200, TRUCK.trailer.z), max: 60000 });
+  for (let k = 0; k < 16; k++) addTruckPallet();                                       // o 1.º camião já vem meio carregado: o KMF completa as 22 paletes
+  addSystem({ draw() {                                                                  // porta seccional do cais: desce em lâminas (escala a partir do topo)
+    const f = 1 - DOCKDOOR.open, pnl = DOCKDOOR.panel; if (!pnl) return;
+    pnl.visible = f > 0.01; pnl.scale.y = Math.max(0.01, f); pnl.position.y = 4900 - (4800 * f) / 2;
+  } });
   TRUCK.add = addTruckPallet; window.__truck = TRUCK;
 
   // ---------- entrada única do recinto (muro sul): portão de correr para viaturas, barreira, portaria/recepção, árvores
