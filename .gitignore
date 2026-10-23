@@ -1,5 +1,4 @@
 .DS_Store
 sim/shots/
 sim/dbg.html
-*.png
 node_modules/
