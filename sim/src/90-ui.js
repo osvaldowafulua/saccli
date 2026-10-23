@@ -436,8 +436,8 @@ newNokCrate(NOK_POS.x, LOW_Y, 0, "lowWait");
 newNokCrate(NOK_END, LOW_Y, 0, "lowReturn");
 cartons.push(makeCarton(PACK_X, CART_Z, "open"));
 for (let i = 0; i < 20; i++) { const k = makeCarton(0, 0, "pallet", true, station.pallet.g); k.g.position.set(SLOTS[i][0], 140 + SLOTS[i][2] * CART.h, SLOTS[i][1]); station.pallet.crates.push(k); }
-// duas paletes já arrumadas no armário
-for (const s of rackSlots.slice(0, 2)) {
+// paletes já arrumadas no armário
+for (const s of rackSlots.slice(0, 6)) {   // 6 paletes prontas: o KMF carrega já o primeiro camião
   const p = makePallet(s.x, -6100); p.g.position.set(s.x, FLOOR + s.y + 60, RACK.z); p.g.rotation.y = Math.PI / 2;
   for (let i = 0; i < SLOTS.length; i++) { const k = makeCarton(0, 0, "pallet", true, p.g); k.g.position.set(SLOTS[i][0], 140 + SLOTS[i][2] * CART.h, SLOTS[i][1]); }
   s.pallet = p;

@@ -179,19 +179,27 @@ function buildHall() {
     { len: 2 * HALL.x, pos: [0, -HALL.z], rot: 0 }, { len: 2 * HALL.x, pos: [0, HALL.z], rot: Math.PI },
     { len: 2 * HALL.z, pos: [-HALL.x, 0], rot: Math.PI / 2 }, { len: 2 * HALL.z, pos: [HALL.x, 0], rot: -Math.PI / 2 },
   ];
+  walls[3].gap = [2200 - 2150, 2200 + 2150];                                     // vão da porta do cais (parede +x; x local = z do mundo)
   for (const w of walls) {
     const g = new THREE.Group(); g.position.set(w.pos[0], FLOOR, w.pos[1]); g.rotation.y = w.rot; scene.add(g);
-    const p = new THREE.Mesh(new THREE.PlaneGeometry(w.len, HALL.h), M(0xffffff, 0.4, 0.55, { map: panelTex(w.len) }));
-    p.position.y = HALL.h / 2; g.add(p);
-    box(w.len, 1200, 120, M(0x6f747a, 0, 0.9), 0, 600, 60, g, false);
-    box(w.len - 2000, 900, 20, mat.window, 0, 5200, 15, g, false);
-    for (let x = -w.len / 2 + 1000; x < w.len / 2 - 900; x += 2000) box(80, 900, 40, mat.steelBlue, x, 5200, 30, g, false);
-    box(w.len, 260, 20, M(0x1f4f9e, 0.1, 0.6), 0, 1450, 15, g, false);
+    const pieces = w.gap ? [[-w.len / 2, w.gap[0]], [w.gap[1], w.len / 2]] : [[-w.len / 2, w.len / 2]];
+    for (const [a, b] of pieces) {
+      const len = b - a, cx = (a + b) / 2;
+      const p = new THREE.Mesh(new THREE.PlaneGeometry(len, HALL.h), M(0xffffff, 0.4, 0.55, { map: panelTex(len) }));
+      p.position.set(cx, HALL.h / 2, 0); g.add(p);
+      box(len, 1200, 120, M(0x6f747a, 0, 0.9), cx, 600, 60, g, false);
+      if (len > 3000) box(len - 2000, 900, 20, mat.window, cx, 5200, 15, g, false);
+      for (let x = a + 1000; x < b - 900; x += 2000) box(80, 900, 40, mat.steelBlue, x, 5200, 30, g, false);
+      box(len, 260, 20, M(0x1f4f9e, 0.1, 0.6), cx, 1450, 15, g, false);
+    }
+    if (w.gap) { const gw = w.gap[1] - w.gap[0], gc = (w.gap[0] + w.gap[1]) / 2; const l = new THREE.Mesh(new THREE.PlaneGeometry(gw, HALL.h - 4900), M(0xffffff, 0.4, 0.55, { map: panelTex(gw) })); l.position.set(gc, 4900 + (HALL.h - 4900) / 2, 0); g.add(l); }
   }
+  // porta seccional do cais ABERTA (enrolada em cima), aro amarelo e vedantes de borracha
   const door = new THREE.Group(); door.position.set(HALL.x - 30, FLOOR, 2200); door.rotation.y = -Math.PI / 2; scene.add(door);
-  box(4200, 4800, 30, M(0x9aa3ad, 0.5, 0.5), 0, 2400, 0, door, false);
-  for (let y = 400; y < 4800; y += 480) box(4200, 18, 40, M(0x7c858f, 0.5, 0.5), 0, y, 0, door, false);
-  box(4400, 200, 60, mat.yellow, 0, 4900, 0, door, false);
+  box(4300, 420, 420, M(0x9aa3ad, 0.5, 0.5), 0, 4700, -120, door, false);          // porta enrolada
+  for (const sx of [-1, 1]) box(160, 4900, 160, mat.yellow, sx * 2160, 2450, 0, door, false);
+  box(4400, 200, 160, mat.yellow, 0, 4950, 0, door, false);
+  for (const sx of [-1, 1]) box(300, 3000, 300, mat.black, sx * 1450, 1900, -200, door, false);   // vedantes laterais
   // cobertura num grupo próprio: esconde-se quando a câmara sobe acima dela (vista de topo "casa de bonecas")
   const roof = new THREE.Mesh(new THREE.PlaneGeometry(2 * HALL.x, 2 * HALL.z), M(0x5b6068, 0.3, 0.8));
   roof.rotation.x = Math.PI / 2; roof.position.y = top; roofG.add(roof);

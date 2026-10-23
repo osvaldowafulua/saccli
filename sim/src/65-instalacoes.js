@@ -114,12 +114,13 @@
   // ---------- cais de carga: a porta da parede +x (z = 2200) é o cais; o camião está encostado por fora, com a traseira aberta no cais
   {
     const DZ = 2200, DX = HALL.x - 40;
-    box(2600, 140, 3200, M(0x6b7280, 0.6, 0.5), DX - 1300, FLOOR + 70, DZ);                      // plataforma / rampa niveladora
-    box(2600, 10, 3200, M(0x374151, 0.6, 0.6), DX - 1300, FLOOR + 145, DZ, scene, false);
+    // rampa niveladora: sobe 418 mm em 2,2 m, do chão da nave até ao piso do reboque (o KMF 1500P sobe-a para carregar)
+    const rampA = Math.atan2(DOCK.rise, DOCK.ramp), rampL = Math.hypot(DOCK.ramp, DOCK.rise);
+    const ramp = box(rampL, 60, 2700, M(0x4b5563, 0.6, 0.5), DX - DOCK.ramp / 2, FLOOR + DOCK.rise / 2 - 20, DZ); ramp.rotation.z = rampA;
+    for (let i = 1; i < 12; i++) { const r = box(40, 20, 2600, M(0x9ca3af, 0.7, 0.4), DX - DOCK.ramp + i * (DOCK.ramp / 12), FLOOR + DOCK.rise * (i / 12) + 14, DZ, scene, false); }   // ranhuras anti-derrapantes
+    for (const sz of [-1, 1]) box(DOCK.ramp, DOCK.rise, 40, mat.yellow, DX - DOCK.ramp / 2, FLOOR + DOCK.rise / 2, DZ + sz * 1370, scene, false);   // saias laterais amarelas
     for (const s of [-1, 1]) box(300, 400, 400, mat.black, DX - 150, FLOOR + 350, DZ + s * 1300);   // batentes de borracha
     stripe(DX - 3200, DZ - 1700, DX - 3200, DZ + 1700, 100); stripe(DX - 3200, DZ - 1700, DX - 100, DZ - 1700, 100); stripe(DX - 3200, DZ + 1700, DX - 100, DZ + 1700, 100);
-    // carga já dentro do reboque + paletes à espera no cais
-    for (const [x, z] of [[DX - 2400, DZ - 1000], [DX - 2400, DZ + 1000], [DX - 3800, DZ - 1000]]) { const p = makePallet(0, 0); p.g.position.set(x, FLOOR, z); stackLoad(p.g, 0, 140, 0, 600, mat.carton); }
     const sg = new THREE.Mesh(new THREE.PlaneGeometry(2600, 500), new THREE.MeshBasicMaterial({ map: signTex("CAIS DE CARGA · 1", "Expedição de paletes · camião", "#b45309") }));
     sg.rotation.y = -Math.PI / 2; sg.position.set(DX - 20, FLOOR + 5300, DZ); scene.add(sg);
   }

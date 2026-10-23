@@ -228,7 +228,11 @@ const rackSlots = [];
 for (const y of RACK.levels) for (const x of RACK.xs) rackSlots.push({ x, y, pallet: null, t: 0 });
 let rackClock = 0;
 const FL_FORK_X = 1310, FL_AISLE_Z = -4250, FL_ROUTE_X = 9150, FL_PARK_Z = 3000;
-const FL = { x: FL_ROUTE_X, z: FL_PARK_Z, hd: -Math.PI / 2, fork: 150, pallet: null, off: 0, task: null, waiting: [] };
+const FL = { x: FL_ROUTE_X, z: FL_PARK_Z, hd: -Math.PI / 2, fork: 150, pallet: null, off: 0, task: null, waiting: [], lift: 0 };
+// cais de carga: rampa niveladora de 2,2 m que sobe do chão da nave até ao piso do reboque (+418 mm) na porta (x = HALL.x − 40, z = 2200).
+// O camião (68-exterior.js) regista-se em DOCK.truck: { wants(), slotX(k), accept(pal) } — o KMF 1500P vai buscar paletes ao armário e
+// carrega-as uma a uma dentro do reboque, da frente para a porta.
+const DOCK = { x: HALL.x - 40, z: 2200, rise: 418, ramp: 2200, truck: null, inside: false, reserved: 0 };
 const flG = new THREE.Group(); scene.add(flG);
 const kukaLogo = new THREE.MeshBasicMaterial({ map: canvasTex(256, 64, (g) => {
   g.fillStyle = "#f1f1ee"; g.fillRect(0, 0, 256, 64);
@@ -283,16 +287,51 @@ const carLogo = new THREE.Mesh(new THREE.PlaneGeometry(330, 82), kukaLogo); carL
 for (const z of [-210, 210]) box(1100, 40, 110, mat.carbon, FL_FORK_X, 0, z, flCar); // garfos
 addView("kmf", "KMF 1500P · armário", [8600, 2600, -900], [5200, 700, -4600]);
 function drawForklift() {
-  flG.position.set(FL.x, 0, FL.z); flG.rotation.y = -FL.hd;
+  flG.position.set(FL.x, FL.lift, FL.z); flG.rotation.y = -FL.hd;
   flCar.position.y = FLOOR + FL.fork;
   flInner.position.y = Math.max(0, FL.fork - 1900);
   if (FL.pallet) {
-    FL.pallet.g.position.set(FL.x + Math.cos(FL.hd) * FL_FORK_X, FLOOR + FL.fork - 60, FL.z + Math.sin(FL.hd) * FL_FORK_X);
+    FL.pallet.g.position.set(FL.x + Math.cos(FL.hd) * FL_FORK_X, FLOOR + FL.lift + FL.fork - 60, FL.z + Math.sin(FL.hd) * FL_FORK_X);
     FL.pallet.g.rotation.y = -FL.hd + FL.off;
   }
 }
+// tarefa de carga: palete mais antiga do armário → camião no cais
+function startLoadTruck() {
+  const tr = DOCK.truck;
+  if (!tr || !tr.wants()) return false;
+  const full = rackSlots.filter((s) => s.pallet);
+  if (!full.length) return false;
+  const slot = full.reduce((a, b) => (a.t <= b.t ? a : b));
+  const pal = slot.pallet, k = tr.reserve();
+  const xIn = tr.slotX(k) - FL_FORK_X;                                             // posição do KMF com a palete no lugar k do reboque
+  FL.task = { i: 0, t: 0, load: true, wps: [
+    { fork: 320 },
+    { to: [FL_ROUTE_X, FL_AISLE_Z] },
+    { to: [slot.x, FL_AISLE_Z] },
+    { face: -Math.PI / 2 },
+    { fork: slot.y + 50 },                                                          // garfos por baixo da palete
+    { to: [slot.x, RACK.z + FL_FORK_X] },
+    { call: () => { slot.pallet = null; FL.pallet = pal; FL.off = pal.g.rotation.y + FL.hd; } },
+    { fork: slot.y + 190 },                                                         // levanta das longarinas
+    { to: [slot.x, FL_AISLE_Z], rev: true },
+    { fork: 320 },
+    { to: [FL_ROUTE_X, FL_AISLE_Z] },
+    { to: [FL_ROUTE_X, DOCK.z] },
+    { face: 0 },
+    { call: () => { DOCK.inside = true; } },
+    { to: [xIn, DOCK.z] },                                                          // sobe a rampa e entra no reboque
+    { fork: 60 },                                                                   // pousa no piso do reboque
+    { call: () => { FL.pallet = null; tr.accept(pal, k); shipped++; } },
+    { to: [FL_ROUTE_X, DOCK.z], rev: true },
+    { call: () => { DOCK.inside = false; } },
+    { fork: 150 },
+    { to: [FL_ROUTE_X, FL_PARK_Z] },
+  ] };
+  return true;
+}
 function startForklift() {
-  if (FL.task || !FL.waiting.length) return;
+  if (FL.task) return;
+  if (!FL.waiting.length) { startLoadTruck(); return; }
   let slot = rackSlots.find((s) => !s.pallet);
   if (!slot) {   // armário cheio: a palete mais antiga sai (carregada no camião)
     slot = rackSlots.reduce((a, b) => (a.t <= b.t ? a : b));
@@ -314,13 +353,17 @@ function startForklift() {
     { fork: slot.y + 180 },                                                         // sobe ao nível livre
     { to: [slot.x, RACK.z + FL_FORK_X] },
     { fork: slot.y + 120 },                                                         // pousa nas longarinas
-    { call: () => { FL.pallet = null; pal.g.position.set(slot.x, FLOOR + slot.y + 60, RACK.z); slot.t = rackClock; shipped++; } },
+    { call: () => { FL.pallet = null; pal.g.position.set(slot.x, FLOOR + slot.y + 60, RACK.z); slot.t = rackClock; } },
     { fork: slot.y + 60 },
     { to: [slot.x, FL_AISLE_Z], rev: true },
     { fork: 150 },
     { to: [FL_ROUTE_X, FL_AISLE_Z] },
     { to: [FL_ROUTE_X, FL_PARK_Z] },
   ] };
+}
+function dockLift() {   // altura do KMF: sobe a rampa niveladora e fica ao nível do piso do reboque lá dentro
+  const u = Math.abs(FL.z - DOCK.z) < 1600 ? Math.max(0, Math.min(1, (FL.x - (DOCK.x - DOCK.ramp)) / DOCK.ramp)) : 0;
+  FL.lift = DOCK.rise * u;
 }
 function runForklift(dt) {
   rackClock += dt;
@@ -333,8 +376,9 @@ function runForklift(dt) {
   const turnTo = (want) => { const dh = ((want - FL.hd) % (2 * Math.PI) + 3 * Math.PI) % (2 * Math.PI) - Math.PI; if (Math.abs(dh) > 0.004) { FL.hd += Math.sign(dh) * Math.min(Math.abs(dh), 1.1 * dt); return false; } FL.hd = want; return true; };
   if (wp.face !== undefined) { if (turnTo(wp.face)) t.i++; return; }
   const dx = wp.to[0] - FL.x, dz = wp.to[1] - FL.z, dist = Math.hypot(dx, dz);
-  if (dist < 1) { FL.x = wp.to[0]; FL.z = wp.to[1]; t.i++; return; }
+  if (dist < 1) { FL.x = wp.to[0]; FL.z = wp.to[1]; t.i++; dockLift(); return; }
   if (!turnTo(Math.atan2(dz, dx) + (wp.rev ? Math.PI : 0))) return;
-  const v = Math.min(dist, (FL.pallet ? 900 : 1300) * dt);
+  const v = Math.min(dist, (FL.pallet ? 900 : 1300) * dt * (FL.lift > 1 ? 0.5 : 1));
   FL.x += (dx / dist) * v; FL.z += (dz / dist) * v;
+  dockLift();
 }

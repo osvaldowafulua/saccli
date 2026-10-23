@@ -421,6 +421,7 @@ const I18N_EXACT = {
 
 // fragmentos para frases dinâmicas com números (substituição de sub-frases inteiras, da mais longa para a mais curta)
 const I18N_PHRASES = [
+  [" · KMF 1500P dentro do reboque", " · KMF 1500P inside the trailer"],
   ["Camião de encomendas · a carregar · ", "Delivery truck · loading · "], [" paletes", " pallets"],
   ["Recepção · Sala de visitas de clientes", "Reception · Client visiting room"], ["Administração · HSA + RH · contabilidade · compras", "Administration · HSE + HR · accounting · purchasing"], ["Sala de reunião executiva · direcção", "Executive meeting room · management"],
   ["PISO 0 · ", "FLOOR 0 · "], ["PISO 1 · ", "FLOOR 1 · "], ["PISO 2 · ", "FLOOR 2 · "],

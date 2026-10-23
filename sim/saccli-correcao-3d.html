@@ -730,6 +730,7 @@ const I18N_EXACT = {
 
 // fragmentos para frases dinâmicas com números (substituição de sub-frases inteiras, da mais longa para a mais curta)
 const I18N_PHRASES = [
+  [" · KMF 1500P dentro do reboque", " · KMF 1500P inside the trailer"],
   ["Camião de encomendas · a carregar · ", "Delivery truck · loading · "], [" paletes", " pallets"],
   ["Recepção · Sala de visitas de clientes", "Reception · Client visiting room"], ["Administração · HSA + RH · contabilidade · compras", "Administration · HSE + HR · accounting · purchasing"], ["Sala de reunião executiva · direcção", "Executive meeting room · management"],
   ["PISO 0 · ", "FLOOR 0 · "], ["PISO 1 · ", "FLOOR 1 · "], ["PISO 2 · ", "FLOOR 2 · "],
@@ -1004,19 +1005,27 @@ function buildHall() {
     { len: 2 * HALL.x, pos: [0, -HALL.z], rot: 0 }, { len: 2 * HALL.x, pos: [0, HALL.z], rot: Math.PI },
     { len: 2 * HALL.z, pos: [-HALL.x, 0], rot: Math.PI / 2 }, { len: 2 * HALL.z, pos: [HALL.x, 0], rot: -Math.PI / 2 },
   ];
+  walls[3].gap = [2200 - 2150, 2200 + 2150];                                     // vão da porta do cais (parede +x; x local = z do mundo)
   for (const w of walls) {
     const g = new THREE.Group(); g.position.set(w.pos[0], FLOOR, w.pos[1]); g.rotation.y = w.rot; scene.add(g);
-    const p = new THREE.Mesh(new THREE.PlaneGeometry(w.len, HALL.h), M(0xffffff, 0.4, 0.55, { map: panelTex(w.len) }));
-    p.position.y = HALL.h / 2; g.add(p);
-    box(w.len, 1200, 120, M(0x6f747a, 0, 0.9), 0, 600, 60, g, false);
-    box(w.len - 2000, 900, 20, mat.window, 0, 5200, 15, g, false);
-    for (let x = -w.len / 2 + 1000; x < w.len / 2 - 900; x += 2000) box(80, 900, 40, mat.steelBlue, x, 5200, 30, g, false);
-    box(w.len, 260, 20, M(0x1f4f9e, 0.1, 0.6), 0, 1450, 15, g, false);
+    const pieces = w.gap ? [[-w.len / 2, w.gap[0]], [w.gap[1], w.len / 2]] : [[-w.len / 2, w.len / 2]];
+    for (const [a, b] of pieces) {
+      const len = b - a, cx = (a + b) / 2;
+      const p = new THREE.Mesh(new THREE.PlaneGeometry(len, HALL.h), M(0xffffff, 0.4, 0.55, { map: panelTex(len) }));
+      p.position.set(cx, HALL.h / 2, 0); g.add(p);
+      box(len, 1200, 120, M(0x6f747a, 0, 0.9), cx, 600, 60, g, false);
+      if (len > 3000) box(len - 2000, 900, 20, mat.window, cx, 5200, 15, g, false);
+      for (let x = a + 1000; x < b - 900; x += 2000) box(80, 900, 40, mat.steelBlue, x, 5200, 30, g, false);
+      box(len, 260, 20, M(0x1f4f9e, 0.1, 0.6), cx, 1450, 15, g, false);
+    }
+    if (w.gap) { const gw = w.gap[1] - w.gap[0], gc = (w.gap[0] + w.gap[1]) / 2; const l = new THREE.Mesh(new THREE.PlaneGeometry(gw, HALL.h - 4900), M(0xffffff, 0.4, 0.55, { map: panelTex(gw) })); l.position.set(gc, 4900 + (HALL.h - 4900) / 2, 0); g.add(l); }
   }
+  // porta seccional do cais ABERTA (enrolada em cima), aro amarelo e vedantes de borracha
   const door = new THREE.Group(); door.position.set(HALL.x - 30, FLOOR, 2200); door.rotation.y = -Math.PI / 2; scene.add(door);
-  box(4200, 4800, 30, M(0x9aa3ad, 0.5, 0.5), 0, 2400, 0, door, false);
-  for (let y = 400; y < 4800; y += 480) box(4200, 18, 40, M(0x7c858f, 0.5, 0.5), 0, y, 0, door, false);
-  box(4400, 200, 60, mat.yellow, 0, 4900, 0, door, false);
+  box(4300, 420, 420, M(0x9aa3ad, 0.5, 0.5), 0, 4700, -120, door, false);          // porta enrolada
+  for (const sx of [-1, 1]) box(160, 4900, 160, mat.yellow, sx * 2160, 2450, 0, door, false);
+  box(4400, 200, 160, mat.yellow, 0, 4950, 0, door, false);
+  for (const sx of [-1, 1]) box(300, 3000, 300, mat.black, sx * 1450, 1900, -200, door, false);   // vedantes laterais
   // cobertura num grupo próprio: esconde-se quando a câmara sobe acima dela (vista de topo "casa de bonecas")
   const roof = new THREE.Mesh(new THREE.PlaneGeometry(2 * HALL.x, 2 * HALL.z), M(0x5b6068, 0.3, 0.8));
   roof.rotation.x = Math.PI / 2; roof.position.y = top; roofG.add(roof);
@@ -1766,7 +1775,11 @@ const rackSlots = [];
 for (const y of RACK.levels) for (const x of RACK.xs) rackSlots.push({ x, y, pallet: null, t: 0 });
 let rackClock = 0;
 const FL_FORK_X = 1310, FL_AISLE_Z = -4250, FL_ROUTE_X = 9150, FL_PARK_Z = 3000;
-const FL = { x: FL_ROUTE_X, z: FL_PARK_Z, hd: -Math.PI / 2, fork: 150, pallet: null, off: 0, task: null, waiting: [] };
+const FL = { x: FL_ROUTE_X, z: FL_PARK_Z, hd: -Math.PI / 2, fork: 150, pallet: null, off: 0, task: null, waiting: [], lift: 0 };
+// cais de carga: rampa niveladora de 2,2 m que sobe do chão da nave até ao piso do reboque (+418 mm) na porta (x = HALL.x − 40, z = 2200).
+// O camião (68-exterior.js) regista-se em DOCK.truck: { wants(), slotX(k), accept(pal) } — o KMF 1500P vai buscar paletes ao armário e
+// carrega-as uma a uma dentro do reboque, da frente para a porta.
+const DOCK = { x: HALL.x - 40, z: 2200, rise: 418, ramp: 2200, truck: null, inside: false, reserved: 0 };
 const flG = new THREE.Group(); scene.add(flG);
 const kukaLogo = new THREE.MeshBasicMaterial({ map: canvasTex(256, 64, (g) => {
   g.fillStyle = "#f1f1ee"; g.fillRect(0, 0, 256, 64);
@@ -1821,16 +1834,51 @@ const carLogo = new THREE.Mesh(new THREE.PlaneGeometry(330, 82), kukaLogo); carL
 for (const z of [-210, 210]) box(1100, 40, 110, mat.carbon, FL_FORK_X, 0, z, flCar); // garfos
 addView("kmf", "KMF 1500P · armário", [8600, 2600, -900], [5200, 700, -4600]);
 function drawForklift() {
-  flG.position.set(FL.x, 0, FL.z); flG.rotation.y = -FL.hd;
+  flG.position.set(FL.x, FL.lift, FL.z); flG.rotation.y = -FL.hd;
   flCar.position.y = FLOOR + FL.fork;
   flInner.position.y = Math.max(0, FL.fork - 1900);
   if (FL.pallet) {
-    FL.pallet.g.position.set(FL.x + Math.cos(FL.hd) * FL_FORK_X, FLOOR + FL.fork - 60, FL.z + Math.sin(FL.hd) * FL_FORK_X);
+    FL.pallet.g.position.set(FL.x + Math.cos(FL.hd) * FL_FORK_X, FLOOR + FL.lift + FL.fork - 60, FL.z + Math.sin(FL.hd) * FL_FORK_X);
     FL.pallet.g.rotation.y = -FL.hd + FL.off;
   }
 }
+// tarefa de carga: palete mais antiga do armário → camião no cais
+function startLoadTruck() {
+  const tr = DOCK.truck;
+  if (!tr || !tr.wants()) return false;
+  const full = rackSlots.filter((s) => s.pallet);
+  if (!full.length) return false;
+  const slot = full.reduce((a, b) => (a.t <= b.t ? a : b));
+  const pal = slot.pallet, k = tr.reserve();
+  const xIn = tr.slotX(k) - FL_FORK_X;                                             // posição do KMF com a palete no lugar k do reboque
+  FL.task = { i: 0, t: 0, load: true, wps: [
+    { fork: 320 },
+    { to: [FL_ROUTE_X, FL_AISLE_Z] },
+    { to: [slot.x, FL_AISLE_Z] },
+    { face: -Math.PI / 2 },
+    { fork: slot.y + 50 },                                                          // garfos por baixo da palete
+    { to: [slot.x, RACK.z + FL_FORK_X] },
+    { call: () => { slot.pallet = null; FL.pallet = pal; FL.off = pal.g.rotation.y + FL.hd; } },
+    { fork: slot.y + 190 },                                                         // levanta das longarinas
+    { to: [slot.x, FL_AISLE_Z], rev: true },
+    { fork: 320 },
+    { to: [FL_ROUTE_X, FL_AISLE_Z] },
+    { to: [FL_ROUTE_X, DOCK.z] },
+    { face: 0 },
+    { call: () => { DOCK.inside = true; } },
+    { to: [xIn, DOCK.z] },                                                          // sobe a rampa e entra no reboque
+    { fork: 60 },                                                                   // pousa no piso do reboque
+    { call: () => { FL.pallet = null; tr.accept(pal, k); shipped++; } },
+    { to: [FL_ROUTE_X, DOCK.z], rev: true },
+    { call: () => { DOCK.inside = false; } },
+    { fork: 150 },
+    { to: [FL_ROUTE_X, FL_PARK_Z] },
+  ] };
+  return true;
+}
 function startForklift() {
-  if (FL.task || !FL.waiting.length) return;
+  if (FL.task) return;
+  if (!FL.waiting.length) { startLoadTruck(); return; }
   let slot = rackSlots.find((s) => !s.pallet);
   if (!slot) {   // armário cheio: a palete mais antiga sai (carregada no camião)
     slot = rackSlots.reduce((a, b) => (a.t <= b.t ? a : b));
@@ -1852,13 +1900,17 @@ function startForklift() {
     { fork: slot.y + 180 },                                                         // sobe ao nível livre
     { to: [slot.x, RACK.z + FL_FORK_X] },
     { fork: slot.y + 120 },                                                         // pousa nas longarinas
-    { call: () => { FL.pallet = null; pal.g.position.set(slot.x, FLOOR + slot.y + 60, RACK.z); slot.t = rackClock; shipped++; } },
+    { call: () => { FL.pallet = null; pal.g.position.set(slot.x, FLOOR + slot.y + 60, RACK.z); slot.t = rackClock; } },
     { fork: slot.y + 60 },
     { to: [slot.x, FL_AISLE_Z], rev: true },
     { fork: 150 },
     { to: [FL_ROUTE_X, FL_AISLE_Z] },
     { to: [FL_ROUTE_X, FL_PARK_Z] },
   ] };
+}
+function dockLift() {   // altura do KMF: sobe a rampa niveladora e fica ao nível do piso do reboque lá dentro
+  const u = Math.abs(FL.z - DOCK.z) < 1600 ? Math.max(0, Math.min(1, (FL.x - (DOCK.x - DOCK.ramp)) / DOCK.ramp)) : 0;
+  FL.lift = DOCK.rise * u;
 }
 function runForklift(dt) {
   rackClock += dt;
@@ -1871,10 +1923,11 @@ function runForklift(dt) {
   const turnTo = (want) => { const dh = ((want - FL.hd) % (2 * Math.PI) + 3 * Math.PI) % (2 * Math.PI) - Math.PI; if (Math.abs(dh) > 0.004) { FL.hd += Math.sign(dh) * Math.min(Math.abs(dh), 1.1 * dt); return false; } FL.hd = want; return true; };
   if (wp.face !== undefined) { if (turnTo(wp.face)) t.i++; return; }
   const dx = wp.to[0] - FL.x, dz = wp.to[1] - FL.z, dist = Math.hypot(dx, dz);
-  if (dist < 1) { FL.x = wp.to[0]; FL.z = wp.to[1]; t.i++; return; }
+  if (dist < 1) { FL.x = wp.to[0]; FL.z = wp.to[1]; t.i++; dockLift(); return; }
   if (!turnTo(Math.atan2(dz, dx) + (wp.rev ? Math.PI : 0))) return;
-  const v = Math.min(dist, (FL.pallet ? 900 : 1300) * dt);
+  const v = Math.min(dist, (FL.pallet ? 900 : 1300) * dt * (FL.lift > 1 ? 0.5 : 1));
   FL.x += (dx / dist) * v; FL.z += (dz / dist) * v;
+  dockLift();
 }
 
 // ----- 50-upstream.js -----
@@ -5686,12 +5739,13 @@ for (let i = 0; i < 6; i++) {
   // ---------- cais de carga: a porta da parede +x (z = 2200) é o cais; o camião está encostado por fora, com a traseira aberta no cais
   {
     const DZ = 2200, DX = HALL.x - 40;
-    box(2600, 140, 3200, M(0x6b7280, 0.6, 0.5), DX - 1300, FLOOR + 70, DZ);                      // plataforma / rampa niveladora
-    box(2600, 10, 3200, M(0x374151, 0.6, 0.6), DX - 1300, FLOOR + 145, DZ, scene, false);
+    // rampa niveladora: sobe 418 mm em 2,2 m, do chão da nave até ao piso do reboque (o KMF 1500P sobe-a para carregar)
+    const rampA = Math.atan2(DOCK.rise, DOCK.ramp), rampL = Math.hypot(DOCK.ramp, DOCK.rise);
+    const ramp = box(rampL, 60, 2700, M(0x4b5563, 0.6, 0.5), DX - DOCK.ramp / 2, FLOOR + DOCK.rise / 2 - 20, DZ); ramp.rotation.z = rampA;
+    for (let i = 1; i < 12; i++) { const r = box(40, 20, 2600, M(0x9ca3af, 0.7, 0.4), DX - DOCK.ramp + i * (DOCK.ramp / 12), FLOOR + DOCK.rise * (i / 12) + 14, DZ, scene, false); }   // ranhuras anti-derrapantes
+    for (const sz of [-1, 1]) box(DOCK.ramp, DOCK.rise, 40, mat.yellow, DX - DOCK.ramp / 2, FLOOR + DOCK.rise / 2, DZ + sz * 1370, scene, false);   // saias laterais amarelas
     for (const s of [-1, 1]) box(300, 400, 400, mat.black, DX - 150, FLOOR + 350, DZ + s * 1300);   // batentes de borracha
     stripe(DX - 3200, DZ - 1700, DX - 3200, DZ + 1700, 100); stripe(DX - 3200, DZ - 1700, DX - 100, DZ - 1700, 100); stripe(DX - 3200, DZ + 1700, DX - 100, DZ + 1700, 100);
-    // carga já dentro do reboque + paletes à espera no cais
-    for (const [x, z] of [[DX - 2400, DZ - 1000], [DX - 2400, DZ + 1000], [DX - 3800, DZ - 1000]]) { const p = makePallet(0, 0); p.g.position.set(x, FLOOR, z); stackLoad(p.g, 0, 140, 0, 600, mat.carton); }
     const sg = new THREE.Mesh(new THREE.PlaneGeometry(2600, 500), new THREE.MeshBasicMaterial({ map: signTex("CAIS DE CARGA · 1", "Expedição de paletes · camião", "#b45309") }));
     sg.rotation.y = -Math.PI / 2; sg.position.set(DX - 20, FLOOR + 5300, DZ); scene.add(sg);
   }
@@ -5856,19 +5910,24 @@ for (let i = 0; i < 6; i++) {
 
   // ---------- revestimento exterior da nave: painéis sandwich horizontais, soco de betão, cobertura a duas águas com beirais
   const extTex = canvasTex(256, 256, (g, w, h) => { g.fillStyle = "#d6dbe1"; g.fillRect(0, 0, w, h); for (let y = 0; y < h; y += 32) { g.fillStyle = "#b8c0c8"; g.fillRect(0, y, w, 5); g.fillStyle = "#e9edf1"; g.fillRect(0, y + 5, w, 3); } }, [1, 1]);
-  const extWall = (len, x, z, rot) => {
+  const extWall = (len, x, z, rot, gap = null) => {
     const g = new THREE.Group(); g.position.set(x, FLOOR, z); g.rotation.y = rot; scene.add(g);
-    const t = extTex.clone(); t.needsUpdate = true; t.repeat.set(len / 2000, H / 2000);
-    const p = new THREE.Mesh(new THREE.PlaneGeometry(len, H + 500), M(0xffffff, 0.3, 0.55, { map: t })); p.position.set(0, (H + 500) / 2, 0); p.receiveShadow = true; g.add(p);
-    box(len, 1400, 160, M(0x8e9298, 0.05, 0.85), 0, 700, -60, g, false);                        // soco de betão
-    box(len - 2000, 900, 40, mat.window, 0, 5200, -10, g, false);                                // fita de janelas
-    for (let xx = -len / 2 + 1000; xx < len / 2 - 900; xx += 2000) box(80, 900, 60, mat.steelBlue, xx, 5200, -20, g, false);
-    box(len, 300, 60, M(0x1f4f9e, 0.1, 0.6), 0, 1450, -20, g, false);                            // faixa azul da marca
+    const pieces = gap ? [[-len / 2, gap[0]], [gap[1], len / 2]] : [[-len / 2, len / 2]];
+    for (const [a, b] of pieces) {
+      const L = b - a, cx = (a + b) / 2;
+      const t = extTex.clone(); t.needsUpdate = true; t.repeat.set(L / 2000, H / 2000);
+      const p = new THREE.Mesh(new THREE.PlaneGeometry(L, H + 500), M(0xffffff, 0.3, 0.55, { map: t })); p.position.set(cx, (H + 500) / 2, 0); p.receiveShadow = true; g.add(p);
+      box(L, 1400, 160, M(0x8e9298, 0.05, 0.85), cx, 700, -60, g, false);                        // soco de betão
+      if (L > 3000) box(L - 2000, 900, 40, mat.window, cx, 5200, -10, g, false);                // fita de janelas
+      for (let xx = a + 1000; xx < b - 900; xx += 2000) box(80, 900, 60, mat.steelBlue, xx, 5200, -20, g, false);
+      box(L, 300, 60, M(0x1f4f9e, 0.1, 0.6), cx, 1450, -20, g, false);                            // faixa azul da marca
+    }
+    if (gap) { const gw = gap[1] - gap[0], gc = (gap[0] + gap[1]) / 2, t = extTex.clone(); t.needsUpdate = true; t.repeat.set(gw / 2000, 1); const l = new THREE.Mesh(new THREE.PlaneGeometry(gw, H + 500 - 4900), M(0xffffff, 0.3, 0.55, { map: t })); l.position.set(gc, 4900 + (H + 500 - 4900) / 2, 0); g.add(l); box(gw + 400, 300, 600, M(0x9aa0a6, 0.3, 0.6), gc, 5100, -350, g, false); }   // lintel e pala do cais
     box(len + 200, 400, 300, M(0x9aa0a6, 0.3, 0.6), 0, H + 450, -100, g, false);                 // platibanda / beiral
     return g;
   };
   extWall(2 * X + 300, 0, -Z - 150, Math.PI); extWall(2 * X + 300, 0, Z + 150, 0);
-  extWall(2 * Z + 300, -X - 150, 0, -Math.PI / 2); extWall(2 * Z + 300, X + 150, 0, Math.PI / 2);
+  extWall(2 * Z + 300, -X - 150, 0, -Math.PI / 2); extWall(2 * Z + 300, X + 150, 0, Math.PI / 2, [-2200 - 2150, -2200 + 2150]);   // vão da porta do cais
   {   // cobertura exterior: duas águas suaves com clarabóias e caleiras (esconde-se com a cobertura interior na vista de topo)
     const half = new THREE.Mesh(new THREE.BoxGeometry(2 * X + 400, 60, Z + 400), M(0x8b9096, 0.4, 0.6));
     for (const s of [-1, 1]) { const r = half.clone(); r.position.set(0, TOP + 420 + 350, s * (Z / 2 + 50)); r.rotation.x = s * Math.atan2(700, Z); roofG.add(r); }
@@ -6025,32 +6084,47 @@ for (let i = 0; i < 6; i++) {
   // ---------- camião de encomendas: tractor + semi-reboque articulado. Estados: "loading" (recuado no cais, portas abertas, a receber
   //            paletes do KMF — uma por cada palete expedida), "closing" (fecha as portas), "leave" (segue pelo pátio, barreira sobe, sai pelo
   //            portão), "arrive" (um camião vazio recua em linha recta até ao cais) — e recomeça. Ciclo ligado ao contador `shipped`.
-  const TRUCK = { state: "loading", t: 0, loaded: 2, CAP: 4, shippedAt: shipped, pallets: [], path: [], i: 0, hd: 0, x: 0, z: 0, trailer: { x: 0, z: 0, hd: 0 }, door: 1, barrier: 0, gone: 0 };
+  const TRUCK = { state: "loading", t: 0, loaded: 0, CAP: 4, shippedAt: shipped, pallets: [], path: [], i: 0, hd: 0, x: 0, z: 0, trailer: { x: 0, z: 0, hd: 0 }, door: 1, barrier: 0, gone: 0 };
   const DZ = 2200, DOCK_X = X - 40;                                                                // porta do cais
   const trailerG = new THREE.Group(), tractorG = new THREE.Group(); scene.add(trailerG, tractorG);
   const TL = 13500, HITCH = TL / 2 - 1100;                                                        // comprimento do reboque; o pino de engate fica 1,1 m atrás da frente
   {
     const mBox = M(0xf1f1ee, 0.2, 0.5), mInner = M(0x1f2937, 0.1, 0.8);
-    box(TL, 2600, 2550, mBox, 0, 1450, 0, trailerG); box(TL - 20, 2560, 2500, mInner, -10, 1450, 0, trailerG);
+    // caixa do reboque em painéis (abre-se à traseira e vê-se o interior a ser carregado)
+    for (const sz of [-1, 1]) { const w = box(TL, 2600, 40, mBox, 0, 1450, sz * 1255, trailerG); w.receiveShadow = false; }
+    { const w = box(40, 2600, 2550, mBox, TL / 2 - 20, 1450, 0, trailerG); w.receiveShadow = false; }
+    for (const sz of [-1, 1]) box(2800, 1100, 440, mBox, -TL / 2 + 2900, 270 + 550, sz * 1030, trailerG);
+    box(1800, 900, 2470, mBox, TL / 2 - 900, 270 + 450, 0, trailerG);                              // pescoço de cisne (frente elevada sobre o prato e as rodas do tractor)   // caixas das rodas (reboque de piso rebaixado): as rodas ficam tapadas e as paletes passam entre elas
+    for (let x = -TL / 2 + 600; x < TL / 2; x += 1200) for (const sz of [-1, 1]) box(60, 2500, 30, M(0xcbd5e1, 0.5, 0.4), x, 1450, sz * 1225, trailerG, false);   // nervuras interiores
+    { const l = box(TL - 400, 20, 300, M(0xfff6e0, 0, 0.3, { emissive: 0xfff3d6, emissiveIntensity: 1 }), 0, 2740, 0, trailerG, false); }   // luz interior
     box(TL, 120, 2550, mat.dark, 0, 2830, 0, trailerG, false); box(TL - 200, 120, 2500, M(0x4b5563, 0.3, 0.6), 0, 210, 0, trailerG);   // tecto e piso
     for (const sz of [-1, 1]) { const logo = new THREE.Mesh(new THREE.PlaneGeometry(5000, 1100), new THREE.MeshBasicMaterial({ map: signTex(1024, 256), transparent: true, toneMapped: false })); logo.position.set(1500, 1650, sz * 1290); logo.rotation.y = sz > 0 ? 0 : Math.PI; trailerG.add(logo); }
-    box(TL - 600, 300, 2300, mat.dark, 0, 300, 0, trailerG);                                      // chassis
+    box(TL - 600, 300, 2300, mat.dark, 0, 0, 0, trailerG);                                        // chassis (por baixo do piso)
     for (const x of [-TL / 2 + 2200, -TL / 2 + 3600]) for (const sx of [-1, 1]) { const w = cyl(520, 380, mTyre, trailerG, 24); w.rotation.x = Math.PI / 2; w.position.set(x, 520, sx * 1050); const r = cyl(300, 390, mRim, trailerG, 16); r.rotation.x = Math.PI / 2; r.position.set(x, 520, sx * 1050); }
-    for (const sx of [-1, 1]) box(140, 900, 140, mat.alu, TL / 2 - 2600, 600, sx * 800, trailerG);   // apoios
-    box(1600, 80, 2500, mat.dark, -TL / 2 + 20, 450, 0, trailerG); for (const sz of [-1, 1]) box(40, 120, 160, mat.ledR, -TL / 2 - 10, 2570, sz * 1180, trailerG, false);
+    for (const sx of [-1, 1]) box(140, 250, 140, mat.alu, TL / 2 - 2600, -20, sx * 800, trailerG);   // apoios (recolhidos, por baixo do piso)
+    box(1600, 80, 2500, mat.dark, -TL / 2 + 20, 60, 0, trailerG); for (const sz of [-1, 1]) box(40, 120, 160, mat.ledR, -TL / 2 - 10, 2570, sz * 1180, trailerG, false);
     TRUCK.doors = [-1, 1].map((sz) => { const pivot = new THREE.Group(); pivot.position.set(-TL / 2, 1450, sz * 1250); trailerG.add(pivot); box(60, 2500, 1240, M(0xe5e7eb, 0.2, 0.5), 0, 0, -sz * 620, pivot); pivot.userData.sz = sz; return pivot; });
     // tractor
-    box(2300, 2400, 2500, M(0xb91c1c, 0.3, 0.4), 1150, 1850, 0, tractorG); box(1500, 1200, 2450, carGlass, 1550, 2350, 0, tractorG, false);
-    box(2000, 500, 2400, M(0x8b1a1a, 0.3, 0.5), 2250, 650, 0, tractorG); box(3600, 300, 2300, mat.dark, 1000, 300, 0, tractorG);
-    box(1200, 400, 2200, mat.dark, -300, 1100, 0, tractorG);                                      // prato de engate
-    for (const x of [-700, 1600]) for (const s of [-1, 1]) { const w = cyl(520, 380, mTyre, tractorG, 24); w.rotation.x = Math.PI / 2; w.position.set(x, 520, s * 1050); const r = cyl(300, 390, mRim, tractorG, 16); r.rotation.x = Math.PI / 2; r.position.set(x, 520, s * 1050); }
-    cyl(120, 1200, mat.alu, tractorG, 12).position.set(-200, 3150, -900); for (const s of [-1, 1]) box(300, 200, 120, mLamp, 2360, 1050, s * 900, tractorG, false);
-    const logoT = new THREE.Mesh(new THREE.PlaneGeometry(1600, 360), new THREE.MeshBasicMaterial({ map: signTex(1024, 256), transparent: true, toneMapped: false })); logoT.position.set(1150, 2900, 1260); tractorG.add(logoT);
+    // (o pino de engate fica em x local −300; a cabina começa 0,5 m à frente da parede frontal do reboque)
+    box(2300, 2400, 2500, M(0xb91c1c, 0.3, 0.4), 2450, 1850, 0, tractorG); box(1500, 1200, 2450, carGlass, 2850, 2350, 0, tractorG, false);
+    box(600, 500, 2400, M(0x8b1a1a, 0.3, 0.5), 3750, 650, 0, tractorG); box(5000, 300, 2300, mat.dark, 1300, 0, 0, tractorG);
+    box(1200, 200, 2200, mat.dark, -300, 250, 0, tractorG);                                       // prato de engate (por baixo do pescoço do reboque)
+    for (const x of [-300, 3000]) for (const s of [-1, 1]) { const w = cyl(520, 380, mTyre, tractorG, 24); w.rotation.x = Math.PI / 2; w.position.set(x, 520, s * 1050); const r = cyl(300, 390, mRim, tractorG, 16); r.rotation.x = Math.PI / 2; r.position.set(x, 520, s * 1050); }
+    cyl(120, 1200, mat.alu, tractorG, 12).position.set(1150, 3150, -1100); for (const s of [-1, 1]) box(120, 200, 300, mLamp, 4060, 1050, s * 900, tractorG, false);
+    const logoT = new THREE.Mesh(new THREE.PlaneGeometry(1600, 360), new THREE.MeshBasicMaterial({ map: signTex(1024, 256), transparent: true, toneMapped: false })); logoT.position.set(2450, 2900, 1260); tractorG.add(logoT);
   }
-  const palletSlot = (k) => V(-TL / 2 + 900 + k * 1250, 270, 0);
-  function addTruckPallet() {
-    const p = makePallet(0, 0); scene.remove(p.g); trailerG.add(p.g); p.g.position.copy(palletSlot(TRUCK.pallets.length)); p.g.rotation.y = Math.PI / 2; p.g.scale.set(0.8, 1, 0.8); stackLoad(p.g, 0, 140, 0, 700, mat.carton); TRUCK.pallets.push(p);
+  // lugares no reboque: a 1.ª palete vai para o fundo (junto ao tractor) e as seguintes vêm em direcção à porta
+  const palletSlot = (k) => V(-TL / 2 + 900 + (TRUCK.CAP - 1 - k) * 1250, 270, 0);
+  function addTruckPallet() {   // (só para testes) palete instantânea
+    const p = makePallet(0, 0); scene.remove(p.g); trailerG.add(p.g); p.g.position.copy(palletSlot(TRUCK.pallets.length)); p.g.rotation.y = Math.PI / 2; stackLoad(p.g, 0, 140, 0, 700, mat.carton); TRUCK.pallets.push(p);
   }
+  // interface com o KMF 1500P (40-logistics.js)
+  DOCK.truck = {
+    wants: () => TRUCK.state === "loading" && TRUCK.door > 0.95 && TRUCK.pallets.length + DOCK.reserved < TRUCK.CAP,
+    reserve: () => TRUCK.pallets.length + DOCK.reserved++,
+    slotX: (k) => TRUCK.trailer.x + palletSlot(k).x,
+    accept: (pal, k) => { DOCK.reserved = Math.max(0, DOCK.reserved - 1); trailerG.attach(pal.g); pal.g.position.copy(palletSlot(k)); pal.g.rotation.set(0, Math.PI / 2, 0); TRUCK.pallets.push(pal); },
+  };
   const DOCK_POSE = { x: DOCK_X - 400 + TL / 2, z: DZ, hd: 0 };                                  // reboque com a traseira 40 cm dentro da porta
   function placeRig(tx, tz, hd, trHd = hd) {                                                      // posiciona pelo reboque (centro) e deduz o tractor pelo pino de engate
     TRUCK.trailer.x = tx; TRUCK.trailer.z = tz; TRUCK.trailer.hd = trHd;
@@ -6062,7 +6136,6 @@ for (let i = 0; i < 6; i++) {
     tractorG.position.set(TRUCK.x, GY + 150, TRUCK.z); tractorG.rotation.y = -TRUCK.hd;
     for (const d of TRUCK.doors) d.rotation.y = d.userData.sz * (Math.PI * 0.95) * TRUCK.door;
   }
-  for (let k = 0; k < 2; k++) addTruckPallet();
   placeRig(DOCK_POSE.x, DOCK_POSE.z, 0); drawRig();
   // percurso de saída (pelo tractor): sai do cais para +x, curva para +z ao longo do pátio, passa a barreira e sai do recinto
   const EXIT = [[X + 17500, DZ + 300], [X + 19600, DZ + 3200], [X + 20000, DZ + 8000], [X + 20000, Z + 30000], [X + 20000, Z + 42000]];
@@ -6070,8 +6143,7 @@ for (let i = 0; i < 6; i++) {
     const T = TRUCK; T.t += dt;
     if (T.state === "loading") {
       T.door = Math.min(1, T.door + dt);
-      if (shipped > T.shippedAt && T.pallets.length < T.CAP) { T.shippedAt = shipped; addTruckPallet(); }
-      if (T.pallets.length >= T.CAP && T.t > 6) { T.state = "closing"; T.t = 0; }
+      if (T.pallets.length >= T.CAP && !DOCK.inside && !DOCK.reserved) { T.full = (T.full || 0) + dt; if (T.full > 2.5) { T.state = "closing"; T.t = 0; T.full = 0; } }   // cheio e o KMF já saiu do reboque
     } else if (T.state === "closing") {
       T.door = Math.max(0, T.door - dt * 0.5);
       if (T.door <= 0 && T.t > 3) { T.state = "leave"; T.t = 0; T.i = 0; }
@@ -6091,7 +6163,7 @@ for (let i = 0; i < 6; i++) {
     } else if (T.state === "gone") {
       T.barrier = Math.max(0, T.barrier - dt * 0.5);
       if (T.t > 6) {   // novo camião vazio: aparece no pátio, alinhado com o cais, e recua em linha recta
-        for (const p of T.pallets) if (p) trailerG.remove(p.g); T.pallets.length = 0; T.loaded = 0; T.door = 0;
+        for (const p of T.pallets) if (p) trailerG.remove(p.g); T.pallets.length = 0; T.loaded = 0; T.door = 0; DOCK.reserved = 0;
         placeRig(DOCK_POSE.x + 9000, DZ, 0); T.state = "arrive"; T.t = 0;
       }
     } else if (T.state === "arrive") {
@@ -6101,7 +6173,7 @@ for (let i = 0; i < 6; i++) {
     drawRig();
   }
   addSystem({ update(dt) { stepRig(dt); } });
-  addTag({ text: () => TRUCK.state === "loading" ? `Camião de encomendas · a carregar · ${TRUCK.pallets.length}/${TRUCK.CAP} paletes` : TRUCK.state === "closing" ? "Camião · a fechar as portas" : TRUCK.state === "leave" ? "Camião · a sair para entrega" : TRUCK.state === "arrive" ? "Camião vazio · a recuar para o cais" : "Cais livre", at: () => V(TRUCK.trailer.x, GY + 4200, TRUCK.trailer.z), max: 60000 });
+  addTag({ text: () => TRUCK.state === "loading" ? `Camião de encomendas · a carregar · ${TRUCK.pallets.length}/${TRUCK.CAP} paletes` + (DOCK.inside ? " · KMF 1500P dentro do reboque" : "") : TRUCK.state === "closing" ? "Camião · a fechar as portas" : TRUCK.state === "leave" ? "Camião · a sair para entrega" : TRUCK.state === "arrive" ? "Camião vazio · a recuar para o cais" : "Cais livre", at: () => V(TRUCK.trailer.x, GY + 4200, TRUCK.trailer.z), max: 60000 });
   TRUCK.add = addTruckPallet; window.__truck = TRUCK;
 
   // ---------- entrada única do recinto (muro sul): portão de correr para viaturas, barreira, portaria/recepção, árvores
@@ -6680,8 +6752,8 @@ newNokCrate(NOK_POS.x, LOW_Y, 0, "lowWait");
 newNokCrate(NOK_END, LOW_Y, 0, "lowReturn");
 cartons.push(makeCarton(PACK_X, CART_Z, "open"));
 for (let i = 0; i < 20; i++) { const k = makeCarton(0, 0, "pallet", true, station.pallet.g); k.g.position.set(SLOTS[i][0], 140 + SLOTS[i][2] * CART.h, SLOTS[i][1]); station.pallet.crates.push(k); }
-// duas paletes já arrumadas no armário
-for (const s of rackSlots.slice(0, 2)) {
+// paletes já arrumadas no armário
+for (const s of rackSlots.slice(0, 6)) {   // 6 paletes prontas: o KMF carrega já o primeiro camião
   const p = makePallet(s.x, -6100); p.g.position.set(s.x, FLOOR + s.y + 60, RACK.z); p.g.rotation.y = Math.PI / 2;
   for (let i = 0; i < SLOTS.length; i++) { const k = makeCarton(0, 0, "pallet", true, p.g); k.g.position.set(SLOTS[i][0], 140 + SLOTS[i][2] * CART.h, SLOTS[i][1]); }
   s.pallet = p;
